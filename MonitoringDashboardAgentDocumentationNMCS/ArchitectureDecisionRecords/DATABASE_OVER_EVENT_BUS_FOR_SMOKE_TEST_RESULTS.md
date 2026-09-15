@@ -1,0 +1,3 @@
+# Write smoke test results directly to a database, not an event bus
+
+The morning smoke test automation runs once a day and produces a small, bounded set of results (one Run, a handful of Pages and PopupChecks) that a person reviews hours later — there's no need for real-time delivery to multiple live consumers. The automation script will write each PageCheck/PopupCheckResult Outcome directly to a database as it completes, rather than publishing Kafka events, to avoid the operational overhead of running and maintaining a broker and consumer for a low-frequency, single-consumer use case. If a genuine need for real-time push or multiple independent consumers emerges later, this can be revisited.
