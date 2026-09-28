@@ -1,5 +1,5 @@
 {
-  "name": "monitoring-dashboard-client-service-layer-msc",
+  "name": "@monitoring-dashboard/client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/react-query": "^5.102.2",
+    "@tanstack/react-router": "^1.170.31",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.43.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "recharts": "^2.15.0",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",

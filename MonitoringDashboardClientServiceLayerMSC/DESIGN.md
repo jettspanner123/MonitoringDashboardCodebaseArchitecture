@@ -1,585 +1,1844 @@
----
-version: alpha
-name: Resend-design-analysis
-description: |
-  Resend's marketing surfaces sit on a near-pure black canvas with off-white
-  text and a single signature color — the deep editorial-serif Domaine
-  Display headline mark — that gives an otherwise utilitarian developer-tool
-  brand its print-magazine confidence. The system pairs Domaine Display
-  (oversized 76px–96px serif, ss01/ss04/ss11 features on) with ABC Favorit
-  for body and Inter for UI. Surfaces rely on subtle 6–9% opacity gradient
-  glows, hairline 1px borders made from translucent white, and a strict
-  rounded-12px container vocabulary. There is no decorative chrome — just
-  type, code, and atmospheric depth.
+# Monitoring Dashboard Canonical Design System & UI/UX Architecture Specification
 
-colors:
-  primary: "#fcfdff"
-  primary-on: "#000000"
-  ink: "#fcfdff"
-  body: "rgba(252,253,255,0.86)"
-  charcoal: "rgba(252,253,255,0.7)"
-  mute: "#a1a4a5"
-  ash: "#888e90"
-  stone: "#464a4d"
-  on-light: "#000000"
-  on-light-mute: "rgba(0,0,51,0.7)"
-  canvas: "#000000"
-  surface-card: "#0a0a0c"
-  surface-elevated: "#101012"
-  surface-deep: "#06060a"
-  hairline: "rgba(255,255,255,0.06)"
-  hairline-strong: "rgba(255,255,255,0.14)"
-  divider-soft: "rgba(255,255,255,0.04)"
-  accent-orange: "#ff801f"
-  accent-orange-glow: "rgba(255,89,0,0.22)"
-  accent-yellow: "#ffc53d"
-  accent-blue: "#3b9eff"
-  accent-blue-glow: "rgba(0,117,255,0.34)"
-  accent-green: "#11ff99"
-  accent-green-glow: "rgba(34,255,153,0.18)"
-  accent-red: "#ff2047"
-  accent-red-glow: "rgba(255,32,71,0.34)"
-  link: "#3b9eff"
-  surface-light: "#f1f7fe"
+> **Version**: 2.2.0 (Complete Enterprise Component Library Edition)  
+> **Target Package**: `MonitoringDashboardClientServiceLayerMSC`  
+> **Provenance**: Adapted from AssetSphere's canonical design system (the source-of-truth design language shared across the AssetSphere/SignForge application family), so this dashboard reads as part of the same application chain rather than a one-off.
 
-typography:
-  display-xxl:
-    fontFamily: Domaine Display
-    fontSize: 96px
-    fontWeight: 400
-    lineHeight: 1.0
-    letterSpacing: -0.96px
-    fontFeature: "ss01, ss04, ss11"
-  display-xl:
-    fontFamily: Domaine Display
-    fontSize: 76.8px
-    fontWeight: 400
-    lineHeight: 1.0
-    letterSpacing: -0.768px
-    fontFeature: "ss01, ss04, ss11"
-  display-lg:
-    fontFamily: ABC Favorit
-    fontSize: 56px
-    fontWeight: 400
-    lineHeight: 1.2
-    letterSpacing: -2.8px
-    fontFeature: "ss01, ss04, ss11"
-  heading-md:
-    fontFamily: Inter
-    fontSize: 24px
-    fontWeight: 500
-    lineHeight: 1.5
-    letterSpacing: -0.4px
-  heading-sm:
-    fontFamily: Inter
-    fontSize: 20px
-    fontWeight: 500
-    lineHeight: 1.3
-    letterSpacing: -0.3px
-  subtitle:
-    fontFamily: ABC Favorit
-    fontSize: 20px
-    fontWeight: 400
-    lineHeight: 1.3
-    fontFeature: "ss01, ss04, ss11"
-  body-lg:
-    fontFamily: Inter
-    fontSize: 18px
-    fontWeight: 400
-    lineHeight: 1.5
-  body-md:
-    fontFamily: ABC Favorit
-    fontSize: 16px
-    fontWeight: 400
-    lineHeight: 1.5
-    letterSpacing: -0.8px
-    fontFeature: "ss01, ss04, ss11"
-  body-sm:
-    fontFamily: Inter
-    fontSize: 14px
-    fontWeight: 400
-    lineHeight: 1.43
-  button-md:
-    fontFamily: Inter
-    fontSize: 14px
-    fontWeight: 500
-    lineHeight: 1.43
-  button-sm:
-    fontFamily: ABC Favorit
-    fontSize: 14px
-    fontWeight: 500
-    lineHeight: 1.43
-    letterSpacing: 0.35px
-    fontFeature: "ss01, ss03, ss04"
-  caption:
-    fontFamily: Inter
-    fontSize: 12px
-    fontWeight: 400
-    lineHeight: 1.5
-  caption-emph:
-    fontFamily: Helvetica
-    fontSize: 14px
-    fontWeight: 600
-    lineHeight: 1.0
-  code-md:
-    fontFamily: Geist Mono
-    fontSize: 13px
-    fontWeight: 400
-    lineHeight: 1.6
-
-rounded:
-  none: 0px
-  xs: 4px
-  sm: 6px
-  md: 8px
-  lg: 12px
-  xl: 16px
-  full: 9999px
-
-spacing:
-  xxs: 2px
-  xs: 4px
-  sm: 8px
-  md: 12px
-  lg: 16px
-  xl: 24px
-  xxl: 32px
-  xxxl: 48px
-  section: 96px
-  band: 128px
-
-components:
-  button-primary:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.primary-on}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.md}"
-    padding: 8px 16px
-    height: 36px
-  button-primary-pressed:
-    backgroundColor: "{colors.surface-light}"
-    textColor: "{colors.primary-on}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.md}"
-  button-ghost:
-    backgroundColor: "{colors.surface-elevated}"
-    textColor: "{colors.ink}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.md}"
-    padding: 8px 16px
-    height: 36px
-  button-outline:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.md}"
-    padding: 7px 15px
-    height: 36px
-  text-input:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-sm}"
-    rounded: "{rounded.md}"
-    padding: 10px 14px
-    height: 40px
-  hero-stripe:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    typography: "{typography.display-xxl}"
-    rounded: "{rounded.none}"
-    padding: 96px 32px
-  feature-card:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-md}"
-    rounded: "{rounded.lg}"
-    padding: 32px
-  feature-card-bordered:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-md}"
-    rounded: "{rounded.lg}"
-    padding: 32px
-  pricing-tier:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-md}"
-    rounded: "{rounded.lg}"
-    padding: 32px
-  pricing-tier-featured:
-    backgroundColor: "{colors.surface-elevated}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-md}"
-    rounded: "{rounded.lg}"
-    padding: 32px
-  code-window:
-    backgroundColor: "{colors.surface-deep}"
-    textColor: "{colors.body}"
-    typography: "{typography.code-md}"
-    rounded: "{rounded.lg}"
-    padding: 24px
-  code-tab:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.charcoal}"
-    typography: "{typography.code-md}"
-    rounded: "{rounded.sm}"
-    padding: 6px 12px
-  email-mockup:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-md}"
-    rounded: "{rounded.lg}"
-    padding: 0
-  badge-pill:
-    backgroundColor: "{colors.surface-elevated}"
-    textColor: "{colors.body}"
-    typography: "{typography.caption}"
-    rounded: "{rounded.full}"
-    padding: 4px 10px
-  status-dot:
-    backgroundColor: "{colors.accent-green}"
-    rounded: "{rounded.full}"
-    size: 8px
-  nav-bar:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.body}"
-    typography: "{typography.button-sm}"
-    rounded: "{rounded.none}"
-    height: 64px
-  sub-nav-pill:
-    backgroundColor: "{colors.surface-elevated}"
-    textColor: "{colors.body}"
-    typography: "{typography.button-sm}"
-    rounded: "{rounded.full}"
-    padding: 6px 14px
-  contributor-avatar:
-    backgroundColor: "{colors.surface-card}"
-    rounded: "{rounded.full}"
-    size: 32px
-  footer:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.charcoal}"
-    typography: "{typography.body-sm}"
-    rounded: "{rounded.none}"
-    padding: 64px 32px
 ---
 
-## Overview
-
-Resend looks like a developer tool with the typography of an editorial.
-Every page opens on `{colors.canvas}` (`#000000`), and the loudest element on
-the canvas is not a button or a brand stamp — it's a 96px Domaine Display
-serif headline ("Email for developers", "Email reimagined") with the
-`ss01 / ss04 / ss11` stylistic alternates engaged. That single typographic
-decision sets the brand tone: confident, considered, slightly literary, and
-priced on quality rather than novelty.
-
-The supporting cast is technical. Body copy switches to **ABC Favorit** for
-marketing prose and **Inter** for UI labels, while code blocks render in
-**Geist Mono** inside `{component.code-window}` shells with hairline traffic-
-light dots. Surface depth is built almost entirely from translucent white —
-6% borders, 14% strong borders, 4% dividers — over a deep `{colors.surface-deep}`
-layer that sits just below the canvas black. There are no gradients painted
-across full bands, just **soft atmospheric glows** (orange, blue, green, red,
-yellow) anchored at the top of select sections, all at low opacity.
-
-Page rhythm cycles in a single dark register: hero stripe → atmospheric
-section → code window section → email mockup section → pricing or feature
-grid → black footer. The brand never warms to a light surface; even
-secondary email mockups are rendered as compact white cards inside the dark
-canvas, framed like print insets in a black-bordered magazine page.
-
-**Key Characteristics:**
-- Pure black canvas (`{colors.canvas}` — `#000000`) on every public page; off-white text (`{colors.ink}` — `#fcfdff`) carries the full read.
-- A serif-led type system: **Domaine Display** at 76–96px for hero headlines, **ABC Favorit** for marketing body, **Inter** for UI, **Geist Mono** for code.
-- Six accent glow colours used only as low-opacity atmospheric washes (`{colors.accent-orange}`, `{colors.accent-blue}`, `{colors.accent-green}`, `{colors.accent-red}`, `{colors.accent-yellow}`) — never as buttons or solid surfaces.
-- Strict container vocabulary: `{rounded.lg}` (12px) for feature cards, code wells, and email mockups; `{rounded.md}` (8px) for buttons; `{rounded.full}` for pills and avatars.
-- Translucent white borders (`{colors.hairline}` 6% / `{colors.hairline-strong}` 14%) replace shadows entirely — the system has no traditional drop-shadow elevation language.
-- `{component.button-primary}` is a small white rectangle with black text — counterintuitive contrast that becomes the page's brightest pixel and works as a single visual anchor.
-
-## Colors
-
-### Brand & Accent
-- **Primary White** (`{colors.primary}` — `#fcfdff`): the brand's de facto accent. Reserved for `{component.button-primary}` (white pill on black canvas), Domaine display headlines, and the active text colour. White is the loudest possible colour on this canvas — that's the signature.
-- **Primary On** (`{colors.primary-on}` — `#000000`): label colour on top of `{colors.primary}` surfaces. Black text on white pill is the brand's CTA pattern.
-- **Surface Light** (`{colors.surface-light}` — `#f1f7fe`): a subtle blue-tinted off-white used as the active/pressed state of `{component.button-primary}`.
-
-### Surface
-- **Canvas** (`{colors.canvas}` — `#000000`): the default page background. True black, never near-black.
-- **Surface Card** (`{colors.surface-card}` — `#0a0a0c`): the standard inset card surface, just lighter than canvas to register a step up in elevation.
-- **Surface Elevated** (`{colors.surface-elevated}` — `#101012`): a second elevation step used on featured pricing tiers and ghost button surfaces.
-- **Surface Deep** (`{colors.surface-deep}` — `#06060a`): code window background — slightly cooler and darker than the canvas itself, suggesting depth via temperature.
-- **Hairline** (`{colors.hairline}` — `rgba(255,255,255,0.06)`): the soft 1px translucent-white divider used between rows and around feature cards.
-- **Hairline Strong** (`{colors.hairline-strong}` — `rgba(255,255,255,0.14)`): the structural 1px border on cards, code wells, and form inputs.
-- **Divider Soft** (`{colors.divider-soft}` — `rgba(255,255,255,0.04)`): low-contrast dividers between footer columns.
-
-### Text
-- **Ink** (`{colors.ink}` — `#fcfdff`): primary text colour on the dark canvas. Faintly blue-cool to feel like printed paper rather than pure white pop.
-- **Body** (`{colors.body}` — `rgba(252,253,255,0.86)`): long-form body text where pure ink would feel too sharp.
-- **Charcoal** (`{colors.charcoal}` — `rgba(252,253,255,0.7)`): captions, secondary nav labels.
-- **Mute** (`{colors.mute}` — `#a1a4a5`): supporting text and inactive labels.
-- **Ash** (`{colors.ash}` — `#888e90`): tertiary text, footer copy.
-- **Stone** (`{colors.stone}` — `#464a4d`): disabled foreground.
-- **On-Light** (`{colors.on-light}` — `#000000`): label colour inside the rare email-mockup white cards.
-- **On-Light Mute** (`{colors.on-light-mute}` — `rgba(0,0,51,0.7)`): secondary text inside email mockups.
-
-### Semantic
-- **Accent Orange** (`{colors.accent-orange}` — `#ff801f`) + glow (`{colors.accent-orange-glow}` — `rgba(255,89,0,0.22)`): atmospheric warm wash anchored to "Email reimagined" / customer story sections. Solid orange never appears as a button or surface — only the glow.
-- **Accent Yellow** (`{colors.accent-yellow}` — `#ffc53d`): used in inline highlight strokes and "first-class developer experience" key callouts.
-- **Accent Blue** (`{colors.accent-blue}` — `#3b9eff`) + glow (`{colors.accent-blue-glow}` — `rgba(0,117,255,0.34)`): inline link colour and the cool atmospheric wash on the "Integrate this weekend" section.
-- **Accent Green** (`{colors.accent-green}` — `#11ff99`) + glow (`{colors.accent-green-glow}` — `rgba(34,255,153,0.18)`): success status dots and the "delivery confirmed" feature glow.
-- **Accent Red** (`{colors.accent-red}` — `#ff2047`) + glow (`{colors.accent-red-glow}` — `rgba(255,32,71,0.34)`): inline error red and the "reach humans, not spam folders" attention wash.
-- **Link** (`{colors.link}` — `#3b9eff`): inline link colour — same as accent blue.
-
-## Typography
-
-### Font Family
-
-Resend ships a four-family stack:
-
-- **Domaine Display** — proprietary editorial serif used exclusively for hero headlines at 76px+, with `ss01 / ss04 / ss11` stylistic sets engaged for a slightly tighter, more print-magazine look.
-- **ABC Favorit** — proprietary humanist sans-serif used for marketing body copy, hero subtitles, and pill labels. Carries `ss01 / ss03 / ss04` features for tabular figures and alternate glyphs.
-- **Inter** — open-source sans-serif used for UI: button labels, captions, card body text, nav links.
-- **Geist Mono** — open-source monospace used in code wells.
-
-When proprietary families cannot be licensed, **Söhne** or **Tiempos Headline** stand in for Domaine Display, and **Geist** or **Inter Tight** can replace ABC Favorit. Inter and Geist Mono are open-source and should be used directly.
-
-### Hierarchy
-
-| Token | Size | Weight | Line Height | Letter Spacing | Use |
-|---|---|---|---|---|---|
-| `{typography.display-xxl}` | 96px | 400 | 1.0 | -0.96px | Home hero ("Email for developers"). One per page. |
-| `{typography.display-xl}` | 76.8px | 400 | 1.0 | -0.768px | Section openers ("Email reimagined", "Available today"). |
-| `{typography.display-lg}` | 56px | 400 | 1.2 | -2.8px | ABC Favorit display sub-titles. |
-| `{typography.heading-md}` | 24px | 500 | 1.5 | -0.4px | Card titles, section sub-titles. |
-| `{typography.heading-sm}` | 20px | 500 | 1.3 | -0.3px | List headers. |
-| `{typography.subtitle}` | 20px | 400 | 1.3 | 0 | Hero subtitles. |
-| `{typography.body-lg}` | 18px | 400 | 1.5 | 0 | Marketing prose. |
-| `{typography.body-md}` | 16px | 400 | 1.5 | -0.8px | ABC Favorit body. |
-| `{typography.body-sm}` | 14px | 400 | 1.43 | 0 | Captions, metadata. |
-| `{typography.button-md}` | 14px | 500 | 1.43 | 0 | Default button label. |
-| `{typography.button-sm}` | 14px | 500 | 1.43 | 0.35px | Pill labels, inline links. |
-| `{typography.caption}` | 12px | 400 | 1.5 | 0 | Footer disclosure, copyright. |
-| `{typography.caption-emph}` | 14px | 600 | 1.0 | 0 | Emphatic small caption — Helvetica fallback. |
-| `{typography.code-md}` | 13px | 400 | 1.6 | 0 | Code blocks, inline code. |
-
-### Principles
-- Display sizes always run at `lineHeight: 1.0` with negative letter-spacing — the Domaine Display headlines pack into solid typographic blocks rather than open prose lines.
-- Body weight stays at 400 across `{typography.body-lg}` and `{typography.body-md}`. The serif/sans family change carries hierarchy, not weight bumps.
-- ABC Favorit always runs with `ss01 / ss04 / ss11` engaged; Inter never carries OpenType features. Code in Geist Mono never carries ligatures.
-- Inline links use `{typography.button-sm}` with positive letter-spacing (`0.35px`) and ABC Favorit — the small spacing nudge gives interactive prose its precision.
-
-### Note on Font Substitutes
-
-When Domaine Display is unavailable, clamp `lineHeight` to 1.0 explicitly and apply `font-feature-settings: "ss01", "liga"` on the substitute serif to mimic the alternate glyphs. Söhne or Tiempos Headline will read closest. ABC Favorit substitutes (Geist, Inter Tight) typically default to looser tracking — apply -0.5% letter-spacing on body sizes to compensate.
-
-## Layout
-
-### Spacing System
-- **Base unit**: 4px, with the working scale on multiples of 4 / 8 / 16.
-- **Tokens**: `{spacing.xxs}` 2px · `{spacing.xs}` 4px · `{spacing.sm}` 8px · `{spacing.md}` 12px · `{spacing.lg}` 16px · `{spacing.xl}` 24px · `{spacing.xxl}` 32px · `{spacing.xxxl}` 48px · `{spacing.section}` 96px · `{spacing.band}` 128px.
-- Section padding: `{spacing.section}` (96px) vertical between bands; `{spacing.band}` (128px) on the hero stripe and closing footer transition.
-- Card internal padding: `{spacing.xxl}` (32px) on `{component.feature-card}`, `{component.pricing-tier}`, and `{component.code-window}`.
-
-### Grid & Container
-- **Max content width** ≈ 1200px on body sections.
-- **Feature grid**: 3 columns at desktop, 2 at tablet, 1 at mobile.
-- **Pricing**: 3-tier grid centred at desktop; centre tier promotes to `{component.pricing-tier-featured}` (one-step-elevated surface).
-- **Code-story splits**: a 2-up split — narrative copy left, `{component.code-window}` right — collapsing to stacked at < 1024px.
-- **Email mockup band**: a single white card (640px max width) centred in the dark canvas with generous vertical padding to read like a print magazine inset.
-
-### Whitespace Philosophy
-- Whitespace is editorial and generous — full-bleed sections breathe at 96–128px so Domaine Display headlines have room to register at scale.
-- Inside cards, padding stays at 32px so feature copy and code wells have a consistent rhythm with the outer grid.
-- Hairline `{colors.hairline}` and `{colors.hairline-strong}` carry the role drop shadows would in a brighter system; the dark canvas suppresses traditional shadow depth entirely.
-
-## Elevation & Depth
-
-| Level | Treatment | Use |
-|---|---|---|
-| 0 — flat | No shadow, no border | Default canvas, full-bleed bands. |
-| 1 — surface card | `{colors.surface-card}` (`#0a0a0c`) + 1px `{colors.hairline-strong}` | Feature cards, pricing tiers, form inputs. |
-| 2 — elevated | `{colors.surface-elevated}` (`#101012`) + 1px `{colors.hairline-strong}` | Featured pricing tier, ghost button. |
-| 3 — code well | `{colors.surface-deep}` (`#06060a`) + 1px `{colors.hairline-strong}` | Code window, terminal shells. |
-| 4 — atmospheric glow | Low-opacity radial gradient (`{colors.accent-*-glow}`) anchored at section top | Section openers ("Integrate this weekend", "Email reimagined"). |
-
-The system has **no traditional drop shadow language**. Every surface either gets a translucent-white hairline border or sits inside an atmospheric glow. The dark canvas absorbs shadow naturally; surfaces register depth via temperature and luminance shifts rather than blur.
-
-### Decorative Depth
-- **Atmospheric section glows** — six accent colours each with a paired glow token (orange, yellow, blue, green, red, plus a deep slate for "everything in your context"). Each section opens with a single radial wash anchored at the top edge of the section, falling off to canvas black within ~600px vertical distance. Never two glows in the same section.
-- **Email card insets** — the "Beyond experience" mockup band lifts a single white email card off the black canvas, giving it the only true light-on-dark contrast in the system. The card uses no shadow; the contrast itself is the elevation.
-- **Code window traffic lights** — `{component.code-window}` shells include a row of three coloured dots (red `{colors.accent-red}`, yellow `{colors.accent-yellow}`, green `{colors.accent-green}`) at the top — the only place all three semantic colours appear together as solid surfaces.
-
-## Shapes
-
-### Border Radius Scale
-
-| Token | Value | Use |
-|---|---|---|
-| `{rounded.none}` | 0px | Hero stripe, full-bleed bands, footer. |
-| `{rounded.xs}` | 4px | Inline tags inside code wells. |
-| `{rounded.sm}` | 6px | Code tabs, mid-size chips. |
-| `{rounded.md}` | 8px | Buttons, form inputs. |
-| `{rounded.lg}` | 12px | Feature cards, pricing tiers, code wells, email mockups. |
-| `{rounded.xl}` | 16px | Larger feature panels. |
-| `{rounded.full}` | 9999px | Pills, status dots, contributor avatars. |
-
-### Photography Geometry
-- The system uses almost no photography. Visual interest comes from typography + atmospheric glows + code wells + the white email-card insets.
-- When portraits appear (testimonial avatars), they are circular (`{rounded.full}`) at 32px, sitting inline with body copy.
-- Email mockup cards run at 4:5 portrait aspect with `{rounded.lg}` corners.
-
-## Components
-
-### Buttons
-
-**`button-primary`** — white CTA
-- Background `{colors.primary}`, label `{colors.primary-on}`, type `{typography.button-md}`, padding `8px 16px`, `rounded: {rounded.md}`, height 36px.
-- The brightest pixel on the canvas. Used for "Get started", "Sign up", "Try Resend".
-- Pressed state lives in `button-primary-pressed` (background `{colors.surface-light}`).
-
-**`button-ghost`** — translucent CTA
-- Background `{colors.surface-elevated}`, label `{colors.ink}`, 1px `{colors.hairline-strong}`, type `{typography.button-md}`, `rounded: {rounded.md}`, height 36px.
-- Equal-weight secondary action paired with `{component.button-primary}`.
-
-**`button-outline`** — outlined CTA
-- Background `{colors.canvas}`, label `{colors.ink}`, 1px `{colors.hairline-strong}`, type `{typography.button-md}`, `rounded: {rounded.md}`, height 36px.
-- Tertiary action; appears on its own next to inline links.
-
-### Cards & Containers
-
-**`hero-stripe`** — full-bleed hero
-- Background `{colors.canvas}`, text `{colors.ink}`, type `{typography.display-xxl}` for the headline, padding `96px 32px`, `rounded: {rounded.none}`.
-- Used only on the home page hero band; carries the 96px Domaine Display headline and a single `{component.button-primary}` CTA. No photography, no atmospheric glow inside the hero itself — the glow appears on the section that follows.
-
-**`feature-card`** — feature highlight card
-- Background `{colors.surface-card}`, text `{colors.ink}`, type `{typography.body-md}`, `rounded: {rounded.lg}`, padding `{spacing.xxl}` (32px).
-- Used in the home grid: "Despite emails using React", "So beyond editing", etc. No outline by default — relies on canvas black contrast.
-
-**`feature-card-bordered`** — outlined feature card
-- Background `{colors.surface-card}`, text `{colors.ink}`, 1px `{colors.hairline-strong}`, type `{typography.body-md}`, `rounded: {rounded.lg}`, padding `{spacing.xxl}`.
-- Used when feature cards sit close together and need explicit separation.
-
-**`pricing-tier`** — pricing tier card
-- Background `{colors.surface-card}`, text `{colors.ink}`, 1px `{colors.hairline-strong}`, type `{typography.body-md}`, `rounded: {rounded.lg}`, padding `{spacing.xxl}` (32px).
-- Tier name in `{typography.heading-md}` + price in `{typography.display-lg}` (ABC Favorit, 56px).
-
-**`pricing-tier-featured`** — recommended tier
-- Background `{colors.surface-elevated}`, text `{colors.ink}`, 1px `{colors.hairline-strong}`, type `{typography.body-md}`, `rounded: {rounded.lg}`, padding `{spacing.xxl}`.
-- Centre tier elevated by surface luminance, not by colour.
-
-**`code-window`** — code well
-- Background `{colors.surface-deep}`, text `{colors.body}`, type `{typography.code-md}`, 1px `{colors.hairline-strong}`, `rounded: {rounded.lg}`, padding `{spacing.xl}` (24px).
-- Includes a 3-dot traffic-light row at top using `{colors.accent-red}` / `{colors.accent-yellow}` / `{colors.accent-green}` for chrome, plus a tab strip below it.
-
-**`code-tab`** — code language tab
-- Background `{colors.surface-card}`, text `{colors.charcoal}`, type `{typography.code-md}`, `rounded: {rounded.sm}`, padding `6px 12px`.
-- Active tab bumps text to `{colors.ink}` and adds a subtle `{colors.hairline-strong}` underline.
-
-**`email-mockup`** — email-card inset
-- Background `{colors.surface-card}` (or the rare `#ffffff` when rendered as a light-island inset), text `{colors.ink}` (or `{colors.on-light}` for white insets), type `{typography.body-md}`, `rounded: {rounded.lg}`, padding 0.
-- Used in the "Beyond experience" band to demonstrate rendered email output.
-
-### Inputs & Forms
-
-**`text-input`** — default input
-- Background `{colors.surface-card}`, text `{colors.ink}`, type `{typography.body-sm}`, 1px `{colors.hairline-strong}`, `rounded: {rounded.md}`, padding `10px 14px`, height 40px.
-- Sign-up and waitlist email fields. Focus state thickens the border to `{colors.ink}` (no separate ring colour).
-
-### Navigation
-
-**`nav-bar`** — top nav (desktop)
-- Background `{colors.canvas}`, text `{colors.body}`, type `{typography.button-sm}`, height 64px, single hairline `{colors.hairline}` bottom border.
-- Left: wordmark logo. Centre: top-level nav ("Features", "Pricing", "Docs", "Customers"). Right: "Sign in" link + `{component.button-primary}`.
-
-**`nav-bar`** (mobile)
-- Same height 64px, collapses centre nav into a hamburger icon. Logo stays left, sign-in CTA stays right.
-
-**`sub-nav-pill`** — pill-style sub-nav
-- Pill chips set in a horizontal row above content (e.g. on the customers index), `{component.sub-nav-pill}` styling.
-
-### Signature Components
-
-**`badge-pill`** — neutral pill
-- Background `{colors.surface-elevated}`, text `{colors.body}`, type `{typography.caption}`, `rounded: {rounded.full}`, padding `4px 10px`.
-- Inline tags ("New", "Beta", "v3.0") inside hero copy and customer story headers.
-
-**`status-dot`** — status indicator
-- Background `{colors.accent-green}`, `rounded: {rounded.full}`, 8px square.
-- Inline indicator next to "Status: Operational" in the footer or system status references.
-
-**`contributor-avatar`** — testimonial avatar
-- Background `{colors.surface-card}` placeholder, `rounded: {rounded.full}`, 32×32px.
-- Used inline with customer testimonials.
-
-**`footer`** — global footer
-- Background `{colors.canvas}`, text `{colors.charcoal}`, type `{typography.body-sm}`, `rounded: {rounded.none}`, padding `64px 32px`.
-- Multi-column quick-links grid above a single-line copyright row separated by `{colors.divider-soft}`.
-
-## Do's and Don'ts
-
-### Do
-- Use `{colors.canvas}` (true black) as the default page background. Every public page lives here.
-- Reserve `{component.button-primary}` (white pill) as the only solid bright surface. One per viewport at most.
-- Set hero headlines in **Domaine Display** at 76–96px with `lineHeight: 1.0` and `ss01 / ss04 / ss11` features engaged.
-- Use **ABC Favorit** for marketing body, **Inter** for UI labels, **Geist Mono** for code. Keep the lanes strict.
-- Build elevation from translucent-white hairlines, not drop shadows.
-- Use `{colors.accent-*-glow}` tokens as low-opacity radial atmospheric washes — never as solid surfaces.
-- Set buttons and inputs to `{rounded.md}` (8px); cards and code wells to `{rounded.lg}` (12px); pills and avatars to `{rounded.full}`.
-- Use the white email-mockup inset sparingly — it's the only deliberately-light surface and should feel like a print pull-quote.
-
-### Don't
-- Don't use a near-black canvas. The brand sits on `#000000`, not `#0a0a0a`.
-- Don't apply solid colour to atmospheric accent tokens. `{colors.accent-orange}` is for inline highlights only — its glow form is for backdrops.
-- Don't add drop shadows to feature cards or code wells. Translucent white borders carry depth on this canvas.
-- Don't bump body weight to 600 for emphasis. Use family change (Inter → ABC Favorit → Domaine Display) instead.
-- Don't render code outside `{component.code-window}` — even small inline code uses Geist Mono and a `{colors.surface-card}` background.
-- Don't loosen Domaine Display `lineHeight` past 1.0. Tight stacking is structural to the brand.
-- Don't introduce a secondary brand accent. White is the brand on black — accents are atmospheric only.
-- Don't bring photography front-and-centre. The brand reads as type-and-code, not photography-led.
-
-## Responsive Behavior
-
-### Breakpoints
-
-| Name | Width | Key Changes |
-|---|---|---|
-| Desktop XL | ≥ 1440px | Full max-width 1200 body, 3-up feature grid, side-by-side code-story splits. |
-| Desktop | 1280–1439px | Container shrinks; xl side padding. |
-| Tablet Large | 1024–1279px | Feature grid stays 3-up, code-story remains 2-up. |
-| Tablet | 768–1023px | Feature grid 2-up, code-story stacks (narrative on top), pricing stacks vertically. |
-| Mobile Large | 426–767px | Feature grid 1-up; nav collapses to hamburger; hero `{typography.display-xxl}` clamps to 56px. |
-| Mobile | ≤ 425px | All grids 1-up, hero clamps to 44px, section padding `{spacing.section}` collapses to 64px. |
-
-### Touch Targets
-- All buttons ship at minimum 36px tall on desktop, scaling to 44px on mobile via padding adjustment. WCAG AAA met on mobile.
-- `{component.text-input}` is 40px tall — comfortable but not large. Mobile scales to 48px via padding.
-- `{component.sub-nav-pill}` stays at 36px on desktop, 40px on mobile.
-
-### Collapsing Strategy
-- Top-level nav collapses to hamburger at < 1024px; the wordmark and `{component.button-primary}` stay anchored.
-- Hero `{typography.display-xxl}` clamps: 96px → 76px → 56px → 44px across the breakpoint ladder.
-- Pricing 3-up stacks vertically at < 1024px with the featured tier remaining centre-stacked.
-- Code-story splits switch from side-by-side to stacked at < 1024px, code well always second.
-- Atmospheric glows scale with section width but maintain the same opacity — they fade naturally at small viewports.
-
-### Image Behavior
-- Email mockup cards reflow at 1:1 aspect on mobile to remain readable.
-- Atmospheric glows are CSS gradients — no asset cost, no breakpoint variation.
-- Customer testimonial avatars stay 32px circular regardless of breakpoint.
-
-## Iteration Guide
-
-1. Focus on ONE component at a time. Most surfaces share `{colors.surface-card}` or `{colors.surface-elevated}` with `{rounded.lg}` — only the role-specific tokens (`{colors.primary}`, `{component.code-window}`) shift between variants.
-2. Reference component names and tokens directly (`{colors.primary}`, `{component.button-primary-pressed}`, `{rounded.lg}`) — do not paraphrase.
-3. Run `npx @google/design.md lint DESIGN.md` after edits; orphaned-tokens warnings will catch unused entries.
-4. Add new variants as separate entries (`-pressed`, `-featured`, `-disabled`) — do not bury them in prose.
-5. Default body type to `{typography.body-md}`; reach for `{typography.subtitle}` only on hero subtitles.
-6. Keep `{colors.primary}` (white) scarce — if more than one solid white surface appears per viewport, ask whether one should drop to `{component.button-ghost}` instead.
-
-## Known Gaps
-
-- Pressed/active visual states are documented only for `button-primary-pressed`; other components rely on the default focus-ring (browser default) for interactive feedback.
-- Logged-in dashboard surfaces (API keys, sending logs, audience management) are out of scope; only the public marketing canvas is documented.
-- Email-template editor surfaces (a key product feature) are not extracted — those live behind authentication.
-- The atmospheric glow rendering uses CSS radial gradients; exact stops and angles vary per section and are not standardised as tokens — render per section-specific design judgment.
+## 1. Executive Philosophy: "Enterprise Editorial Precision"
+
+Monitoring Dashboard pairs the authoritative, high-craft editorial posture of print journalism (**Playfair Display** serif display headlines) with an uncompromising, ultra-crisp developer-grade engineering canvas (**JetBrains Mono** data tags, **Inter** UI, `#0C2086` signature sapphire blue accents, and translucent hairline borders).
+
+```
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │                                                                        │
+   │   Playfair Display Editorial Serif (Headlines, Page & Modal Titles)    │
+   │                                   +                                    │
+   │       Inter / Plus Jakarta Sans (Operational UI, Forms & Controls)     │
+   │                                   +                                    │
+   │     JetBrains Mono (Identifiers, Serial Numbers, Currencies & Dates)   │
+   │                                   +                                    │
+   │   #0C2086 Signature Sapphire Accent & Translucent Hairline Depth       │
+   │                                                                        │
+   └────────────────────────────────────────────────────────────────────────┘
+```
+
+### Core Design Pillars
+1. **Zero Decorative Chrome & Zero Fake Filler Data**: Every metric, tag, badge, and card is grounded 100% in real backend database state. If the database holds 0 entities, the UI displays dedicated `EmptyStateSharedComponent` layouts rather than synthetic mock placeholders.
+2. **Dual-Canvas Theming**: Light Mode is a crisp, clean alabaster slate (`#ffffff` canvas, `#f8fafc` cards, `#09090b` text). Dark Mode is a deep, luminous obsidian space (`#000000` canvas, `#0a0a0c` / `#121216` cards, `#fcfdff` text).
+3. **Intentional Physics & Predictable Motion**: Modals and cards respond with physics-driven spatial transitions (`exitDirection="down"` for top triggers, `exitDirection="up"` for bottom actions).
+
+---
+
+## 2. Typography System & The Tri-Font Hierarchy
+
+Monitoring Dashboard strictly enforces a **Tri-Font Architecture**. Fonts are loaded globally via Google Fonts in `src/index.css`:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+```
+
+```
+┌─────────────────────────┬───────────────────────────────┬──────────────────────────────────────────┐
+│ Font Family             │ CSS Variable / Class          │ Application Scope                        │
+├─────────────────────────┼───────────────────────────────┼──────────────────────────────────────────┤
+│ Playfair Display (Serif)│ --font-serif                  │ Page H1s, section H2/H3s, card titles,   │
+│                         │ .font-serif-headline          │ modal header titles, stats hero numbers  │
+├─────────────────────────┼───────────────────────────────┼──────────────────────────────────────────┤
+│ Inter / Plus Jakarta    │ --font-sans                   │ UI controls, form labels, button labels, │
+│ Sans (Sans-Serif)       │ .font-sans                    │ body copy, tooltips, toasts, tables      │
+├─────────────────────────┼───────────────────────────────┼──────────────────────────────────────────┤
+│ JetBrains Mono          │ --font-mono                   │ Asset tags, serial codes, currencies,    │
+│ (Monospace)             │ .font-mono / .font-code       │ dates, licenses, IP addresses, badges    │
+└─────────────────────────┴───────────────────────────────┴──────────────────────────────────────────┘
+```
+
+### Type Scale & Hierarchy Reference Table
+
+| Semantic Role | Font Family | Size | Weight | Line Height | Tracking | Tailwind Utility |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Page Title (Display XL)** | Playfair Display | `28px–32px` | `700` (Bold) | `1.15` | `-0.02em` | `text-2xl sm:text-3xl font-bold font-serif-headline` |
+| **Section Header (Display LG)**| Playfair Display | `20px–24px` | `600` (Semibold)| `1.25` | `-0.01em` | `text-xl sm:text-2xl font-semibold font-serif-headline` |
+| **Card / Modal Title (MD)** | Playfair Display | `16px–18px` | `600` (Semibold)| `1.3` | `normal` | `text-base sm:text-lg font-semibold font-serif-headline`|
+| **Section Eyebrow Label** | JetBrains Mono | `11px–12px` | `700` (Bold) | `1.0` | `+0.05em` | `text-xs font-bold uppercase tracking-wider font-mono` |
+| **UI Body / Inputs** | Inter / Sans | `13px–14px` | `400` (Regular) | `1.5` | `normal` | `text-xs sm:text-sm font-normal text-slate-600 dark:text-zinc-300` |
+| **Field Labels** | Inter / Sans | `12px` | `500` (Medium) | `1.2` | `normal` | `text-xs font-medium text-slate-700 dark:text-zinc-300` |
+| **Technical Metadata** | JetBrains Mono | `11px–12px` | `500`/`600` | `1.4` | `tight` | `text-xs font-mono text-slate-500 dark:text-zinc-400` |
+| **Micro Badges / Chips** | JetBrains Mono | `10px` | `700` (Bold) | `1.0` | `wide` | `text-[10px] font-mono font-bold uppercase` |
+
+---
+
+## 3. Color Palette & Dual-Canvas Token Specification
+
+Monitoring Dashboard employs CSS variables coupled with Tailwind `@variant dark (&:where(.dark, .dark *))` to maintain flawless theme switching without layout recalculation.
+
+```
+                  ┌────────────────────────────────────────┐
+                  │       LIGHT MODE CANADIAN SLATE        │
+                  │   Canvas: #ffffff  │  Card: #f8fafc    │
+                  │   Ink:    #09090b  │  Body: #334155    │
+                  └───────────────────┬────────────────────┘
+                                      │
+                         [ THEME SWITCH DYNAMICS ]
+                                      │
+                  ┌───────────────────┴────────────────────┐
+                  │       DARK MODE OBSIDIAN SPACE         │
+                  │   Canvas: #000000  │  Card: #0a0a0c    │
+                  │   Ink:    #fcfdff  │  Body: 86% White  │
+                  └────────────────────────────────────────┘
+```
+
+### 1. Canvas & Surface Tokens
+
+| Token Name | Light Mode Value | Dark Mode Value | Usage Context |
+| :--- | :--- | :--- | :--- |
+| `--color-canvas` | `#ffffff` | `#000000` | Global viewport body background |
+| `--color-surface-card` | `#f8fafc` | `#0a0a0c` | Standard cards, list items, sidebars |
+| `--color-surface-elevated`| `#f1f5f9` | `#101012` | Nested cards, hover states, table rows |
+| `--color-surface-deep` | `#f8fafc` | `#06060a` | Deep inset panels, code blocks, terminal |
+
+### 2. Typography & Ink Tokens
+
+| Token Name | Light Mode Value | Dark Mode Value | Usage Context |
+| :--- | :--- | :--- | :--- |
+| `--color-ink` | `#09090b` (Slate 950) | `#fcfdff` (Off-white) | High-contrast headings, active text |
+| `--color-body` | `#334155` (Slate 700) | `rgba(252,253,255,0.86)`| Primary reading body text |
+| `--color-charcoal` | `#475569` (Slate 600) | `rgba(252,253,255,0.70)`| Secondary text, table cells |
+| `--color-mute` | `#64748b` (Slate 500) | `#a1a4a5` | Muted labels, timestamps, icons |
+| `--color-ash` | `#94a3b8` (Slate 400) | `#888e90` | Placeholder text, subtle borders |
+| `--color-stone` | `#cbd5e1` (Slate 300) | `#464a4d` | Inactive checkboxes, dividers |
+
+### 3. Signature Brand Sapphire Accent & Interactive States
+
+```
+   Brand Sapphire:       #0C2086  (rgb(12, 32, 134))
+   Brand Hover:          #081765  (rgb(8, 23, 101))
+   Focus Glow (Light):   rgba(12, 32, 134, 0.15)
+   Focus Glow (Dark):    rgba(59, 130, 246, 0.30)
+```
+
+- **Primary Action Utility**: `!bg-[#0C2086] hover:!bg-[#081765] !text-white border-none shadow-sm font-semibold`
+- **White Text/Icon Invariant**: All primary brand buttons **MUST** declare `!text-white` on text labels and icon SVGs to prevent dark-mode CSS inheritance bugs.
+
+---
+
+## 4. Borders, Dividers, & Hairlines
+
+Monitoring Dashboard avoids heavy solid borders, utilizing micro-translucent hairlines that illuminate subtly against obsidian in Dark Mode and create crisp structure in Light Mode.
+
+```css
+/* Hairline border utilities in index.css */
+.hairline-border {
+  border: 1px solid var(--color-hairline);
+}
+.hairline-border-strong {
+  border: 1px solid var(--color-hairline-strong);
+}
+```
+
+```
+┌───────────────────────────────┬───────────────────────────────┬──────────────────────────────────────────┐
+│ Border Level                  │ Light Mode Tailwind           │ Dark Mode Tailwind                       │
+├───────────────────────────────┼───────────────────────────────┼──────────────────────────────────────────┤
+│ Outer Container / Modal Box   │ border-slate-200              │ border-zinc-800                          │
+│ Inner Sub-divider / Section   │ border-slate-100              │ border-zinc-800/80                       │
+│ Table Cell Bottom Divider     │ border-slate-200/60           │ border-zinc-800/60                       │
+│ Interactive Hover Border      │ hover:border-slate-300        │ dark:hover:border-zinc-700               │
+│ Active / Selected Outline     │ border-[#0C2086]              │ dark:border-blue-500                     │
+└───────────────────────────────┴───────────────────────────────┴──────────────────────────────────────────┘
+```
+
+---
+
+## 5. Container Geometry, Radii, Shadows & Elevation
+
+### Standard Radii Vocabulary
+- **`rounded-2xl` (16px)**: Page cards, root modal dialog containers, floating toolbars.
+- **`rounded-xl` (12px)**: Item rows, roster cards, inner info groups, dropdown menus.
+- **`rounded-lg` (8px)**: Buttons, form input text boxes, select trigger boxes.
+- **`rounded-md` (6px)**: Status badges, department chips, code pills.
+- **`rounded-full` (9999px)**: Avatar initials circles, status dot indicators, counter pills.
+
+### Elevation & Shadows
+- **Light Mode**: Ultra-crisp, diffuse elevation using `shadow-xs` / `shadow-sm` (`rgba(0, 0, 0, 0.04)` to `rgba(0, 0, 0, 0.08)`).
+- **Dark Mode**: `shadow-none` with luminous hairline border containment (`border-zinc-800` / `border-white/10`).
+
+---
+
+## 6. Modal Architecture & Backdrop Physics
+
+All modal dialogs throughout the application **MUST** build upon [`ModalSharedComponent.tsx`](file:///c:/Users/UddeshyaSingh/Development/MonitoringDashboardCodebaseArchitecture/MonitoringDashboardClientServiceLayerMSC/src/Shared/Components/ModalSharedComponent.tsx). Never build bespoke `<AnimatePresence>` modal overlays in screens.
+
+```
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │                                                                        │
+   │   Backdrop: bg-slate-900/60 (Light) │ bg-black/80 (Dark)               │
+   │   Backdrop Filter: backdrop-blur-md                                    │
+   │   Container: bg-white dark:bg-[#0c0c0e] border border-slate-200/80...  │
+   │                                                                        │
+   │   Header (Sticky / Border-b)                                           │
+   │   ├── Title (Playfair Display font-serif-headline)                     │
+   │   └── Close Button (X icon) ───[ Triggers EXIT DOWN ]                  │
+   │                                                                        │
+   │   Body: Multi-section forms (scrollMode="backdrop")                    │
+   │   ├── Section 1 (Title + 2-Column Input Grid)                          │
+   │   ├── Section 2 (mt-[15px] + Eyebrow Header + 2-Column Grid)           │
+   │   └── Section 3 (mt-[15px] + Commercials & Terms)                      │
+   │                                                                        │
+   │   Footer (Sticky / Border-t / mt-6 pt-4 gap-3)                         │
+   │   ├── Cancel / Back Button (size="sm" outline) ──[ Triggers EXIT UP ]  │
+   │   └── Primary Action (size="sm" #0C2086) ────────[ Triggers EXIT UP ]  │
+   │                                                                        │
+   └────────────────────────────────────────────────────────────────────────┘
+```
+
+### Modal Specifications
+1. **Backdrop Atmosphere**: `bg-slate-900/60` (Light) / `bg-black/80` (Dark) with `backdrop-blur-md`.
+2. **Max Width Tiers**:
+   - `max-w-md` (448px): Confirmation modals, delete prompts, single-field inputs.
+   - `max-w-2xl` (672px): Quick assign modals, QR scanners, single-step dialogs.
+   - `max-w-3xl` / `max-w-4xl` (768px–896px): Multi-step wizards, comprehensive Asset / Employee / Software Detail sheets.
+3. **Scroll Mode Invariant**: Multi-section forms **MUST** use `scrollMode="backdrop"` to allow natural document scrolling without double scrollbar glitches.
+4. **Section Spacing Invariant (`mt-[15px]`)**: Sections 2, 3, 4+ inside modals must declare `mt-[15px]`:
+   ```tsx
+   <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono flex items-center gap-1.5 pb-2 border-b border-slate-100 dark:border-zinc-800 mt-[15px]">
+     <Icon className="w-3.5 h-3.5 text-blue-500" />
+     2. Section Title
+   </h4>
+   ```
+
+---
+
+## 7. Modal Exit Physics Invariant (`exitDirection`)
+
+Monitoring Dashboard modals follow **Physical Spatial Directionality** based on user intent and trigger origin.
+
+```
+             ▲  SLIDE UP EXIT  ▲
+   ┌───────────────────────────────────┐
+   │                                   │
+   │   Triggered By:                   │
+   │   • Footer "Cancel" Button        │
+   │   • Footer "Close" Button         │
+   │   • Form "Submit" / "Register"    │
+   │   • "Resolve Ticket" / Actions    │
+   │   • Deep Backdrop Click (y > 40)  │
+   │                                   │
+   └───────────────────────────────────┘
+
+   ┌───────────────────────────────────┐
+   │                                   │
+   │   Triggered By:                   │
+   │   • Header "X" Button             │
+   │   • Top Backdrop Click (y <= 40)  │
+   │                                   │
+   └───────────────────────────────────┘
+             ▼ SLIDE DOWN EXIT ▼
+```
+
+---
+
+## 8. Button Design System & Micro-Interactions
+
+Buttons in Monitoring Dashboard use spring micro-scaling via `motion/react` with precise tokenized variants.
+
+```tsx
+<motion.button
+  whileHover={{ scale: 1.01 }}
+  whileTap={{ scale: 0.98 }}
+  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+/>
+```
+
+```
+┌──────────────┬─────────────────────────────────────────────────────────────────────────────┐
+│ Variant      │ Tokenized Style & Purpose                                                   │
+├──────────────┼─────────────────────────────────────────────────────────────────────────────┤
+│ Primary      │ !bg-[#0C2086] hover:!bg-[#081765] !text-white border-none shadow-sm        │
+│ (Brand CTA)  │ Explicit white text & icon invariant: <span className="!text-white">        │
+├──────────────┼─────────────────────────────────────────────────────────────────────────────┤
+│ Outline      │ border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900     │
+│ (Secondary)  │ text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800 │
+├──────────────┼─────────────────────────────────────────────────────────────────────────────┤
+│ Ghost        │ text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800│
+│ (Subtle)     │ hover:text-slate-900 dark:hover:text-white                                  │
+├──────────────┼─────────────────────────────────────────────────────────────────────────────┤
+│ Danger       │ !text-rose-600 dark:!text-rose-400 hover:!bg-rose-50 dark:hover:!bg-rose-950│
+│ (Destructive)│ border-rose-200/80 dark:border-rose-900/60                                  │
+└──────────────┴─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 9. Categorized Component Library (100% Complete Production Source Code)
+
+The following sections provide 100% copy-pasteable TypeScript implementations organized into 5 functional modules.
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│                    MONITORING DASHBOARD COMPONENT CATALOG MODULES                   │
+├────────────────────────────────────────────────────────────────────────────┤
+│ MODULE 1: MODALS & DIALOGS                                                 │
+│ • ModalSharedComponent.tsx                                                 │
+│ • ConfirmationModalSharedComponent.tsx                                     │
+│                                                                            │
+│ MODULE 2: SELECTION & INPUTS                                               │
+│ • CustomSelectSharedComponent.tsx                                          │
+│ • CreatableCustomSelectSharedComponent.tsx                                 │
+│ • InputSharedComponent.tsx                                                 │
+│                                                                            │
+│ MODULE 3: ACTIONS & BUTTONS                                                │
+│ • ButtonSharedComponent.tsx                                                │
+│ • PrimaryActionButtonSharedComponent.tsx                                   │
+│                                                                            │
+│ MODULE 4: STATES, SECURITY & BADGES                                        │
+│ • BadgeSharedComponent.tsx                                                 │
+│ • EmptyStateSharedComponent.tsx                                            │
+│ • PermissionGuardSharedComponent.tsx                                       │
+│                                                                            │
+│ MODULE 5: THEMING & VIEW TRANSITIONS                                       │
+│ • ThemeToggleSharedComponent.tsx                                           │
+│ • AnimatedThemeToggleSharedComponent.tsx                                   │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Module 1: Modals & Dialogs
+
+#### 1.1 `ModalSharedComponent.tsx`
+- **File**: `src/Shared/Components/ModalSharedComponent.tsx`
+- **Export**: `default function ModalSharedComponent`
+
+```tsx
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { X } from 'lucide-react';
+
+export interface ModalSharedComponentProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
+  minHeight?: string;
+  scrollMode?: 'backdrop' | 'body';
+  animationType?: 'scale' | 'slide-up';
+  exitDirection?: 'down' | 'up';
+  headerCloseDirection?: 'down' | 'up';
+  zIndex?: number;
+}
+
+export default function ModalSharedComponent({
+  isOpen,
+  onClose,
+  title,
+  subtitle,
+  children,
+  footer,
+  maxWidth = '2xl',
+  minHeight,
+  scrollMode = 'backdrop',
+  animationType = 'slide-up',
+  exitDirection: exitDirectionProp = 'down',
+  headerCloseDirection = 'down',
+  zIndex = 50,
+}: ModalSharedComponentProps): React.JSX.Element {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const dialogCardRef = useRef<HTMLDivElement>(null);
+  const [internalExitDirection, setInternalExitDirection] = useState<'down' | 'up'>(exitDirectionProp);
+  const prevOpenRef = useRef(isOpen);
+
+  useEffect(() => {
+    setInternalExitDirection(exitDirectionProp);
+  }, [exitDirectionProp]);
+
+  useEffect(() => {
+    if (isOpen && !prevOpenRef.current) {
+      setInternalExitDirection(exitDirectionProp || 'down');
+    }
+    prevOpenRef.current = isOpen;
+  }, [isOpen, exitDirectionProp]);
+
+  const getScrollAwareDirection = (): 'down' | 'up' => {
+    if (scrollMode === 'backdrop' && scrollContainerRef.current) {
+      return scrollContainerRef.current.scrollTop > 40 ? 'up' : 'down';
+    }
+    return 'down';
+  };
+
+  const handleBackdropClick = () => {
+    const direction = getScrollAwareDirection();
+    setInternalExitDirection(direction);
+    setTimeout(() => onClose(), 0);
+  };
+
+  const handleEscapeKey = () => {
+    const direction = getScrollAwareDirection();
+    setInternalExitDirection(direction);
+    setTimeout(() => onClose(), 0);
+  };
+
+  const handleHeaderClose = () => {
+    setInternalExitDirection(headerCloseDirection);
+    setTimeout(() => onClose(), 0);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleEscapeKey();
+    };
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  let widthClass = 'max-w-2xl';
+  if (maxWidth === 'sm') widthClass = 'max-w-sm';
+  if (maxWidth === 'md') widthClass = 'max-w-md';
+  if (maxWidth === 'lg') widthClass = 'max-w-lg';
+  if (maxWidth === 'xl') widthClass = 'max-w-xl';
+  if (maxWidth === '2xl') widthClass = 'max-w-2xl';
+  if (maxWidth === '3xl') widthClass = 'max-w-3xl';
+  if (maxWidth === '4xl') widthClass = 'max-w-4xl';
+  if (maxWidth === '5xl') widthClass = 'max-w-5xl';
+
+  const isSlideUp = animationType === 'slide-up';
+  const activeExitDirection: 'down' | 'up' =
+    exitDirectionProp === 'up' || internalExitDirection === 'up' ? 'up' : 'down';
+
+  const getExitDistance = (dir: 'down' | 'up'): number => {
+    if (typeof window === 'undefined') return dir === 'up' ? -1800 : 1800;
+    const vh = window.innerHeight || 800;
+    const cardHeight = dialogCardRef.current?.offsetHeight || 800;
+    const scrollTop = scrollContainerRef.current?.scrollTop || 0;
+    return dir === 'up' ? -(cardHeight + vh + scrollTop + 400) : cardHeight + vh + 400;
+  };
+
+  const modalVariants = {
+    initial: {
+      y: isSlideUp ? (typeof window !== 'undefined' ? window.innerHeight + 1000 : '150vh') : 8,
+      opacity: isSlideUp ? 1 : 0,
+      scale: isSlideUp ? 1 : 0.96,
+    },
+    animate: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
+    },
+    exit: (customDir?: 'down' | 'up') => {
+      const dir = customDir || activeExitDirection;
+      const distance = getExitDistance(dir);
+      return {
+        y: isSlideUp ? distance : 8,
+        opacity: isSlideUp ? 1 : 0,
+        scale: isSlideUp ? 1 : 0.96,
+        transition: { duration: 0.55, ease: [0.4, 0, 0.2, 1] as const },
+      };
+    },
+  };
+
+  return (
+    <AnimatePresence custom={activeExitDirection}>
+      {isOpen && (
+        <div
+          ref={scrollContainerRef}
+          style={{ zIndex }}
+          className="fixed inset-0 flex items-start justify-center p-4 sm:p-6 overflow-y-auto overflow-x-hidden"
+        >
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+            onClick={handleBackdropClick}
+            className="fixed inset-0 bg-slate-900/60 dark:bg-black/60 backdrop-blur-sm"
+          />
+
+          <motion.div
+            ref={dialogCardRef}
+            custom={activeExitDirection}
+            variants={modalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className={`relative w-full ${widthClass} bg-white dark:bg-[#0a0a0c] hairline-border-strong rounded-xl shadow-2xl z-10 my-auto sm:my-8 flex flex-col shrink-0`}
+          >
+            {(title || subtitle) && (
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-zinc-800/80 flex items-center justify-between shrink-0">
+                <div>
+                  {title && (
+                    <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-zinc-100 font-serif-headline">
+                      {title}
+                    </h2>
+                  )}
+                  {subtitle && (
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={handleHeaderClose}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+
+            <div className={`p-6 flex-1 ${scrollMode === 'body' ? 'max-h-[85vh] overflow-y-auto' : ''} ${minHeight ? minHeight : ''}`}>
+              {children}
+            </div>
+
+            {footer && (
+              <div className="px-6 py-4 border-t border-slate-200 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-[#08080a] shrink-0">
+                {footer}
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+```
+
+---
+
+#### 1.2 `ConfirmationModalSharedComponent.tsx`
+- **File**: `src/Shared/Components/ConfirmationModalSharedComponent.tsx`
+- **Export**: `default function ConfirmationModalSharedComponent`
+
+```tsx
+import React from 'react';
+import ModalSharedComponent from './ModalSharedComponent';
+import ButtonSharedComponent from './ButtonSharedComponent';
+
+export type ConfirmationVariant = 'danger' | 'warning' | 'primary';
+
+export interface ConfirmationModalSharedComponentProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void | Promise<void>;
+  title: string;
+  subtitle?: string;
+  description: string | React.ReactNode;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: ConfirmationVariant;
+  isLoading?: boolean;
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  additionalContent?: React.ReactNode;
+}
+
+export default function ConfirmationModalSharedComponent({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  subtitle,
+  description,
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  variant = 'danger',
+  isLoading = false,
+  maxWidth = 'md',
+  additionalContent,
+}: ConfirmationModalSharedComponentProps): React.JSX.Element {
+  const [exitDirection, setExitDirection] = React.useState<'down' | 'up'>('down');
+  const prevIsOpenRef = React.useRef(isOpen);
+
+  React.useEffect(() => {
+    if (isOpen && !prevIsOpenRef.current) {
+      setExitDirection('down');
+    }
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  const handleCancel = () => {
+    setExitDirection('up');
+    setTimeout(() => onClose(), 0);
+  };
+
+  const handleConfirm = async () => {
+    setExitDirection('up');
+    setTimeout(async () => {
+      await onConfirm();
+    }, 0);
+  };
+
+  const getConfirmButtonClasses = () => {
+    if (variant === 'danger') {
+      return '!bg-rose-600 hover:!bg-rose-700 active:!bg-rose-800 !text-white border-none shadow-sm font-semibold';
+    }
+    if (variant === 'warning') {
+      return '!bg-amber-600 hover:!bg-amber-700 active:!bg-amber-800 !text-white border-none shadow-sm font-semibold';
+    }
+    return '!bg-[#0C2086] hover:!bg-[#081765] active:!bg-[#051047] !text-white border-none shadow-sm font-semibold';
+  };
+
+  return (
+    <ModalSharedComponent
+      isOpen={isOpen}
+      onClose={onClose}
+      exitDirection={exitDirection}
+      title={title}
+      subtitle={subtitle}
+      maxWidth={maxWidth}
+    >
+      <div className="flex flex-col justify-between h-full text-xs">
+        <div className="space-y-4 py-1">
+          <div className="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed font-normal">
+            {description}
+          </div>
+          {additionalContent && <div>{additionalContent}</div>}
+        </div>
+
+        <div className="flex items-center justify-end gap-3 pt-4 mt-6 border-t border-slate-200 dark:border-zinc-800 shrink-0">
+          <ButtonSharedComponent
+            variant="outline"
+            size="sm"
+            onClick={handleCancel}
+            disabled={isLoading}
+          >
+            {cancelText}
+          </ButtonSharedComponent>
+          <ButtonSharedComponent
+            type="button"
+            variant={variant === 'danger' ? 'danger' : 'primary'}
+            size="sm"
+            disabled={isLoading}
+            onClick={handleConfirm}
+            className={getConfirmButtonClasses()}
+            icon={
+              isLoading ? (
+                <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+              ) : undefined
+            }
+          >
+            <span className="!text-white font-medium">{confirmText}</span>
+          </ButtonSharedComponent>
+        </div>
+      </div>
+    </ModalSharedComponent>
+  );
+}
+```
+
+---
+
+### Module 2: Selection & Inputs
+
+#### 2.1 `CustomSelectSharedComponent.tsx`
+- **File**: `src/Shared/Components/CustomSelectSharedComponent.tsx`
+- **Export**: `default function CustomSelectSharedComponent`
+
+```tsx
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ChevronDown, Check, Search } from 'lucide-react';
+
+export interface SelectOption {
+  value: string;
+  label: string;
+  sublabel?: string;
+  icon?: React.ReactNode;
+}
+
+export interface SelectFooterAction {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+}
+
+export interface CustomSelectSharedComponentProps {
+  label?: string;
+  value: string;
+  options: SelectOption[];
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  triggerClassName?: string;
+  dropdownClassName?: string;
+  size?: 'sm' | 'md';
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  footerAction?: SelectFooterAction;
+}
+
+export default function CustomSelectSharedComponent({
+  label,
+  value,
+  options,
+  onChange,
+  placeholder = 'Select option...',
+  className = 'w-full',
+  triggerClassName,
+  dropdownClassName,
+  size = 'md',
+  searchable = false,
+  searchPlaceholder = 'Search options...',
+  footerAction,
+}: CustomSelectSharedComponentProps): React.JSX.Element {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchTerm('');
+      return;
+    }
+    if (searchable && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handlePointerDown);
+      document.addEventListener('touchstart', handlePointerDown);
+    }, 10);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [isOpen, searchable]);
+
+  const filteredOptions = React.useMemo(() => {
+    if (!searchable || !searchTerm.trim()) return options;
+    const term = searchTerm.toLowerCase().trim();
+    return options.filter(
+      (opt) =>
+        opt.label.toLowerCase().includes(term) ||
+        opt.value.toLowerCase().includes(term) ||
+        (opt.sublabel && opt.sublabel.toLowerCase().includes(term))
+    );
+  }, [options, searchable, searchTerm]);
+
+  const heightClass = size === 'sm' ? 'h-9 px-2.5' : 'h-10 px-3';
+
+  return (
+    <div className={`relative ${className}`} ref={dropdownRef}>
+      {label && (
+        <label className="text-xs font-medium text-slate-600 dark:text-zinc-400 mb-1 block">
+          {label}
+        </label>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`${className.includes('w-') ? 'w-full' : ''} ${heightClass} rounded-lg bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 border border-slate-200/80 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors focus:outline-none text-xs flex items-center justify-between gap-2 cursor-pointer select-none ${triggerClassName || ''}`}
+      >
+        <div className="flex items-center gap-2 truncate font-medium">
+          {selectedOption?.icon}
+          <span className="truncate">
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        </div>
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${
+            isOpen ? 'rotate-180 text-slate-700 dark:text-zinc-200' : ''
+          }`}
+        />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 4 }}
+            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className={`absolute left-0 right-0 min-w-[200px] top-full mt-1.5 z-50 bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-xl p-1 text-xs space-y-0.5 max-h-64 overflow-y-auto ${dropdownClassName || ''}`}
+          >
+            {searchable && (
+              <div className="p-1.5 border-b border-slate-100 dark:border-zinc-800/80 mb-1">
+                <div className="relative flex items-center">
+                  <Search className="w-3.5 h-3.5 absolute left-2.5 text-slate-400 dark:text-zinc-500 pointer-events-none" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={searchPlaceholder}
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-hidden focus:ring-1 focus:ring-[#0C2086] transition-all"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </div>
+            )}
+
+            {filteredOptions.length === 0 ? (
+              <div className="py-3 px-2 text-center text-xs text-slate-400 dark:text-zinc-500">
+                No results found
+              </div>
+            ) : (
+              filteredOptions.map((option) => {
+                const isSelected = option.value === value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      onChange(option.value);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer text-left ${
+                      isSelected
+                        ? 'bg-slate-100 dark:bg-zinc-800/90 text-slate-900 dark:text-white font-bold'
+                        : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
+                      {option.icon}
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium truncate">{option.label}</div>
+                        {option.sublabel && (
+                          <div className="text-[10px] text-slate-400 dark:text-zinc-500 font-mono mt-0.5">
+                            {option.sublabel}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <Check className="w-4 h-4 text-indigo-500 shrink-0" />
+                    )}
+                  </button>
+                );
+              })
+            )}
+
+            {footerAction && (
+              <div className="pt-1 mt-1 border-t border-slate-100 dark:border-zinc-800/80">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpen(false);
+                    footerAction.onClick();
+                  }}
+                  className="w-full flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0C2086] dark:text-sky-400 hover:bg-blue-50 dark:hover:bg-sky-950/40 transition-colors cursor-pointer text-left"
+                >
+                  {footerAction.icon}
+                  <span className="truncate">{footerAction.label}</span>
+                </button>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+```
+
+---
+
+#### 2.2 `CreatableCustomSelectSharedComponent.tsx`
+- **File**: `src/Shared/Components/CreatableCustomSelectSharedComponent.tsx`
+- **Export**: `default function CreatableCustomSelectSharedComponent`
+- **Purpose**: Enables users to either pick an existing option or dynamically type a novel custom value directly into the search input.
+
+```tsx
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ChevronDown, Check, Search, Plus, Sparkles } from 'lucide-react';
+
+export interface CreatableSelectOption {
+  value: string;
+  label: string;
+  sublabel?: string;
+  icon?: React.ReactNode;
+}
+
+export interface CreatableCustomSelectSharedComponentProps {
+  label?: string;
+  value: string;
+  options: CreatableSelectOption[];
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  triggerClassName?: string;
+  dropdownClassName?: string;
+  size?: 'sm' | 'md';
+  searchPlaceholder?: string;
+  enableSearch?: boolean;
+  enableCustomCreation?: boolean;
+  required?: boolean;
+  disabled?: boolean;
+  helperText?: string;
+}
+
+export default function CreatableCustomSelectSharedComponent({
+  label,
+  value,
+  options,
+  onChange,
+  placeholder = 'Select or type custom value...',
+  className = 'w-full',
+  triggerClassName,
+  dropdownClassName,
+  size = 'md',
+  searchPlaceholder = 'Search options or type custom value...',
+  enableSearch = true,
+  enableCustomCreation = true,
+  required = false,
+  disabled = false,
+  helperText,
+}: CreatableCustomSelectSharedComponentProps): React.JSX.Element {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+  const displayLabel = selectedOption ? selectedOption.label : value;
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchTerm('');
+      return;
+    }
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handlePointerDown);
+      document.addEventListener('touchstart', handlePointerDown);
+    }, 10);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [isOpen]);
+
+  const filteredOptions = useMemo(() => {
+    if (!searchTerm.trim()) return options;
+    const term = searchTerm.toLowerCase().trim();
+    return options.filter(
+      (opt) =>
+        opt.label.toLowerCase().includes(term) ||
+        opt.value.toLowerCase().includes(term) ||
+        (opt.sublabel && opt.sublabel.toLowerCase().includes(term))
+    );
+  }, [options, searchTerm]);
+
+  const exactMatchExists = options.some(
+    (opt) =>
+      opt.label.toLowerCase().trim() === searchTerm.toLowerCase().trim() ||
+      opt.value.toLowerCase().trim() === searchTerm.toLowerCase().trim()
+  );
+
+  const handleSelectOption = (val: string) => {
+    onChange(val);
+    setIsOpen(false);
+  };
+
+  const handleApplyCustomValue = () => {
+    if (!searchTerm.trim()) return;
+    onChange(searchTerm.trim());
+    setIsOpen(false);
+  };
+
+  const heightClass = size === 'sm' ? 'h-9 px-2.5' : 'h-10 px-3';
+
+  return (
+    <div className={`space-y-1.5 ${className}`} ref={dropdownRef}>
+      {label && (
+        <label className="text-xs font-medium text-slate-600 dark:text-zinc-400 flex items-center justify-between">
+          <span>
+            {label} {required && <span className="text-rose-500 font-bold">*</span>}
+          </span>
+          {enableCustomCreation && value && !selectedOption && (
+            <span className="text-[10px] font-mono text-[#0C2086] dark:text-blue-400 flex items-center gap-1 font-semibold">
+              <Sparkles className="w-2.5 h-2.5" />
+              Custom Value
+            </span>
+          )}
+        </label>
+      )}
+
+      <div className="relative">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          className={`w-full flex items-center justify-between text-xs rounded-xl bg-white dark:bg-zinc-900/80 border border-slate-300 dark:border-zinc-700/80 text-slate-900 dark:text-zinc-100 hover:border-slate-400 dark:hover:border-zinc-600 transition-all shadow-2xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#0C2086]/50 ${
+            disabled ? 'opacity-50 cursor-not-allowed' : ''
+          } ${heightClass} ${triggerClassName || ''}`}
+        >
+          <div className="flex items-center gap-2 truncate min-w-0 pr-2">
+            {selectedOption?.icon}
+            {displayLabel ? (
+              <span className="truncate font-medium">{displayLabel}</span>
+            ) : (
+              <span className="text-slate-400 dark:text-zinc-500 truncate">{placeholder}</span>
+            )}
+          </div>
+          <ChevronDown
+            className={`w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0 transition-transform duration-200 ${
+              isOpen ? 'rotate-180 text-[#0C2086] dark:text-blue-400' : ''
+            }`}
+          />
+        </button>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 4, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 4, scale: 0.98 }}
+              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className={`absolute left-0 right-0 top-full mt-1.5 z-50 bg-white dark:bg-[#121215] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-xl p-1.5 max-h-72 overflow-hidden flex flex-col ${
+                dropdownClassName || ''
+              }`}
+            >
+              {enableSearch && (
+                <div className="p-1 border-b border-slate-100 dark:border-zinc-800/80 mb-1">
+                  <div className="relative flex items-center">
+                    <Search className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 absolute left-2.5" />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (filteredOptions.length === 1) {
+                            handleSelectOption(filteredOptions[0].value);
+                          } else if (enableCustomCreation && searchTerm.trim()) {
+                            handleApplyCustomValue();
+                          }
+                        }
+                      }}
+                      placeholder={searchPlaceholder}
+                      className="w-full h-8 pl-8 pr-2.5 text-xs bg-slate-50 dark:bg-zinc-800/70 border border-slate-200 dark:border-zinc-700/60 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#0C2086]/50 focus:border-[#0C2086]"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className={`overflow-y-auto space-y-0.5 ${enableSearch ? 'max-h-52' : 'max-h-60'} pr-0.5`}>
+                {enableCustomCreation && searchTerm.trim().length > 0 && !exactMatchExists && (
+                  <button
+                    type="button"
+                    onClick={handleApplyCustomValue}
+                    className="w-full flex items-center gap-2 p-2 rounded-lg bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/60 text-[#0C2086] dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors text-left font-medium mb-1 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 shrink-0 text-[#0C2086] dark:text-blue-400" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-xs font-semibold">
+                        Use custom: <span className="underline italic">"{searchTerm.trim()}"</span>
+                      </div>
+                      <div className="text-[10px] text-blue-600/70 dark:text-blue-400/70 font-mono">
+                        Press Enter or click to apply
+                      </div>
+                    </div>
+                  </button>
+                )}
+
+                {filteredOptions.map((opt) => {
+                  const isSelected = opt.value === value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => handleSelectOption(opt.value)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors text-left cursor-pointer ${
+                        isSelected
+                          ? 'bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white font-bold'
+                          : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate min-w-0 pr-2">
+                        {opt.icon}
+                        <div className="truncate min-w-0">
+                          <div className="truncate font-medium">{opt.label}</div>
+                          {opt.sublabel && (
+                            <div className="text-[10px] text-slate-400 dark:text-zinc-500 font-mono">
+                              {opt.sublabel}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-[#0C2086] dark:text-blue-400 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {helperText && (
+        <p className="text-[11px] text-slate-400 dark:text-zinc-500">{helperText}</p>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+#### 2.3 `InputSharedComponent.tsx`
+- **File**: `src/Shared/Components/InputSharedComponent.tsx`
+- **Export**: `default function InputSharedComponent`
+
+```tsx
+import React from 'react';
+
+export interface InputSharedComponentProps {
+  label?: string;
+  error?: string;
+  icon?: React.ReactNode;
+  fullWidth?: boolean;
+  className?: string;
+  placeholder?: string;
+  value?: string | number;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  min?: string | number;
+  max?: string | number;
+  step?: string | number;
+  required?: boolean;
+  disabled?: boolean;
+  name?: string;
+}
+
+export default function InputSharedComponent({
+  label,
+  error,
+  icon,
+  fullWidth = true,
+  className = '',
+  placeholder = '',
+  value = '',
+  onChange,
+  type = 'text',
+  min,
+  max,
+  step,
+  required = false,
+  disabled = false,
+  name,
+}: InputSharedComponentProps): React.JSX.Element {
+  const widthStyle = fullWidth ? 'w-full' : '';
+
+  return (
+    <div className={`flex flex-col gap-1.5 ${widthStyle}`}>
+      {label && (
+        <label className="text-xs font-medium text-slate-600 dark:text-zinc-400">
+          {label}
+        </label>
+      )}
+      <div className="relative flex items-center">
+        {icon && (
+          <div className="absolute left-3 text-slate-400 dark:text-zinc-500 pointer-events-none flex items-center">
+            {icon}
+          </div>
+        )}
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          min={min}
+          max={max}
+          step={step}
+          required={required}
+          disabled={disabled}
+          className={`h-10 text-sm px-3 py-2 rounded-md bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 hairline-border-strong focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors duration-200 ${
+            icon ? 'pl-9' : ''
+          } ${error ? 'border-red-500 dark:border-red-500' : ''} ${className} ${widthStyle}`}
+        />
+      </div>
+      {error && <span className="text-xs text-rose-500 mt-0.5">{error}</span>}
+    </div>
+  );
+}
+```
+
+---
+
+### Module 3: Actions & Buttons
+
+#### 3.1 `ButtonSharedComponent.tsx`
+- **File**: `src/Shared/Components/ButtonSharedComponent.tsx`
+- **Export**: `default function ButtonSharedComponent`
+
+```tsx
+import React from 'react';
+import { motion } from 'motion/react';
+import { Loader2 } from 'lucide-react';
+
+export interface ButtonSharedComponentProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  variant?: 'primary' | 'ghost' | 'outline' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  icon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  fullWidth?: boolean;
+  disabled?: boolean;
+  isLoading?: boolean;
+  loadingText?: React.ReactNode;
+  type?: 'button' | 'submit' | 'reset';
+  className?: string;
+  title?: string;
+}
+
+export default function ButtonSharedComponent({
+  children,
+  onClick,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  rightIcon,
+  fullWidth = false,
+  disabled = false,
+  isLoading = false,
+  loadingText,
+  type = 'button',
+  className = '',
+  title,
+}: ButtonSharedComponentProps): React.JSX.Element {
+  let baseStyles =
+    'inline-flex items-center justify-center font-medium rounded-md cursor-pointer select-none transition-colors duration-200 focus:outline-none whitespace-nowrap';
+
+  let sizeStyles = '';
+  if (size === 'sm') {
+    sizeStyles = 'px-3 py-1.5 text-xs h-8 gap-1.5';
+  } else if (size === 'lg') {
+    sizeStyles = 'px-5 py-2.5 text-sm h-11 gap-2.5';
+  } else {
+    sizeStyles = 'px-4 py-2 text-sm h-9 gap-2';
+  }
+
+  let variantStyles = '';
+  if (variant === 'primary') {
+    variantStyles =
+      'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white shadow-sm';
+  } else if (variant === 'ghost') {
+    variantStyles =
+      'bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 hairline-border';
+  } else if (variant === 'outline') {
+    variantStyles =
+      'bg-transparent text-slate-700 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-zinc-800/60 hairline-border-strong';
+  } else if (variant === 'danger') {
+    variantStyles = 'bg-red-600 text-white hover:bg-red-700 shadow-sm';
+  }
+
+  const widthStyle = fullWidth ? 'w-full' : '';
+  const isButtonDisabled = disabled || isLoading;
+  const disabledStyle = isButtonDisabled ? 'opacity-70 cursor-not-allowed pointer-events-none' : '';
+
+  return (
+    <motion.button
+      type={type}
+      onClick={onClick}
+      disabled={isButtonDisabled}
+      title={title}
+      whileHover={isButtonDisabled ? {} : { scale: 1.01 }}
+      whileTap={isButtonDisabled ? {} : { scale: 0.98 }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      className={`${baseStyles} ${sizeStyles} ${variantStyles} ${widthStyle} ${disabledStyle} ${className}`}
+    >
+      {isLoading ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0 text-current" />
+      ) : (
+        icon && <span className="inline-flex items-center shrink-0">{icon}</span>
+      )}
+      <span className="inline-flex items-center whitespace-nowrap">{isLoading && loadingText ? loadingText : children}</span>
+      {!isLoading && rightIcon && (
+        <span className="inline-flex items-center shrink-0">{rightIcon}</span>
+      )}
+    </motion.button>
+  );
+}
+```
+
+---
+
+#### 3.2 `PrimaryActionButtonSharedComponent.tsx`
+- **File**: `src/Shared/Components/PrimaryActionButtonSharedComponent.tsx`
+- **Export**: `default function PrimaryActionButtonSharedComponent`
+- **Purpose**: Canonical primary CTA button wrapper enforcing the `#0C2086` brand sapphire palette and white text/icon contrast.
+
+```tsx
+import React from 'react';
+import { Plus } from 'lucide-react';
+import ButtonSharedComponent from './ButtonSharedComponent';
+
+export interface PrimaryActionButtonSharedComponentProps {
+  label: string;
+  onClick?: () => void;
+  icon?: React.ReactNode;
+  disabled?: boolean;
+  isLoading?: boolean;
+  loadingText?: React.ReactNode;
+  type?: 'button' | 'submit' | 'reset';
+  className?: string;
+}
+
+export default function PrimaryActionButtonSharedComponent({
+  label,
+  onClick,
+  icon = <Plus className="w-3.5 h-3.5 !text-white" />,
+  disabled = false,
+  isLoading = false,
+  loadingText,
+  type = 'button',
+  className = '',
+}: PrimaryActionButtonSharedComponentProps): React.JSX.Element {
+  return (
+    <ButtonSharedComponent
+      variant="primary"
+      size="sm"
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      isLoading={isLoading}
+      loadingText={loadingText}
+      className={`!bg-[#0C2086] hover:!bg-[#081765] !text-white border-none shadow-sm font-semibold shrink-0 ${className}`}
+      icon={icon}
+    >
+      <span className="!text-white font-medium">{label}</span>
+    </ButtonSharedComponent>
+  );
+}
+```
+
+---
+
+### Module 4: States, Security & Badges
+
+#### 4.1 `BadgeSharedComponent.tsx`
+- **File**: `src/Shared/Components/BadgeSharedComponent.tsx`
+- **Export**: `default function BadgeSharedComponent`
+
+```tsx
+import React from 'react';
+
+export interface BadgeSharedComponentProps {
+  children: React.ReactNode;
+  variant?: 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+  size?: 'sm' | 'md';
+  showDot?: boolean;
+  className?: string;
+}
+
+export default function BadgeSharedComponent({
+  children,
+  variant = 'neutral',
+  size = 'md',
+  showDot = false,
+  className = '',
+}: BadgeSharedComponentProps): React.JSX.Element {
+  let baseStyles = 'inline-flex items-center font-mono font-medium rounded-full';
+  
+  let sizeStyles = size === 'sm' ? 'text-[10px] px-2 py-0.5 gap-1' : 'text-xs px-2.5 py-1 gap-1.5';
+
+  let variantStyles = '';
+  let dotStyles = '';
+
+  switch (variant) {
+    case 'success':
+      variantStyles = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20';
+      dotStyles = 'bg-emerald-500';
+      break;
+    case 'warning':
+      variantStyles = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20';
+      dotStyles = 'bg-amber-500';
+      break;
+    case 'danger':
+      variantStyles = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20';
+      dotStyles = 'bg-rose-500';
+      break;
+    case 'info':
+      variantStyles = 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20';
+      dotStyles = 'bg-sky-500';
+      break;
+    case 'neutral':
+    default:
+      variantStyles = 'bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700';
+      dotStyles = 'bg-slate-400 dark:bg-zinc-500';
+      break;
+  }
+
+  return (
+    <span className={`${baseStyles} ${sizeStyles} ${variantStyles} ${className}`}>
+      {showDot && (
+        <span className={`w-1.5 h-1.5 rounded-full ${dotStyles} animate-pulse shrink-0`} />
+      )}
+      {children}
+    </span>
+  );
+}
+```
+
+---
+
+#### 4.2 `EmptyStateSharedComponent.tsx`
+- **File**: `src/Shared/Components/EmptyStateSharedComponent.tsx`
+- **Export**: `default function EmptyStateSharedComponent`
+
+```tsx
+import React from 'react';
+import { motion } from 'motion/react';
+
+export interface EmptyStateSharedComponentProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  actionButton?: React.ReactNode;
+  className?: string;
+}
+
+export default function EmptyStateSharedComponent({
+  icon,
+  title,
+  description,
+  actionButton,
+  className = '',
+}: EmptyStateSharedComponentProps): React.JSX.Element {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className={`py-12 px-6 rounded-xl bg-white dark:bg-[#0d0d10] border border-slate-300/90 dark:border-zinc-800 shadow-sm dark:shadow-2xs text-center flex flex-col items-center justify-center select-none ${className}`}
+    >
+      <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700/60 shadow-2xs flex items-center justify-center mb-3 text-slate-400 dark:text-zinc-500 shrink-0">
+        {icon}
+      </div>
+
+      <h3 className="text-lg font-semibold text-slate-700 dark:text-zinc-300 font-serif-headline tracking-tight">
+        {title}
+      </h3>
+
+      <p className="text-xs text-slate-400 dark:text-zinc-500 max-w-sm mx-auto leading-relaxed mt-1.5 font-sans">
+        {description}
+      </p>
+
+      {actionButton && <div className="mt-4">{actionButton}</div>}
+    </motion.div>
+  );
+}
+```
+
+---
+
+#### 4.3 `PermissionGuardSharedComponent.tsx`
+- **File**: `src/Shared/Components/PermissionGuardSharedComponent.tsx`
+- **Export**: `default function PermissionGuardSharedComponent`
+
+```tsx
+import React from 'react';
+import { UserRoleType } from '@/src/Types';
+import useAuthenticationStateStore from '@/src/Store/AuthenticationStateStore';
+import ApplicationPermissionService from '@/src/Services/ApplicationPermissionService';
+
+export interface PermissionGuardSharedComponentProps {
+  permission: Set<UserRoleType>;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+/**
+ * Declarative component that conditionally renders its children only if
+ * the current authenticated user's role is included in the allowed permission set.
+ */
+export default function PermissionGuardSharedComponent({
+  permission,
+  children,
+  fallback = null,
+}: PermissionGuardSharedComponentProps): React.JSX.Element | null {
+  const userRole = useAuthenticationStateStore((state) => state.user?.role);
+  const hasAccess = ApplicationPermissionService.current.hasPermission(permission);
+
+  if (!hasAccess) {
+    return fallback ? <React.Fragment>{fallback}</React.Fragment> : null;
+  }
+
+  return <React.Fragment>{children}</React.Fragment>;
+}
+```
+
+---
+
+### Module 5: Theming & View Transitions
+
+#### 5.1 `ThemeToggleSharedComponent.tsx`
+- **File**: `src/Shared/Components/ThemeToggleSharedComponent.tsx`
+- **Export**: `default function ThemeToggleSharedComponent`
+
+```tsx
+import React from 'react';
+import { motion } from 'motion/react';
+import { Sun, Moon } from 'lucide-react';
+import ApplicationThemeCON from '../../Constants/ApplicationThemeCON';
+
+export interface ThemeToggleSharedComponentProps {
+  currentTheme: string;
+  onToggle: () => void;
+}
+
+export default function ThemeToggleSharedComponent({
+  currentTheme,
+  onToggle,
+}: ThemeToggleSharedComponentProps): React.JSX.Element {
+  const isDark = currentTheme === ApplicationThemeCON.DARK;
+
+  return (
+    <motion.button
+      onClick={onToggle}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      className="p-2 rounded-lg bg-slate-100 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-300 hairline-border hover:bg-slate-200 dark:hover:bg-zinc-700/80 transition-colors cursor-pointer"
+    >
+      {isDark ? (
+        <Sun className="w-4 h-4 text-amber-400" />
+      ) : (
+        <Moon className="w-4 h-4 text-slate-600" />
+      )}
+    </motion.button>
+  );
+}
+```
+
+---
+
+#### 5.2 `AnimatedThemeToggleSharedComponent.tsx`
+- **File**: `src/Shared/Components/AnimatedThemeToggleSharedComponent.tsx`
+- **Export**: `default function AnimatedThemeToggleSharedComponent`
+- **Key Capabilities**: Native CSS View Transitions API (`startViewTransition`) executing spatial polygon clip-path expansions (`circle`, `square`, `triangle`, `diamond`, `hexagon`, `rectangle`, `star`) anchored from the clicked toggle button position across the entire viewport.
+
+```tsx
+import React, { useCallback, useEffect, useRef } from 'react';
+import { Moon, Sun } from 'lucide-react';
+import { flushSync } from 'react-dom';
+import ApplicationThemeCON from '../../Constants/ApplicationThemeCON';
+
+export type TransitionVariant =
+  | 'circle'
+  | 'square'
+  | 'triangle'
+  | 'diamond'
+  | 'hexagon'
+  | 'rectangle'
+  | 'star';
+
+export interface AnimatedThemeToggleSharedComponentProps {
+  currentTheme?: string;
+  onToggleTheme?: () => void;
+  duration?: number;
+  variant?: TransitionVariant;
+  fromCenter?: boolean;
+  className?: string;
+}
+
+function polygonCollapsed(point: string, vertexCount: number): string {
+  const pairs = Array.from({ length: vertexCount }, () => point).join(', ');
+  return `polygon(${pairs})`;
+}
+
+function getThemeTransitionClipPaths(
+  variant: TransitionVariant,
+  cx: number,
+  cy: number,
+  maxRadius: number,
+  viewportWidth: number,
+  viewportHeight: number
+): [string, string] {
+  const toX = (x: number) => `${(x / viewportWidth) * 100}%`;
+  const toY = (y: number) => `${(y / viewportHeight) * 100}%`;
+  const point = (x: number, y: number) => `${toX(x)} ${toY(y)}`;
+  const toRadius = (r: number) =>
+    `${(r / (Math.hypot(viewportWidth, viewportHeight) / Math.SQRT2)) * 100}%`;
+
+  switch (variant) {
+    case 'circle':
+      return [
+        `circle(0% at ${point(cx, cy)})`,
+        `circle(${toRadius(maxRadius)} at ${point(cx, cy)})`,
+      ];
+    case 'square': {
+      const halfW = Math.max(cx, viewportWidth - cx);
+      const halfH = Math.max(cy, viewportHeight - cy);
+      const halfSide = Math.max(halfW, halfH) * 1.05;
+      const end = [
+        point(cx - halfSide, cy - halfSide),
+        point(cx + halfSide, cy - halfSide),
+        point(cx + halfSide, cy + halfSide),
+        point(cx - halfSide, cy + halfSide),
+      ].join(', ');
+      return [polygonCollapsed(point(cx, cy), 4), `polygon(${end})`];
+    }
+    case 'triangle': {
+      const scale = maxRadius * 2.2;
+      const dx = (Math.sqrt(3) / 2) * scale;
+      const verts = [
+        point(cx, cy - scale),
+        point(cx + dx, cy + 0.5 * scale),
+        point(cx - dx, cy + 0.5 * scale),
+      ].join(', ');
+      return [polygonCollapsed(point(cx, cy), 3), `polygon(${verts})`];
+    }
+    case 'diamond': {
+      const R = maxRadius * Math.SQRT2;
+      const end = [
+        point(cx, cy - R),
+        point(cx + R, cy),
+        point(cx, cy + R),
+        point(cx - R, cy),
+      ].join(', ');
+      return [polygonCollapsed(point(cx, cy), 4), `polygon(${end})`];
+    }
+    case 'hexagon': {
+      const R = maxRadius * Math.SQRT2;
+      const verts: string[] = [];
+      for (let i = 0; i < 6; i++) {
+        const a = -Math.PI / 2 + (i * Math.PI) / 3;
+        verts.push(point(cx + R * Math.cos(a), cy + R * Math.sin(a)));
+      }
+      return [polygonCollapsed(point(cx, cy), 6), `polygon(${verts.join(', ')})`];
+    }
+    case 'rectangle': {
+      const halfW = Math.max(cx, viewportWidth - cx);
+      const halfH = Math.max(cy, viewportHeight - cy);
+      const end = [
+        point(cx - halfW, cy - halfH),
+        point(cx + halfW, cy - halfH),
+        point(cx + halfW, cy + halfH),
+        point(cx - halfW, cy + halfH),
+      ].join(', ');
+      return [polygonCollapsed(point(cx, cy), 4), `polygon(${end})`];
+    }
+    case 'star': {
+      const R = maxRadius * Math.SQRT2 * 1.03;
+      const innerRatio = 0.42;
+      const starPolygon = (radius: number) => {
+        const verts: string[] = [];
+        for (let i = 0; i < 5; i++) {
+          const outerA = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+          verts.push(
+            point(cx + radius * Math.cos(outerA), cy + radius * Math.sin(outerA))
+          );
+          const innerA = outerA + Math.PI / 5;
+          verts.push(
+            point(
+              cx + radius * innerRatio * Math.cos(innerA),
+              cy + radius * innerRatio * Math.sin(innerA)
+            )
+          );
+        }
+        return `polygon(${verts.join(', ')})`;
+      };
+      const startR = Math.max(2, R * 0.025);
+      return [starPolygon(startR), starPolygon(R)];
+    }
+    default:
+      return [
+        `circle(0% at ${point(cx, cy)})`,
+        `circle(${toRadius(maxRadius)} at ${point(cx, cy)})`,
+      ];
+  }
+}
+
+export default function AnimatedThemeToggleSharedComponent({
+  currentTheme,
+  onToggleTheme,
+  duration = 450,
+  variant = 'circle',
+  fromCenter = false,
+  className = '',
+}: AnimatedThemeToggleSharedComponentProps): React.JSX.Element {
+  const isDark = currentTheme === ApplicationThemeCON.DARK;
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const isTransitioningRef = useRef<boolean>(false);
+  const activeAnimRef = useRef<Animation | null>(null);
+
+  const cancelAnim = useCallback(() => {
+    activeAnimRef.current?.cancel();
+    activeAnimRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      cancelAnim();
+      const root = document.documentElement;
+      if (root.dataset.magicuiThemeVt !== 'active') return;
+      delete root.dataset.magicuiThemeVt;
+      root.style.removeProperty('--magicui-theme-toggle-vt-duration');
+      root.style.removeProperty('--magicui-theme-vt-clip-from');
+    };
+  }, [cancelAnim]);
+
+  const handleToggle = useCallback(() => {
+    const button = buttonRef.current;
+    if (
+      !button ||
+      isTransitioningRef.current ||
+      document.documentElement.dataset.magicuiThemeVt === 'active'
+    ) {
+      onToggleTheme?.();
+      return;
+    }
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let x: number;
+    let y: number;
+    if (fromCenter) {
+      x = viewportWidth / 2;
+      y = viewportHeight / 2;
+    } else {
+      const { top, left, width, height } = button.getBoundingClientRect();
+      x = left + width / 2;
+      y = top + height / 2;
+    }
+
+    const maxRadius = Math.hypot(
+      Math.max(x, viewportWidth - x),
+      Math.max(y, viewportHeight - y)
+    );
+
+    const applyTheme = () => {
+      onToggleTheme?.();
+    };
+
+    if (
+      typeof document === 'undefined' ||
+      !(document as any).startViewTransition
+    ) {
+      applyTheme();
+      return;
+    }
+
+    const clipPath = getThemeTransitionClipPaths(
+      variant,
+      x,
+      y,
+      maxRadius,
+      viewportWidth,
+      viewportHeight
+    );
+
+    const root = document.documentElement;
+    root.dataset.magicuiThemeVt = 'active';
+    root.style.setProperty('--magicui-theme-toggle-vt-duration', `${duration}ms`);
+    root.style.setProperty('--magicui-theme-vt-clip-from', clipPath[0]);
+
+    const cleanup = () => {
+      clearTimeout(safetyTimer);
+      isTransitioningRef.current = false;
+      delete root.dataset.magicuiThemeVt;
+      root.style.removeProperty('--magicui-theme-toggle-vt-duration');
+      root.style.removeProperty('--magicui-theme-vt-clip-from');
+      cancelAnim();
+    };
+
+    const safetyTimer = setTimeout(cleanup, duration + 200);
+
+    isTransitioningRef.current = true;
+    const transition = (document as any).startViewTransition(() => {
+      flushSync(applyTheme);
+    });
+
+    if (transition?.finished?.finally) {
+      transition.finished.finally(cleanup).catch(() => {});
+    } else {
+      cleanup();
+    }
+
+    const ready = transition?.ready;
+    if (ready && typeof ready.then === 'function') {
+      ready
+        .then(() => {
+          const anim = document.documentElement.animate(
+            {
+              clipPath,
+            },
+            {
+              duration,
+              easing: variant === 'star' ? 'linear' : 'cubic-bezier(0.16, 1, 0.3, 1)',
+              fill: 'forwards',
+              pseudoElement: '::view-transition-new(root)',
+            }
+          );
+          activeAnimRef.current = anim;
+        })
+        .catch(() => {});
+    }
+  }, [variant, fromCenter, duration, onToggleTheme, cancelAnim]);
+
+  return (
+    <button
+      type="button"
+      ref={buttonRef}
+      onClick={handleToggle}
+      aria-label="Toggle light and dark theme"
+      title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      className={`p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-300 transition-all shadow-sm cursor-pointer flex items-center justify-center ${className}`}
+    >
+      {isDark ? (
+        <Sun className="w-4 h-4 text-amber-400 animate-in spin-in-90 duration-300" />
+      ) : (
+        <Moon className="w-4 h-4 text-slate-700 animate-in spin-in-90 duration-300" />
+      )}
+    </button>
+  );
+}
+```
+
+---
+
+## 10. Operational Invariants & Zero-Mock Data Specification
+
+### 1. Strict 2-Column Form Layout
+- Multi-section forms adhere strictly to `grid grid-cols-1 md:grid-cols-2 gap-4`.
+- A maximum of 2 inputs are permitted per row. If a section contains an odd number of inputs (e.g. 3), the 3rd input is positioned on a new line taking `md:col-span-1` (exactly half-width).
+- All input text boxes & custom dropdown triggers are standardized to `h-10` (`40px`).
+- Label header containers are standardized to `h-4.5` (`18px`) with `mb-1.5` margins for baseline alignment across mixed inputs.
+
+### 2. Metric Grid Constraints
+- Metric cards across dashboards and modal overviews **MUST** constrain to a maximum of 3 cards per row on large displays: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3`.
+
+### 3. Zero-Mock Data Invariant
+- Every number, string, status, and relationship shown on screen must be derived from backend API queries.
+- When an entity dataset is empty (0 assets, 0 employees, 0 software licenses), never invent fallback demo items. Always render [`EmptyStateSharedComponent.tsx`](#42-emptystatesharedcomponenttsx).
+
+---
+
+*Authored and Certified for Monitoring Dashboard App Codebase Architecture.*
