@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { motion } from 'motion/react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   Activity,
   CheckCircle2,
@@ -12,6 +12,8 @@ import {
   List,
   LayoutGrid,
   Play,
+  CalendarDays,
+  CalendarRange,
 } from 'lucide-react';
 import CardSharedComponent from '../../Shared/Components/CardSharedComponent';
 import BadgeSharedComponent from '../../Shared/Components/BadgeSharedComponent';
@@ -20,10 +22,26 @@ import PrimaryActionButtonSharedComponent from '../../Shared/Components/PrimaryA
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
 import CustomSelectSharedComponent, { type SelectOption } from '../../Shared/Components/CustomSelectSharedComponent';
 import ConfirmationModalSharedComponent from '../../Shared/Components/ConfirmationModalSharedComponent';
+import HealthByDayBarChartSharedComponent from '../../Shared/Components/HealthByDayBarChartSharedComponent';
+import SegmentedControlSharedComponent from '../../Shared/Components/SegmentedControlSharedComponent';
+import PingCheckCardSharedComponent from '../../Shared/Components/PingCheckCardSharedComponent';
+import LoginCheckCardSharedComponent from '../../Shared/Components/LoginCheckCardSharedComponent';
+import PageLoadCheckCardSharedComponent from '../../Shared/Components/PageLoadCheckCardSharedComponent';
+import IndexingFreshnessCardSharedComponent from '../../Shared/Components/IndexingFreshnessCardSharedComponent';
+import QueueStatusCardSharedComponent from '../../Shared/Components/QueueStatusCardSharedComponent';
 import DateFormatterUtility from '../../Utilities/DateFormatterUtility';
 import RunsService from '../../Services/RunsService';
-import type { RunSummary, HealthType } from '../../Types';
+import type { RunSummary, RunDetail, HealthType } from '../../Types';
 import DashboardCON from './Constants/DashboardCON';
+
+function isSameCalendarDay(isoString: string, reference: Date): boolean {
+  const target = new Date(isoString);
+  return (
+    target.getFullYear() === reference.getFullYear() &&
+    target.getMonth() === reference.getMonth() &&
+    target.getDate() === reference.getDate()
+  );
+}
 
 export interface DashboardScreenControllerProps {
   runs: RunSummary[];
@@ -36,6 +54,8 @@ export interface DashboardScreenControllerProps {
 type StatusFilterType = 'ALL' | HealthType;
 type ViewModeType = 'table' | 'grid';
 type GridColumnsType = 2 | 3;
+type GridColumnsLabelType = '2 Per Row' | '3 Per Row';
+type ScopeFilterType = 'Today' | 'Week';
 
 function healthBadgeVariant(health: HealthType): 'success' | 'warning' | 'danger' {
   if (health === 'Healthy') return 'success';
@@ -56,6 +76,77 @@ export default function DashboardScreenController({
   const [gridColumns, setGridColumns] = useState<GridColumnsType>(2);
   const [isExportingCsv, setIsExportingCsv] = useState<boolean>(false);
   const [isRunTestModalOpen, setIsRunTestModalOpen] = useState<boolean>(false);
+  const [selectedEnvironment, setSelectedEnvironment] = useState<string>(
+    DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS[0].value,
+  );
+  const [selectedTestIds, setSelectedTestIds] = useState<Set<string>>(
+    () => new Set(DashboardCON.RUN_SMOKE_TEST_ITEMS.map((item) => item.id)),
+  );
+
+  const toggleTestSelection = (id: string): void => {
+    setSelectedTestIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const isAuthenticationLoginUnchecked = !selectedTestIds.has(DashboardCON.AUTHENTICATION_LOGIN_TEST_ID);
+  const [scopeFilter, setScopeFilter] = useState<ScopeFilterType>('Today');
+  const [todayRunDetail, setTodayRunDetail] = useState<RunDetail | null>(null);
+  const [isLoadingTodayRun, setIsLoadingTodayRun] = useState<boolean>(false);
+
+  const todayRun = useMemo(() => {
+    const now = new Date();
+    return runs.find((run) => isSameCalendarDay(run.createdAt, now)) ?? null;
+  }, [runs]);
+
+  useEffect(() => {
+    if (!todayRun) {
+      setTodayRunDetail(null);
+      return;
+    }
+    let cancelled = false;
+    setIsLoadingTodayRun(true);
+    RunsService.current
+      .getRunById(todayRun.id)
+      .then((detail) => {
+        if (!cancelled) setTodayRunDetail(detail);
+      })
+      .catch(() => {
+        if (!cancelled) setTodayRunDetail(null);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingTodayRun(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [todayRun]);
+
+  const todayAuthChecks = useMemo(
+    () =>
+      (todayRunDetail?.pageChecks ?? []).filter(
+        (check) => check.checkType === 'AuthenticationPing' || check.checkType === 'AuthenticationLogin',
+      ),
+    [todayRunDetail],
+  );
+  const todayPageLoadChecks = useMemo(
+    () => (todayRunDetail?.pageChecks ?? []).filter((check) => check.checkType === 'PageLoad'),
+    [todayRunDetail],
+  );
+  const todayIndexingChecks = useMemo(
+    () => (todayRunDetail?.pageChecks ?? []).filter((check) => check.checkType === 'IndexingFreshness'),
+    [todayRunDetail],
+  );
+  const todayQueueChecks = useMemo(
+    () => (todayRunDetail?.pageChecks ?? []).filter((check) => check.checkType === 'QueueStatus'),
+    [todayRunDetail],
+  );
 
   const totalRuns = runs.length;
   const healthyCount = runs.filter((run) => run.health === 'Healthy').length;
@@ -126,7 +217,22 @@ export default function DashboardScreenController({
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl">{DashboardCON.SUBTITLE}</p>
         </div>
-        <div className="w-full sm:w-auto sm:shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto sm:shrink-0">
+          {/* Scope Segmented Control (Today vs Week) */}
+          <SegmentedControlSharedComponent<ScopeFilterType>
+            value={scopeFilter}
+            onChange={setScopeFilter}
+            layoutId="activeScopeFilterPill"
+            fullWidthOnMobile
+            hapticFeedback
+            activeTextClassName="text-[#0C2086] dark:text-zinc-100 font-semibold"
+            inactiveTextClassName="text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200"
+            options={[
+              { value: 'Today', label: "Today's Test", icon: <CalendarDays className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> },
+              { value: 'Week', label: 'Weekly Data', icon: <CalendarRange className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> },
+            ]}
+          />
+
           <PrimaryActionButtonSharedComponent
             onClick={() => setIsRunTestModalOpen(true)}
             icon={<Play className="w-4 h-4 sm:w-3.5 sm:h-3.5 !text-white" />}
@@ -138,40 +244,102 @@ export default function DashboardScreenController({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Card 1: Total Runs */}
-        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
-              Total Runs
-            </span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0C2086] text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
-              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+      <AnimatePresence mode="wait">
+      {scopeFilter === 'Today' && (
+        <motion.div
+          key="today-test-content"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 6 }}
+          transition={{ duration: 0.2 }}
+          className="space-y-6"
+        >
+          {isLoadingTodayRun ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3].map((placeholderKey) => (
+                <div key={placeholderKey} className="h-32 rounded-xl bg-slate-100 dark:bg-zinc-800/60 animate-pulse" />
+              ))}
             </div>
-          </div>
+          ) : !todayRunDetail || todayRunDetail.pageChecks.length === 0 ? (
+            <CardSharedComponent>
+              <EmptyStateSharedComponent
+                icon={<CalendarDays className="w-5 h-5" />}
+                title="No Test Run Today Yet"
+                description="The morning smoke test hasn't run yet today — check back after 8:30 AM."
+                className="w-full py-8"
+              />
+            </CardSharedComponent>
+          ) : (
+            <>
+              {todayAuthChecks.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
+                    Authentication
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {todayAuthChecks.map((check) =>
+                      check.checkType === 'AuthenticationPing' ? (
+                        <PingCheckCardSharedComponent key={check.id} check={check} />
+                      ) : (
+                        <LoginCheckCardSharedComponent key={check.id} check={check} />
+                      ),
+                    )}
+                  </div>
+                </div>
+              )}
 
-          <div className="mt-2.5 sm:mt-3 flex items-baseline justify-between gap-1 sm:gap-2">
-            {isLoading ? (
-              <div className="h-7 sm:h-8 w-14 bg-slate-200 dark:bg-zinc-800 rounded animate-pulse" />
-            ) : (
-              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-mono tracking-tight text-slate-900 dark:text-zinc-50">
-                {totalRuns}
-              </div>
-            )}
-            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-indigo-900 dark:text-zinc-300 bg-indigo-100/80 dark:bg-zinc-800/80 border border-indigo-200/60 dark:border-zinc-700/60 px-1.5 sm:px-2 py-0.5 rounded-md">
-              {flaggedCount > 0 ? `${flaggedCount} flagged` : 'All Clear'}
-            </span>
-          </div>
+              {todayPageLoadChecks.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
+                    Page Loads
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {todayPageLoadChecks.map((check) => (
+                      <PageLoadCheckCardSharedComponent key={check.id} check={check} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          <div className="mt-2.5 sm:mt-3.5 pt-2 sm:pt-2.5 border-t border-slate-200/60 dark:border-zinc-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-500 dark:text-zinc-400">
-            <span className="truncate">Overall History</span>
-            <span className="flex items-center gap-1.5 font-semibold text-indigo-800 dark:text-zinc-300 shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-zinc-400" />
-              Live Monitor
-            </span>
-          </div>
-        </div>
+              {todayIndexingChecks.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
+                    Indexing Freshness
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {todayIndexingChecks.map((check) => (
+                      <IndexingFreshnessCardSharedComponent key={check.id} check={check} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
+              {todayQueueChecks.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
+                    Queue Status
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {todayQueueChecks.map((check) => (
+                      <QueueStatusCardSharedComponent key={check.id} check={check} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </motion.div>
+      )}
+      {scopeFilter === 'Week' && (
+        <motion.div
+          key="weekly-data-content"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 6 }}
+          transition={{ duration: 0.2 }}
+          className="space-y-6"
+        >
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 2: Healthy */}
         <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-emerald-600/10 via-slate-600/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center justify-between gap-2">
@@ -206,12 +374,12 @@ export default function DashboardScreenController({
         </div>
 
         {/* Card 3: Degraded */}
-        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
+        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Degraded
             </span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#1332BD] text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0C2086] text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
               <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
@@ -220,19 +388,19 @@ export default function DashboardScreenController({
             {isLoading ? (
               <div className="h-6 sm:h-7 w-14 bg-slate-200 dark:bg-zinc-800 rounded animate-pulse" />
             ) : (
-              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-mono tracking-tight text-[#0C2086] dark:text-zinc-50">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-mono tracking-tight text-slate-900 dark:text-zinc-50">
                 {degradedCount}
               </div>
             )}
-            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-blue-900 dark:text-zinc-300 bg-blue-50 dark:bg-zinc-800/80 border border-blue-200/60 dark:border-zinc-700/60 px-1.5 sm:px-2 py-0.5 rounded-md">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-indigo-900 dark:text-zinc-300 bg-indigo-100/80 dark:bg-zinc-800/80 border border-indigo-200/60 dark:border-zinc-700/60 px-1.5 sm:px-2 py-0.5 rounded-md">
               {degradedPct}% of runs
             </span>
           </div>
 
           <div className="mt-2.5 sm:mt-3.5 pt-2 sm:pt-2.5 border-t border-slate-200/60 dark:border-zinc-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-500 dark:text-zinc-400">
             <span className="truncate">Needs Review</span>
-            <span className="flex items-center gap-1 font-semibold text-[#0C2086] dark:text-zinc-300 shrink-0">
-              <AlertTriangle className="w-3 h-3 text-blue-600 dark:text-zinc-400 hidden sm:inline" />
+            <span className="flex items-center gap-1 font-semibold text-indigo-800 dark:text-zinc-300 shrink-0">
+              <AlertTriangle className="w-3 h-3 text-indigo-600 dark:text-zinc-400 hidden sm:inline" />
               Latest Flag
             </span>
           </div>
@@ -270,6 +438,44 @@ export default function DashboardScreenController({
             </span>
           </div>
         </div>
+
+        {/* Card 5: Total Runs */}
+        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
+              Total Runs
+            </span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0C2086] text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
+              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </div>
+          </div>
+
+          <div className="mt-2.5 sm:mt-3 flex items-baseline justify-between gap-1 sm:gap-2">
+            {isLoading ? (
+              <div className="h-7 sm:h-8 w-14 bg-slate-200 dark:bg-zinc-800 rounded animate-pulse" />
+            ) : (
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-mono tracking-tight text-slate-900 dark:text-zinc-50">
+                {totalRuns}
+              </div>
+            )}
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-indigo-900 dark:text-zinc-300 bg-indigo-100/80 dark:bg-zinc-800/80 border border-indigo-200/60 dark:border-zinc-700/60 px-1.5 sm:px-2 py-0.5 rounded-md">
+              {flaggedCount > 0 ? `${flaggedCount} flagged` : 'All Clear'}
+            </span>
+          </div>
+
+          <div className="mt-2.5 sm:mt-3.5 pt-2 sm:pt-2.5 border-t border-slate-200/60 dark:border-zinc-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-500 dark:text-zinc-400">
+            <span className="truncate">Overall History</span>
+            <span className="flex items-center gap-1.5 font-semibold text-indigo-800 dark:text-zinc-300 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-zinc-400" />
+              Live Monitor
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts: 7-day health history */}
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 items-stretch">
+        <HealthByDayBarChartSharedComponent runs={runs} />
       </div>
 
       {/* Controls Toolbar */}
@@ -325,106 +531,26 @@ export default function DashboardScreenController({
 
           <div className="hidden sm:flex items-center gap-3">
             {viewMode === 'grid' && (
-              <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60 h-9 w-auto">
-                <button
-                  type="button"
-                  onClick={() => setGridColumns(2)}
-                  title="Show 2 Items Per Row"
-                  className="relative flex items-center justify-center px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
-                >
-                  {gridColumns === 2 && (
-                    <motion.div
-                      layoutId="activeGridDensityPill"
-                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
-                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                    />
-                  )}
-                  <span
-                    className={`relative z-10 ${
-                      gridColumns === 2
-                        ? 'text-slate-900 dark:text-white font-bold'
-                        : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    2 Per Row
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setGridColumns(3)}
-                  title="Show 3 Items Per Row"
-                  className="relative flex items-center justify-center px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
-                >
-                  {gridColumns === 3 && (
-                    <motion.div
-                      layoutId="activeGridDensityPill"
-                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
-                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                    />
-                  )}
-                  <span
-                    className={`relative z-10 ${
-                      gridColumns === 3
-                        ? 'text-slate-900 dark:text-white font-bold'
-                        : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    3 Per Row
-                  </span>
-                </button>
-              </div>
+              <SegmentedControlSharedComponent<GridColumnsLabelType>
+                value={gridColumns === 2 ? '2 Per Row' : '3 Per Row'}
+                onChange={(val) => setGridColumns(val === '2 Per Row' ? 2 : 3)}
+                layoutId="activeGridDensityPill"
+                options={[
+                  { value: '2 Per Row', label: '2 Per Row' },
+                  { value: '3 Per Row', label: '3 Per Row' },
+                ]}
+              />
             )}
 
-            <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60 h-9 w-auto">
-              <button
-                type="button"
-                onClick={() => setViewMode('table')}
-                title="Table View"
-                className="relative flex items-center justify-center gap-1.5 px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
-              >
-                {viewMode === 'table' && (
-                  <motion.div
-                    layoutId="activeViewModePill"
-                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <span
-                  className={`relative z-10 flex items-center gap-1.5 ${
-                    viewMode === 'table'
-                      ? 'text-slate-900 dark:text-white font-bold'
-                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  <List className="w-3.5 h-3.5" />
-                  <span>Table</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                title="Grid View"
-                className="relative flex items-center justify-center gap-1.5 px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
-              >
-                {viewMode === 'grid' && (
-                  <motion.div
-                    layoutId="activeViewModePill"
-                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <span
-                  className={`relative z-10 flex items-center gap-1.5 ${
-                    viewMode === 'grid'
-                      ? 'text-slate-900 dark:text-white font-bold'
-                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                  <span>Grid</span>
-                </span>
-              </button>
-            </div>
+            <SegmentedControlSharedComponent<ViewModeType>
+              value={viewMode}
+              onChange={setViewMode}
+              layoutId="activeViewModePill"
+              options={[
+                { value: 'table', label: 'Table', icon: <List className="w-3.5 h-3.5" /> },
+                { value: 'grid', label: 'Grid', icon: <LayoutGrid className="w-3.5 h-3.5" /> },
+              ]}
+            />
           </div>
         </div>
       </CardSharedComponent>
@@ -504,6 +630,9 @@ export default function DashboardScreenController({
             </div>
           )}
       </CardSharedComponent>
+        </motion.div>
+      )}
+      </AnimatePresence>
 
       <ConfirmationModalSharedComponent
         isOpen={isRunTestModalOpen}
@@ -516,6 +645,58 @@ export default function DashboardScreenController({
         cancelText="Cancel"
         variant="primary"
         maxWidth="md"
+        additionalContent={
+          <div className="space-y-3.5">
+            <CustomSelectSharedComponent
+              label="Environment"
+              value={selectedEnvironment}
+              onChange={setSelectedEnvironment}
+              options={DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS}
+              size="sm"
+            />
+            <div>
+              <span className="text-xs font-medium text-slate-600 dark:text-zinc-400 mb-1.5 block">
+                Tests that will run
+              </span>
+              <div className="rounded-lg border border-slate-200 dark:border-zinc-800 divide-y divide-slate-100 dark:divide-zinc-800/60 overflow-hidden">
+                {DashboardCON.RUN_SMOKE_TEST_ITEMS.map((item) => {
+                  const isChecked = selectedTestIds.has(item.id);
+                  return (
+                    <label
+                      key={item.id}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-zinc-900/40 transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleTestSelection(item.id)}
+                        className="w-3.5 h-3.5 rounded border-slate-300 dark:border-zinc-700 text-[#0C2086] focus:ring-[#0C2086] shrink-0"
+                      />
+                      <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-zinc-800/80 text-slate-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                        <item.icon className="w-3.5 h-3.5" />
+                      </div>
+                      <span
+                        className={`font-medium ${
+                          isChecked
+                            ? 'text-slate-700 dark:text-zinc-200'
+                            : 'text-slate-400 dark:text-zinc-500 line-through'
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              {isAuthenticationLoginUnchecked && (
+                <div className="mt-2.5 flex items-start gap-2 rounded-lg border border-amber-200 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>No tests can proceed if the Authentication Login Test is skipped — every other check depends on being signed in first.</span>
+                </div>
+              )}
+            </div>
+          </div>
+        }
       />
     </div>
   );
