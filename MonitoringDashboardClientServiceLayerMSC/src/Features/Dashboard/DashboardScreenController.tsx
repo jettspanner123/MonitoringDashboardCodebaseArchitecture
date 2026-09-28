@@ -93,7 +93,7 @@ export default function DashboardScreenController({
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Healthy
             </span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-800 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-700 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
               <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function DashboardScreenController({
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Degraded
             </span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-800 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-700 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
               <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function DashboardScreenController({
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Failed
             </span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-rose-800 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-700 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
               <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
