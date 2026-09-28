@@ -1,17 +1,38 @@
-import React from 'react';
-import { Activity, CheckCircle2, AlertTriangle, XCircle, ChevronRight } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { motion } from 'motion/react';
+import {
+  Activity,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  ChevronRight,
+  Search,
+  RefreshCw,
+  Download,
+  List,
+  LayoutGrid,
+} from 'lucide-react';
 import CardSharedComponent from '../../Shared/Components/CardSharedComponent';
 import BadgeSharedComponent from '../../Shared/Components/BadgeSharedComponent';
+import ButtonSharedComponent from '../../Shared/Components/ButtonSharedComponent';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
+import CustomSelectSharedComponent, { type SelectOption } from '../../Shared/Components/CustomSelectSharedComponent';
 import DateFormatterUtility from '../../Utilities/DateFormatterUtility';
+import RunsService from '../../Services/RunsService';
 import type { RunSummary, HealthType } from '../../Types';
 import DashboardCON from './Constants/DashboardCON';
 
 export interface DashboardScreenControllerProps {
   runs: RunSummary[];
   isLoading: boolean;
+  isRefetching: boolean;
+  onRefetch: () => void;
   onSelectRun: (run: RunSummary) => void;
 }
+
+type StatusFilterType = 'ALL' | HealthType;
+type ViewModeType = 'table' | 'grid';
+type GridColumnsType = 2 | 3;
 
 function healthBadgeVariant(health: HealthType): 'success' | 'warning' | 'danger' {
   if (health === 'Healthy') return 'success';
@@ -22,8 +43,16 @@ function healthBadgeVariant(health: HealthType): 'success' | 'warning' | 'danger
 export default function DashboardScreenController({
   runs,
   isLoading,
+  isRefetching,
+  onRefetch,
   onSelectRun,
 }: DashboardScreenControllerProps): React.JSX.Element {
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilterType>('ALL');
+  const [viewMode, setViewMode] = useState<ViewModeType>('table');
+  const [gridColumns, setGridColumns] = useState<GridColumnsType>(2);
+  const [isExportingCsv, setIsExportingCsv] = useState<boolean>(false);
+
   const totalRuns = runs.length;
   const healthyCount = runs.filter((run) => run.health === 'Healthy').length;
   const degradedCount = runs.filter((run) => run.health === 'Degraded').length;
@@ -33,6 +62,57 @@ export default function DashboardScreenController({
   const degradedPct = totalRuns > 0 ? Math.round((degradedCount / totalRuns) * 100) : 0;
   const failedPct = totalRuns > 0 ? Math.round((failedCount / totalRuns) * 100) : 0;
   const latestRun = runs[0];
+
+  const statusOptions: SelectOption[] = [
+    { value: 'ALL', label: `All Runs (${totalRuns})` },
+    { value: 'Healthy', label: `Healthy (${healthyCount})` },
+    { value: 'Degraded', label: `Degraded (${degradedCount})` },
+    { value: 'Failed', label: `Failed (${failedCount})` },
+  ];
+
+  const filteredRuns = useMemo(() => {
+    return runs.filter((run) => {
+      if (activeStatusFilter !== 'ALL' && run.health !== activeStatusFilter) return false;
+      if (searchQuery.trim()) {
+        const term = searchQuery.trim().toLowerCase();
+        const dateStr = DateFormatterUtility.current.formatDateTime(run.createdAt).toLowerCase();
+        const healthStr = run.health.toLowerCase();
+        if (!dateStr.includes(term) && !healthStr.includes(term)) return false;
+      }
+      return true;
+    });
+  }, [runs, activeStatusFilter, searchQuery]);
+
+  const handleExportCsv = async (): Promise<void> => {
+    setIsExportingCsv(true);
+    try {
+      const details = await Promise.all(filteredRuns.map((run) => RunsService.current.getRunById(run.id)));
+      const headers = ['Run Date', 'Run Health', 'Page Name', 'Check Type', 'Status', 'Message'];
+      const rows: string[][] = [];
+      details.forEach((detail) => {
+        const dateStr = DateFormatterUtility.current.formatDateTime(detail.createdAt);
+        if (detail.pageChecks.length === 0) {
+          rows.push([dateStr, detail.health, '', '', '', '']);
+        } else {
+          detail.pageChecks.forEach((check) => {
+            rows.push([dateStr, detail.health, check.pageName, check.checkType, check.status, check.message]);
+          });
+        }
+      });
+      const csvContent = [headers, ...rows]
+        .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+      const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+      const link = document.createElement('a');
+      link.href = encodedUri;
+      link.download = `observacore_runs_${Date.now()}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } finally {
+      setIsExportingCsv(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -179,6 +259,139 @@ export default function DashboardScreenController({
         </div>
       </div>
 
+      {/* Controls Toolbar */}
+      <CardSharedComponent className="p-4 space-y-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="relative flex-1 min-w-0 sm:max-w-md">
+              <Search className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by date or health status..."
+                className="w-full h-11 sm:h-9 pl-11 pr-4 text-base sm:text-xs rounded-xl sm:rounded-lg bg-slate-50 dark:bg-[#08080a] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 border border-slate-300 dark:border-zinc-800 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors"
+              />
+            </div>
+            <ButtonSharedComponent
+              variant="outline"
+              size="sm"
+              disabled={isRefetching}
+              isLoading={isRefetching}
+              onClick={onRefetch}
+              icon={<RefreshCw className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-500 dark:text-zinc-400" />}
+              className="shrink-0 !px-3 sm:!px-2.5 !h-11 sm:!h-9"
+            >
+              <span className="sr-only">Refetch</span>
+            </ButtonSharedComponent>
+          </div>
+          <ButtonSharedComponent
+            variant="outline"
+            size="sm"
+            onClick={() => void handleExportCsv()}
+            disabled={isExportingCsv || filteredRuns.length === 0}
+            isLoading={isExportingCsv}
+            icon={<Download className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-500 dark:text-zinc-400" />}
+            className="w-full sm:w-auto !h-11 sm:!h-9 px-4 text-sm sm:text-xs font-bold"
+          >
+            Export CSV
+          </ButtonSharedComponent>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800/80 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Status:</span>
+            <CustomSelectSharedComponent
+              value={activeStatusFilter}
+              options={statusOptions}
+              onChange={(val) => setActiveStatusFilter(val as StatusFilterType)}
+              size="sm"
+              className="w-full sm:w-60"
+            />
+          </div>
+
+          <div className="hidden sm:flex items-center gap-3">
+            {viewMode === 'grid' && (
+              <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700/60 h-9">
+                <button
+                  type="button"
+                  onClick={() => setGridColumns(2)}
+                  className="relative px-3 h-7 rounded-lg text-xs font-semibold cursor-pointer"
+                >
+                  {gridColumns === 2 && (
+                    <motion.div
+                      layoutId="activeGridDensityPill"
+                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <span
+                    className={`relative z-10 ${gridColumns === 2 ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
+                  >
+                    2 Per Row
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGridColumns(3)}
+                  className="relative px-3 h-7 rounded-lg text-xs font-semibold cursor-pointer"
+                >
+                  {gridColumns === 3 && (
+                    <motion.div
+                      layoutId="activeGridDensityPill"
+                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <span
+                    className={`relative z-10 ${gridColumns === 3 ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
+                  >
+                    3 Per Row
+                  </span>
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700/60 h-9">
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                title="Table View"
+                className="relative px-2.5 h-7 rounded-lg cursor-pointer"
+              >
+                {viewMode === 'table' && (
+                  <motion.div
+                    layoutId="activeViewModePill"
+                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <List
+                  className={`relative z-10 w-4 h-4 ${viewMode === 'table' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
+                />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                title="Grid View"
+                className="relative px-2.5 h-7 rounded-lg cursor-pointer"
+              >
+                {viewMode === 'grid' && (
+                  <motion.div
+                    layoutId="activeViewModePill"
+                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <LayoutGrid
+                  className={`relative z-10 w-4 h-4 ${viewMode === 'grid' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </CardSharedComponent>
+
       <CardSharedComponent>
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -191,7 +404,42 @@ export default function DashboardScreenController({
             </div>
           </div>
 
-          {runs.length > 0 ? (
+          {runs.length === 0 ? (
+            <EmptyStateSharedComponent
+              icon={<Activity className="w-5 h-5" />}
+              title="No Runs Recorded"
+              description="Once the morning smoke test automation runs, its results will appear here."
+              className="w-full py-8"
+            />
+          ) : filteredRuns.length === 0 ? (
+            <EmptyStateSharedComponent
+              icon={<Search className="w-5 h-5" />}
+              title="No Matching Runs"
+              description="No runs match the current search or status filter."
+              className="w-full py-8"
+            />
+          ) : viewMode === 'grid' ? (
+            <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridColumns === 3 ? 'lg:grid-cols-3' : ''} gap-3`}>
+              {filteredRuns.map((run) => (
+                <button
+                  key={run.id}
+                  type="button"
+                  onClick={() => onSelectRun(run)}
+                  className="text-left rounded-xl border border-slate-200 dark:border-zinc-800 p-4 hover:bg-slate-50 dark:hover:bg-zinc-900/40 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="font-mono text-xs font-semibold text-slate-900 dark:text-zinc-100 truncate">
+                      {DateFormatterUtility.current.formatDateTime(run.createdAt)}
+                    </span>
+                    <BadgeSharedComponent variant={healthBadgeVariant(run.health)} size="sm">
+                      {run.health}
+                    </BadgeSharedComponent>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 font-mono">{run.pageCheckCount} page check(s)</p>
+                </button>
+              ))}
+            </div>
+          ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
@@ -203,7 +451,7 @@ export default function DashboardScreenController({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
-                  {runs.map((run) => (
+                  {filteredRuns.map((run) => (
                     <tr key={run.id} className="hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 transition-colors">
                       <td className="py-3 px-3 font-mono font-medium text-slate-900 dark:text-zinc-100">
                         {DateFormatterUtility.current.formatDateTime(run.createdAt)}
@@ -228,13 +476,6 @@ export default function DashboardScreenController({
                 </tbody>
               </table>
             </div>
-          ) : (
-            <EmptyStateSharedComponent
-              icon={<Activity className="w-5 h-5" />}
-              title="No Runs Recorded"
-              description="Once the morning smoke test automation runs, its results will appear here."
-              className="w-full py-8"
-            />
           )}
       </CardSharedComponent>
     </div>

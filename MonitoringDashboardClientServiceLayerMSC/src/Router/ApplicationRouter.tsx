@@ -79,7 +79,12 @@ const dashboardRoute = createRoute({
     const search = useSearch({ strict: false }) as DashboardSearchParams;
     const selectedRunId = search[ApplicationRouteCON.PARAM_RUN_ID];
 
-    const { data: runs = [], isLoading: isLoadingRuns } = TanstackQueryClientService.current.runs.useRunsQuery();
+    const {
+      data: runs = [],
+      isLoading: isLoadingRuns,
+      isFetching: isRefetchingRuns,
+      refetch: refetchRuns,
+    } = TanstackQueryClientService.current.runs.useRunsQuery();
     const { data: run, isLoading: isLoadingRun } = TanstackQueryClientService.current.runs.useRunDetailQuery(
       selectedRunId ?? ''
     );
@@ -103,6 +108,8 @@ const dashboardRoute = createRoute({
       <DashboardOverviewScreenRoute
         runs={runs}
         isLoading={isLoadingRuns}
+        isRefetching={isRefetchingRuns}
+        onRefetch={() => void refetchRuns()}
         onSelectRun={(selected) =>
           navigate({
             to: '.',
