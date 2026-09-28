@@ -11,12 +11,15 @@ import {
   Download,
   List,
   LayoutGrid,
+  Play,
 } from 'lucide-react';
 import CardSharedComponent from '../../Shared/Components/CardSharedComponent';
 import BadgeSharedComponent from '../../Shared/Components/BadgeSharedComponent';
 import ButtonSharedComponent from '../../Shared/Components/ButtonSharedComponent';
+import PrimaryActionButtonSharedComponent from '../../Shared/Components/PrimaryActionButtonSharedComponent';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
 import CustomSelectSharedComponent, { type SelectOption } from '../../Shared/Components/CustomSelectSharedComponent';
+import ConfirmationModalSharedComponent from '../../Shared/Components/ConfirmationModalSharedComponent';
 import DateFormatterUtility from '../../Utilities/DateFormatterUtility';
 import RunsService from '../../Services/RunsService';
 import type { RunSummary, HealthType } from '../../Types';
@@ -52,6 +55,7 @@ export default function DashboardScreenController({
   const [viewMode, setViewMode] = useState<ViewModeType>('table');
   const [gridColumns, setGridColumns] = useState<GridColumnsType>(2);
   const [isExportingCsv, setIsExportingCsv] = useState<boolean>(false);
+  const [isRunTestModalOpen, setIsRunTestModalOpen] = useState<boolean>(false);
 
   const totalRuns = runs.length;
   const healthyCount = runs.filter((run) => run.health === 'Healthy').length;
@@ -122,6 +126,16 @@ export default function DashboardScreenController({
             {DashboardCON.TITLE}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl">{DashboardCON.SUBTITLE}</p>
+        </div>
+        <div className="w-full sm:w-auto sm:shrink-0">
+          <PrimaryActionButtonSharedComponent
+            onClick={() => setIsRunTestModalOpen(true)}
+            icon={<Play className="w-4 h-4 sm:w-3.5 sm:h-3.5 !text-white" />}
+            className="w-full sm:w-auto justify-center !h-11 sm:!h-9 px-4 sm:px-3.5 text-sm sm:text-xs font-bold"
+          >
+            <span className="sm:hidden">Run Test</span>
+            <span className="hidden sm:inline">Run Smoke Test</span>
+          </PrimaryActionButtonSharedComponent>
         </div>
       </div>
 
@@ -502,6 +516,19 @@ export default function DashboardScreenController({
             </div>
           )}
       </CardSharedComponent>
+
+      <ConfirmationModalSharedComponent
+        isOpen={isRunTestModalOpen}
+        onClose={() => setIsRunTestModalOpen(false)}
+        onConfirm={() => setIsRunTestModalOpen(false)}
+        title="Run Smoke Test"
+        subtitle="Automated Morning Check"
+        description="Smoke tests run automatically every morning via the scheduled MorningSmokeTestAutomation script. Manually triggering a run from this dashboard isn't available yet."
+        confirmText="Start Test"
+        cancelText="Cancel"
+        variant="primary"
+        maxWidth="md"
+      />
     </div>
   );
 }
