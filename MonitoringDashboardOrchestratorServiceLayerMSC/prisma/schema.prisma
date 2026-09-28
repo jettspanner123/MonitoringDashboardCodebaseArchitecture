@@ -1,0 +1,97 @@
+// This schema mirrors tables owned and migrated by MorningSmokeTestAutomation
+// (a separate repo/process). This backend is read-only with respect to
+// schema — never run `prisma migrate` here; only `prisma generate`.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TestRun {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  pingChecks              AuthenticationPingCheck[]
+  loginChecks             AuthenticationLoginCheck[]
+  pageLoadChecks          PageLoadCheck[]
+  indexingFreshnessChecks IndexingFreshnessCheck[]
+  queueStatusChecks       QueueStatusCheck[]
+
+  @@map("MD_TestRunTBL")
+}
+
+model AuthenticationPingCheck {
+  id         String   @id @default(cuid())
+  success    Boolean
+  message    String
+  statusCode Int?
+  createdAt  DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_AuthenticationPingCheckTBL")
+}
+
+model AuthenticationLoginCheck {
+  id        String   @id @default(cuid())
+  username  String
+  password  String
+  success   Boolean
+  message   String
+  createdAt DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_AuthenticationLoginCheckTBL")
+}
+
+model PageLoadCheck {
+  id         String   @id @default(cuid())
+  pageName   String
+  success    Boolean
+  message    String
+  statusCode Int?
+  createdAt  DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_PageLoadCheckTBL")
+}
+
+model IndexingFreshnessCheck {
+  id             String   @id @default(cuid())
+  resultCount    Int      @map("result_count")
+  indexTime      DateTime @map("index_time")
+  machineTime    DateTime @map("machine_time")
+  timeDifference Float    @map("time_difference")
+  isFresh        Boolean  @map("is_fresh")
+  message        String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  testRunId String  @map("test_run_id")
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_IndexingFreshnessCheckTBL")
+}
+
+model QueueStatusCheck {
+  id                String   @id @default(cuid())
+  pageName          String
+  state             String
+  lessThan10Min     String
+  lessThan1Hour     String
+  lessThan4Hours    String
+  greaterThan4Hours String
+  createdAt         DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_QueueStatusCheckTBL")
+}

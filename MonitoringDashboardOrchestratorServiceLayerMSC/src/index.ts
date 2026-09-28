@@ -1,0 +1,31 @@
+import 'dotenv/config';
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import ApplicationRouteFactory from './Factories/ApplicationRouteFactory';
+import GlobalExceptionHandlingMiddleware from './Middlewares/GlobalExceptionHandlingMiddleware';
+import HealthCheckController from './Features/HealthCheck/HealthCheckController';
+import RunsController from './Features/Runs/RunsController';
+import ApplicationDatabaseProvider from './Providers/ApplicationDatabaseProvider';
+
+async function bootstrap(): Promise<void> {
+    const fastify = Fastify({ logger: true });
+
+    await fastify.register(cors, {
+        origin: process.env.CORS_ORIGIN ?? true,
+    });
+
+    fastify.setErrorHandler(GlobalExceptionHandlingMiddleware);
+
+    await fastify.register(HealthCheckController, { prefix: ApplicationRouteFactory.current.healthCheck.CONTROLLER_URL });
+    await fastify.register(RunsController, { prefix: ApplicationRouteFactory.current.runs.CONTROLLER_URL });
+
+    const port = Number(process.env.PORT ?? 4000);
+    await fastify.listen({ port, host: '0.0.0.0' });
+}
+
+bootstrap().catch(async (error) => {
+    // eslint-disable-next-line no-console
+    console.error('Failed to start server:', error);
+    await ApplicationDatabaseProvider.current.disconnect();
+    process.exit(1);
+});
