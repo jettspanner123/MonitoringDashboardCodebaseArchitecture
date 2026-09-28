@@ -1,6 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { Activity, CheckCircle2, AlertTriangle, XCircle, ChevronRight, PieChart as PieChartIcon } from 'lucide-react';
+import { Activity, CheckCircle2, AlertTriangle, XCircle, ChevronRight } from 'lucide-react';
 import CardSharedComponent from '../../Shared/Components/CardSharedComponent';
 import BadgeSharedComponent from '../../Shared/Components/BadgeSharedComponent';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
@@ -34,13 +33,6 @@ export default function DashboardScreenController({
   const degradedPct = totalRuns > 0 ? Math.round((degradedCount / totalRuns) * 100) : 0;
   const failedPct = totalRuns > 0 ? Math.round((failedCount / totalRuns) * 100) : 0;
   const latestRun = runs[0];
-
-  const healthChartData = (['Healthy', 'Degraded', 'Failed'] as HealthType[])
-    .map((health) => ({
-      name: health,
-      value: runs.filter((run) => run.health === health).length,
-    }))
-    .filter((entry) => entry.value > 0);
 
   return (
     <div className="space-y-6">
@@ -187,46 +179,7 @@ export default function DashboardScreenController({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <CardSharedComponent className="lg:col-span-1">
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white font-serif-headline">
-              Health Distribution
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400">Across every recorded run</p>
-          </div>
-          <div className="h-56 flex items-center justify-center">
-            {healthChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={healthChartData} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value">
-                    {healthChartData.map((entry) => (
-                      <Cell key={entry.name} fill={DashboardCON.HEALTH_CHART_COLORS[entry.name as HealthType]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--color-surface-elevated)',
-                      borderColor: 'var(--color-hairline-strong)',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      color: 'var(--color-ink)',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <EmptyStateSharedComponent
-                icon={<PieChartIcon className="w-5 h-5" />}
-                title="No Runs Yet"
-                description="No smoke test runs have been recorded yet."
-                className="w-full h-full py-4"
-              />
-            )}
-          </div>
-        </CardSharedComponent>
-
-        <CardSharedComponent className="lg:col-span-2">
+      <CardSharedComponent>
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline">
@@ -283,8 +236,7 @@ export default function DashboardScreenController({
               className="w-full py-8"
             />
           )}
-        </CardSharedComponent>
-      </div>
+      </CardSharedComponent>
     </div>
   );
 }
