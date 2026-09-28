@@ -34,12 +34,12 @@ export default function RunDetailScreenController({
 }: RunDetailScreenControllerProps): React.JSX.Element {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-300 dark:border-zinc-800">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-zinc-800/80 pb-6">
         <div>
           <ButtonSharedComponent variant="ghost" size="sm" onClick={onBack} icon={<ArrowLeft className="w-3.5 h-3.5" />}>
             Back to Runs
           </ButtonSharedComponent>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline mt-3">
+          <h1 className="text-2xl sm:text-3xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight mt-3">
             {run ? DateFormatterUtility.current.formatDateTime(run.createdAt) : 'Loading run…'}
           </h1>
         </div>

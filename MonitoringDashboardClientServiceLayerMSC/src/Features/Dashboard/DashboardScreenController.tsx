@@ -40,11 +40,13 @@ export default function DashboardScreenController({
 
   return (
     <div className="space-y-6">
-      <div className="pb-4 border-b border-slate-300 dark:border-zinc-800">
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline">
-          {DashboardCON.TITLE}
-        </h1>
-        <p className="text-sm sm:text-base text-slate-500 dark:text-zinc-400 mt-1">{DashboardCON.SUBTITLE}</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-zinc-800/80 pb-6">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
+            {DashboardCON.TITLE}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl">{DashboardCON.SUBTITLE}</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

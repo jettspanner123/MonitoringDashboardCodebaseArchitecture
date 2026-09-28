@@ -22,7 +22,17 @@ const rootRoute = createRootRoute({
   component: RootLayout,
 });
 
+// Mirrors AssetSphere's own pattern: the "selected entity" is a search param
+// on one route, not a dynamic `$param` path segment — this is what AssetSphere
+// itself does for every entity-detail view (e.g. `selectedAssetId`), since a
+// path param sourced from a CON string constant loses the literal type
+// TanStack Router needs to infer params at compile time.
+interface DashboardSearchParams {
+  [ApplicationRouteCON.PARAM_RUN_ID]?: string;
+}
+
 function RootLayout(): React.JSX.Element {
+  const navigate = useNavigate();
   const [currentTheme, setCurrentTheme] = useState<string>(() => {
     const saved = ApplicationThemeUtility.current.getSavedTheme();
     ApplicationThemeUtility.current.applyTheme(saved);
@@ -38,8 +48,15 @@ function RootLayout(): React.JSX.Element {
     setCurrentTheme(next);
   };
 
+  const handleNavigateHome = (): void => {
+    navigate({
+      to: '.',
+      search: (prev: DashboardSearchParams) => ({ ...prev, [ApplicationRouteCON.PARAM_RUN_ID]: undefined }),
+    });
+  };
+
   return (
-    <NavigationController currentTheme={currentTheme} onToggleTheme={handleToggleTheme}>
+    <NavigationController currentTheme={currentTheme} onToggleTheme={handleToggleTheme} onNavigateHome={handleNavigateHome}>
       <Outlet />
     </NavigationController>
   );
@@ -48,15 +65,6 @@ function RootLayout(): React.JSX.Element {
 // ==========================================
 // 2. Single Route: Runs Overview <-> Run Detail
 // ==========================================
-// Mirrors AssetSphere's own pattern: the "selected entity" is a search param
-// on one route, not a dynamic `$param` path segment — this is what AssetSphere
-// itself does for every entity-detail view (e.g. `selectedAssetId`), since a
-// path param sourced from a CON string constant loses the literal type
-// TanStack Router needs to infer params at compile time.
-interface DashboardSearchParams {
-  [ApplicationRouteCON.PARAM_RUN_ID]?: string;
-}
-
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: ApplicationRouteCON.ROOT,
