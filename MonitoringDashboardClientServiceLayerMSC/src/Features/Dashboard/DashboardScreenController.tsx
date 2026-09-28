@@ -65,7 +65,6 @@ export default function DashboardScreenController({
   const healthyPct = totalRuns > 0 ? Math.round((healthyCount / totalRuns) * 100) : 0;
   const degradedPct = totalRuns > 0 ? Math.round((degradedCount / totalRuns) * 100) : 0;
   const failedPct = totalRuns > 0 ? Math.round((failedCount / totalRuns) * 100) : 0;
-  const latestRun = runs[0];
 
   const statusOptions: SelectOption[] = [
     { value: 'ALL', label: `All Runs (${totalRuns})` },
@@ -431,17 +430,6 @@ export default function DashboardScreenController({
       </CardSharedComponent>
 
       <CardSharedComponent>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline">
-                Runs
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
-                {latestRun ? `Latest: ${DateFormatterUtility.current.formatDateTime(latestRun.createdAt)}` : 'No runs recorded yet'}
-              </p>
-            </div>
-          </div>
-
           {runs.length === 0 ? (
             <EmptyStateSharedComponent
               icon={<Activity className="w-5 h-5" />}
