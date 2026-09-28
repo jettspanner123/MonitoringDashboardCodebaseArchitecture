@@ -6,6 +6,14 @@
 
 ---
 
+## 0. Workflow Rules
+
+- **Research before writing code**: Before writing any code, research the equivalent implementation in the sibling AssetSphere and SignForge codebases first. This project's patterns are meant to replicate what those two projects already ship, not invent something new.
+- **Ask when a pattern isn't covered**: If a coding pattern is encountered that this file doesn't explicitly cover, ask the user what to do instead of guessing. This file will not have an explicit rule for every situation — surface the gap rather than picking silently.
+- **Reuse a component before writing new code**: Before writing any new UI code, check whether an existing component already covers the need. Reuse it, or adapt it slightly, if it reasonably fits. Only write genuinely new code when nothing fits — and when that happens, the new code must itself be a proper standalone component (e.g. a `*SharedComponent.tsx`), never loose JSX duplicated inline inside a screen controller or another component.
+
+---
+
 ## 1. Architectural Philosophy: The MSC (Model-Service-Controller) Pattern
 
 Monitoring Dashboard enforces a strict, modular **Model-Service-Controller (MSC)** architecture across the React 19 + TypeScript frontend. Every component, service, constant, and utility operates under explicit layer boundaries to ensure complete code splitting, zero circular dependencies, and deterministic behavior.
