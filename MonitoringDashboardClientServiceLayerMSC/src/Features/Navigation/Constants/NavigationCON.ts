@@ -1,5 +1,5 @@
 export default class NavigationCON {
-  public static readonly BRAND_TITLE: string = 'Monitoring Dashboard';
+  public static readonly BRAND_TITLE: string = 'ObservaCore';
   public static readonly BRAND_SUBTITLE: string = 'Smoke Test Monitor';
 
   // This dashboard has no authentication system, so the profile dropdown's identity
