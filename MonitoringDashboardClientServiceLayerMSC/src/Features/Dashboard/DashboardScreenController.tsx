@@ -88,12 +88,12 @@ export default function DashboardScreenController({
         </div>
 
         {/* Card 2: Healthy */}
-        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-slate-500/10 via-indigo-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
+        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-emerald-600/10 via-slate-600/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Healthy
             </span>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-700 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-800 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
               <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
@@ -102,19 +102,19 @@ export default function DashboardScreenController({
             {isLoading ? (
               <div className="h-6 sm:h-7 w-14 bg-slate-200 dark:bg-zinc-800 rounded animate-pulse" />
             ) : (
-              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-mono tracking-tight text-slate-800 dark:text-zinc-50">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-mono tracking-tight text-emerald-900 dark:text-zinc-50">
                 {healthyCount}
               </div>
             )}
-            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-slate-800 dark:text-zinc-300 bg-slate-100 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700/60 px-1.5 sm:px-2 py-0.5 rounded-md">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-emerald-900 dark:text-zinc-300 bg-emerald-100/70 dark:bg-zinc-800/80 border border-emerald-200/60 dark:border-zinc-700/60 px-1.5 sm:px-2 py-0.5 rounded-md">
               {healthyPct}% of runs
             </span>
           </div>
 
           <div className="mt-2.5 sm:mt-3.5 pt-2 sm:pt-2.5 border-t border-slate-200/60 dark:border-zinc-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-500 dark:text-zinc-400">
             <span className="truncate">Passing</span>
-            <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-zinc-300 shrink-0">
-              <CheckCircle2 className="w-3 h-3 text-slate-500 dark:text-zinc-400 hidden sm:inline" />
+            <span className="flex items-center gap-1 font-semibold text-emerald-800 dark:text-zinc-300 shrink-0">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-zinc-400 hidden sm:inline" />
               Latest Pass
             </span>
           </div>
