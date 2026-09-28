@@ -312,21 +312,26 @@ export default function DashboardScreenController({
 
           <div className="hidden sm:flex items-center gap-3">
             {viewMode === 'grid' && (
-              <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700/60 h-9">
+              <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60 h-9 w-auto">
                 <button
                   type="button"
                   onClick={() => setGridColumns(2)}
-                  className="relative px-3 h-7 rounded-lg text-xs font-semibold cursor-pointer"
+                  title="Show 2 Items Per Row"
+                  className="relative flex items-center justify-center px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
                 >
                   {gridColumns === 2 && (
                     <motion.div
                       layoutId="activeGridDensityPill"
-                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
                       transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
                   <span
-                    className={`relative z-10 ${gridColumns === 2 ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
+                    className={`relative z-10 ${
+                      gridColumns === 2
+                        ? 'text-slate-900 dark:text-white font-bold'
+                        : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
                   >
                     2 Per Row
                   </span>
@@ -334,17 +339,22 @@ export default function DashboardScreenController({
                 <button
                   type="button"
                   onClick={() => setGridColumns(3)}
-                  className="relative px-3 h-7 rounded-lg text-xs font-semibold cursor-pointer"
+                  title="Show 3 Items Per Row"
+                  className="relative flex items-center justify-center px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
                 >
                   {gridColumns === 3 && (
                     <motion.div
                       layoutId="activeGridDensityPill"
-                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                      className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
                       transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
                   <span
-                    className={`relative z-10 ${gridColumns === 3 ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
+                    className={`relative z-10 ${
+                      gridColumns === 3
+                        ? 'text-slate-900 dark:text-white font-bold'
+                        : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
                   >
                     3 Per Row
                   </span>
@@ -352,40 +362,54 @@ export default function DashboardScreenController({
               </div>
             )}
 
-            <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700/60 h-9">
+            <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60 h-9 w-auto">
               <button
                 type="button"
                 onClick={() => setViewMode('table')}
                 title="Table View"
-                className="relative px-2.5 h-7 rounded-lg cursor-pointer"
+                className="relative flex items-center justify-center gap-1.5 px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
               >
                 {viewMode === 'table' && (
                   <motion.div
                     layoutId="activeViewModePill"
-                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
-                <List
-                  className={`relative z-10 w-4 h-4 ${viewMode === 'table' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
-                />
+                <span
+                  className={`relative z-10 flex items-center gap-1.5 ${
+                    viewMode === 'table'
+                      ? 'text-slate-900 dark:text-white font-bold'
+                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span>Table</span>
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
                 title="Grid View"
-                className="relative px-2.5 h-7 rounded-lg cursor-pointer"
+                className="relative flex items-center justify-center gap-1.5 px-3.5 py-1.5 h-7 rounded-md text-xs font-bold transition-colors cursor-pointer select-none"
               >
                 {viewMode === 'grid' && (
                   <motion.div
                     layoutId="activeViewModePill"
-                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-xs"
+                    className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-md shadow-xs"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
-                <LayoutGrid
-                  className={`relative z-10 w-4 h-4 ${viewMode === 'grid' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-zinc-400'}`}
-                />
+                <span
+                  className={`relative z-10 flex items-center gap-1.5 ${
+                    viewMode === 'grid'
+                      ? 'text-slate-900 dark:text-white font-bold'
+                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  <span>Grid</span>
+                </span>
               </button>
             </div>
           </div>
