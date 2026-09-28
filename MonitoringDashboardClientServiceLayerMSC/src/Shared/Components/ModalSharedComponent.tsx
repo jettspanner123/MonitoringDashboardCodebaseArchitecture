@@ -22,10 +22,11 @@ export interface ModalSharedComponentProps {
    * class) because CSS transitions cannot interpolate min-height to/from its default `auto`. */
   minHeightPx?: number;
   scrollMode?: 'backdrop' | 'body';
-  /** 'capped' (default) keeps the existing ~90dvh dialog cap with an internally-scrolling body.
-   * 'full' removes that cap entirely so the dialog grows to whatever height its content needs,
-   * relying on the outer portal container's own scroll instead - a true "classic", backdrop-
-   * scrollable modal. Opt-in only: existing modals are unaffected unless they pass this. */
+  /** 'full' (default) removes the dialog height cap entirely so it grows to whatever height its
+   * content needs, relying on the outer portal container's own scroll instead - a true "classic",
+   * backdrop-scrollable modal, matching this app's standing convention for every modal.
+   * 'capped' keeps a ~90dvh dialog cap with an internally-scrolling body instead - opt into this
+   * only for a modal whose content is unbounded/very tall and genuinely needs its own scroll. */
   heightMode?: 'capped' | 'full';
   animationType?: 'scale' | 'slide-up';
   exitDirection?: 'down' | 'up';
@@ -45,7 +46,7 @@ export default function ModalSharedComponent({
   maxWidth = '2xl',
   minHeightPx,
   scrollMode = 'backdrop',
-  heightMode = 'capped',
+  heightMode = 'full',
   animationType = 'slide-up',
   exitDirection: exitDirectionProp = 'down',
   headerCloseDirection = 'down',

@@ -57,6 +57,17 @@ body {
   margin: 0;
 }
 
+/* Hide scrollbars visually everywhere in the app (page and any inner scrollable
+   container) while keeping scrolling itself fully functional. */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
 .font-serif-headline {
   font-family: var(--font-serif);
 }
