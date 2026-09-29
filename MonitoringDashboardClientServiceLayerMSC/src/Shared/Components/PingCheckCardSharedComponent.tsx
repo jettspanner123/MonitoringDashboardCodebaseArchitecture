@@ -9,7 +9,7 @@ export interface PingCheckCardSharedComponentProps {
 
 function statusTone(status: PageCheckType['status']): { gradient: string; iconBg: string } {
   if (status === 'Pass') {
-    return { gradient: 'from-emerald-600/10 dark:from-emerald-400/10 via-slate-600/5', iconBg: 'bg-emerald-800' };
+    return { gradient: 'from-emerald-600/10 dark:from-emerald-300/20 via-slate-600/5', iconBg: 'bg-emerald-800' };
   }
   if (status === 'Warning') {
     return { gradient: 'from-amber-500/10 via-slate-500/5', iconBg: 'bg-amber-700' };
