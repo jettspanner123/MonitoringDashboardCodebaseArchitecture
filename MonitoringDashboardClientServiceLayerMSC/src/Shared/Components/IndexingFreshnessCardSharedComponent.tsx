@@ -41,7 +41,7 @@ export default function IndexingFreshnessCardSharedComponent({
       <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800 mt-4">
         <div className="px-5 py-4 text-left">
           <div className="font-mono font-extrabold text-slate-900 dark:text-zinc-50 leading-none tracking-tight flex items-baseline gap-0.5">
-            <span className="text-5xl">
+            <span className="text-4xl">
               {timeDifferenceMinutes !== null ? timeDifferenceMinutes.toFixed(1) : '—'}
             </span>
             <span className="text-2xl text-slate-400 dark:text-zinc-600">m</span>
@@ -51,7 +51,7 @@ export default function IndexingFreshnessCardSharedComponent({
           </div>
         </div>
         <div className="px-5 py-4 text-right">
-          <div className="font-mono font-extrabold text-5xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
+          <div className="font-mono font-extrabold text-4xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
             {resultCount !== null ? resultCount.toLocaleString() : '—'}
           </div>
           <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
