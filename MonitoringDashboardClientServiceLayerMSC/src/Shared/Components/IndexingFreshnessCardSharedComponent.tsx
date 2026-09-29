@@ -33,7 +33,7 @@ export default function IndexingFreshnessCardSharedComponent({
           <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
             {check.pageName || 'Indexing Freshness'}
           </div>
-          <div className="text-[11px] text-slate-400 dark:text-zinc-500 mt-0 leading-tight truncate">
+          <div className="text-[11px] text-slate-400 dark:text-zinc-500 -mt-0.5 leading-tight truncate">
             Search index freshness check
           </div>
         </div>
