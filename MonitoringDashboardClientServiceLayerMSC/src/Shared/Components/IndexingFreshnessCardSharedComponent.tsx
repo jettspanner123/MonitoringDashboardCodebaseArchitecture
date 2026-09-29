@@ -18,7 +18,7 @@ export default function IndexingFreshnessCardSharedComponent({
   const machineTime = typeof details.machineTime === 'string' ? details.machineTime : null;
   const isFresh = check.status === 'Pass';
   const gradient = isFresh
-    ? 'from-emerald-600/10 dark:from-emerald-300/20 via-slate-600/5'
+    ? 'from-emerald-600/10 via-slate-600/5'
     : 'from-amber-500/10 via-slate-500/5';
 
   return (
