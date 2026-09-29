@@ -21,21 +21,17 @@ export default function IndexingFreshnessCardSharedComponent({
 
   return (
     <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
-      <div className="flex items-center justify-between px-5 pt-5">
-        <div className="flex items-center gap-2 min-w-0">
-          <Database className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
-          <span className="text-xs font-mono uppercase tracking-[0.15em] text-slate-400 dark:text-zinc-500 truncate">
-            {check.pageName || 'Indexing Freshness'}
-          </span>
-        </div>
-        <span
-          className={`flex items-center gap-1.5 text-xs font-medium shrink-0 ${
-            isFresh ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
-          }`}
-        >
-          <span className={`w-1.5 h-1.5 rounded-full ${isFresh ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-          {isFresh ? 'Fresh' : 'Stale'}
+      <div className="flex items-center justify-between gap-2 px-5 pt-5">
+        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
+          {check.pageName || 'Indexing Freshness'}
         </span>
+        <div
+          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${
+            isFresh ? 'bg-emerald-800' : 'bg-amber-700'
+          } text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0`}
+        >
+          <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800 mt-4">
