@@ -41,7 +41,9 @@ export default function PageLoadCheckCardSharedComponent({
         </div>
       </div>
 
-      <div className="px-5 py-4 mt-1 text-left">
+      <div className="mx-5 mt-4 border-t border-slate-200/70 dark:border-zinc-800/80" />
+
+      <div className="px-5 py-4 text-left">
         <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
           {statusCode !== null ? statusCode : '—'}
         </div>

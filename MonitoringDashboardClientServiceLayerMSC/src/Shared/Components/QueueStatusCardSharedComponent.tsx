@@ -65,6 +65,8 @@ export default function QueueStatusCardSharedComponent({
         </BadgeSharedComponent>
       </div>
 
+      <div className="border-t border-slate-200/70 dark:border-zinc-800/80" />
+
       {states.length === 0 ? (
         <p className="text-xs text-slate-400 dark:text-zinc-500">No queue state data captured.</p>
       ) : (
