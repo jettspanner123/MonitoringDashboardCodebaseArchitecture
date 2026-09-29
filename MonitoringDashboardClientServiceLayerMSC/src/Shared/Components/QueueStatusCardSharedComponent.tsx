@@ -70,7 +70,7 @@ export default function QueueStatusCardSharedComponent({
       {states.length === 0 ? (
         <p className="text-xs text-slate-400 dark:text-zinc-500">No queue state data captured.</p>
       ) : (
-        <div className="space-y-2.5 mt-2">
+        <div className="space-y-2.5 mt-4">
           {states.map((row, index) => {
             const values = BUCKETS.map((bucket) => parseBucketValue(row[bucket.key]));
             const numericValues = values.filter((value): value is number => value !== null);
