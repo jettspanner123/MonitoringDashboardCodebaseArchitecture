@@ -89,3 +89,11 @@ body {
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* Gradient-backgrounds preference (profile dropdown toggle): strips the
+   soft gradient wash every card uses, falling back to each card's own flat
+   base background. Status icon colors are untouched - they're a signal,
+   not decoration. */
+html.no-gradients [class~="bg-gradient-to-br"] {
+  background-image: none !important;
+}

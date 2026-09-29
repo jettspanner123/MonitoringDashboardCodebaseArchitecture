@@ -7,6 +7,8 @@ import weplmLogo from '../../Assets/weplm.jpeg';
 export interface NavigationControllerProps {
   currentTheme: string;
   onToggleTheme: () => void;
+  gradientsEnabled: boolean;
+  onToggleGradients: () => void;
   onNavigateHome: () => void;
   children: React.ReactNode;
 }
@@ -14,6 +16,8 @@ export interface NavigationControllerProps {
 export default function NavigationController({
   currentTheme,
   onToggleTheme,
+  gradientsEnabled,
+  onToggleGradients,
   onNavigateHome,
   children,
 }: NavigationControllerProps): React.JSX.Element {
@@ -73,6 +77,8 @@ export default function NavigationController({
                 onClose={() => setIsProfileOpen(false)}
                 currentTheme={currentTheme}
                 onToggleTheme={onToggleTheme}
+                gradientsEnabled={gradientsEnabled}
+                onToggleGradients={onToggleGradients}
               />
             </div>
           </div>
