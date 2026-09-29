@@ -42,7 +42,7 @@ export default function LoginCheckCardSharedComponent({
       </div>
 
       <div className="px-5 py-4 mt-1 text-left min-w-0">
-        <div className="font-mono font-extrabold text-4xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight truncate">
+        <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight truncate">
           {username !== null ? username : '—'}
         </div>
         <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
