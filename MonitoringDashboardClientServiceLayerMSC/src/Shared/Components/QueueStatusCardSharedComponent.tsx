@@ -47,17 +47,17 @@ export default function QueueStatusCardSharedComponent({
   return (
     <CardSharedComponent className="space-y-2.5 bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10]">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-indigo-800 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
-            <ListOrdered className="w-4 h-4" />
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-800 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
+            <ListOrdered className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono block truncate">
-              Queue Status
-            </span>
-            <span className="text-sm font-bold text-slate-900 dark:text-zinc-100 truncate block">
+            <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               {check.pageName || 'Queue Status'}
-            </span>
+            </div>
+            <div className="text-[11px] text-slate-400 dark:text-zinc-500 -mt-0.5 leading-tight truncate">
+              Queue state breakdown
+            </div>
           </div>
         </div>
         <BadgeSharedComponent variant="neutral" size="sm">
