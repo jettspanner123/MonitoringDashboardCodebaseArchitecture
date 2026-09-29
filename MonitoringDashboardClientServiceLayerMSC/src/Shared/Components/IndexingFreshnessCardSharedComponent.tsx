@@ -19,8 +19,8 @@ export default function IndexingFreshnessCardSharedComponent({
   const machineTime = typeof details.machineTime === 'string' ? details.machineTime : null;
   const isFresh = check.status === 'Pass';
   const gradient = isFresh
-    ? 'from-emerald-600/10 via-slate-600/5'
-    : 'from-amber-500/10 via-slate-500/5';
+    ? 'from-emerald-600/7 via-slate-600/3'
+    : 'from-amber-500/7 via-slate-500/3';
 
   return (
     <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>

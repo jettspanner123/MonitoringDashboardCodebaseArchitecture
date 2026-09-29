@@ -10,12 +10,12 @@ export interface LoginCheckCardSharedComponentProps {
 
 function statusTone(status: PageCheckType['status']): { gradient: string; iconBg: string } {
   if (status === 'Pass') {
-    return { gradient: 'from-emerald-600/10 via-slate-600/5', iconBg: 'bg-emerald-800' };
+    return { gradient: 'from-emerald-600/7 via-slate-600/3', iconBg: 'bg-emerald-800' };
   }
   if (status === 'Warning') {
-    return { gradient: 'from-amber-500/10 via-slate-500/5', iconBg: 'bg-amber-700' };
+    return { gradient: 'from-amber-500/7 via-slate-500/3', iconBg: 'bg-amber-700' };
   }
-  return { gradient: 'from-rose-600/10 via-slate-600/5', iconBg: 'bg-rose-800' };
+  return { gradient: 'from-rose-600/7 via-slate-600/3', iconBg: 'bg-rose-800' };
 }
 
 function getInitials(username: string | null): string {

@@ -46,7 +46,7 @@ export default function QueueStatusCardSharedComponent({
   const states: QueueStateRow[] = Array.isArray(rawStates) ? rawStates.filter(isQueueStateRow) : [];
 
   return (
-    <CardSharedComponent className="space-y-2.5 bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10]">
+    <CardSharedComponent className="space-y-2.5 bg-gradient-to-br from-indigo-500/7 via-slate-500/3 to-transparent dark:bg-[#0d0d10]">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-800 text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
