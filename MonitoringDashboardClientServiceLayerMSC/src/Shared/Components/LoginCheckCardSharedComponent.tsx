@@ -18,11 +18,27 @@ function statusTone(status: PageCheckType['status']): { gradient: string; iconBg
   return { gradient: 'from-rose-600/10 via-slate-600/5', iconBg: 'bg-rose-800' };
 }
 
+function getInitials(username: string | null): string {
+  if (!username) return '?';
+  const parts = username.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function getStampText(status: PageCheckType['status']): string {
+  if (status === 'Pass') return 'Access Granted';
+  if (status === 'Warning') return 'Access Flagged';
+  return 'Access Denied';
+}
+
 export default function LoginCheckCardSharedComponent({
   check,
 }: LoginCheckCardSharedComponentProps): React.JSX.Element {
   const username = typeof check.details?.username === 'string' ? check.details.username : null;
   const tone = statusTone(check.status);
+  const initials = getInitials(username);
+  const stampText = getStampText(check.status);
 
   return (
     <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10]`}>
@@ -47,12 +63,27 @@ export default function LoginCheckCardSharedComponent({
 
       <div className="mx-5 mt-4 border-t border-slate-200/70 dark:border-zinc-800/80" />
 
-      <div className="px-5 py-4 text-left min-w-0">
-        <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight truncate">
-          {username !== null ? username : '—'}
-        </div>
-        <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
-          User
+      <div className="px-5 py-4">
+        <div className="relative flex items-center gap-3 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-white/60 dark:bg-zinc-900/40 px-4 py-3 min-w-0">
+          <div
+            className={`w-11 h-11 rounded-full ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center font-mono font-extrabold text-sm shadow-xs shrink-0`}
+          >
+            {initials}
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+              Signed In As
+            </div>
+            <div className="font-mono font-bold text-lg text-slate-900 dark:text-zinc-50 leading-tight truncate">
+              {username !== null ? username : '—'}
+            </div>
+          </div>
+
+          <div
+            className={`absolute -top-2.5 -right-2.5 rotate-[8deg] px-2 py-1 rounded-md ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 text-[9px] font-mono font-extrabold uppercase tracking-wider shadow-sm border-2 border-white dark:border-[#0d0d10] whitespace-nowrap`}
+          >
+            {stampText}
+          </div>
         </div>
       </div>
 
