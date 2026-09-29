@@ -2,6 +2,7 @@ import React from 'react';
 import { ListOrdered } from 'lucide-react';
 import CardSharedComponent from './CardSharedComponent';
 import BadgeSharedComponent from './BadgeSharedComponent';
+import CardOptionsMenuSharedComponent from './CardOptionsMenuSharedComponent';
 import type { PageCheckType } from '../../Types';
 
 export interface QueueStatusCardSharedComponentProps {
@@ -60,9 +61,12 @@ export default function QueueStatusCardSharedComponent({
             </div>
           </div>
         </div>
-        <BadgeSharedComponent variant="neutral" size="sm">
-          {states.length} state{states.length === 1 ? '' : 's'}
-        </BadgeSharedComponent>
+        <div className="flex items-center gap-2 shrink-0">
+          <BadgeSharedComponent variant="neutral" size="sm">
+            {states.length} state{states.length === 1 ? '' : 's'}
+          </BadgeSharedComponent>
+          <CardOptionsMenuSharedComponent />
+        </div>
       </div>
 
       <div className="border-t border-slate-200/70 dark:border-zinc-800/80" />

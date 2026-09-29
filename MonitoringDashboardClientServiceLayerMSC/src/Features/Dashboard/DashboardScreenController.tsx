@@ -136,7 +136,17 @@ export default function DashboardScreenController({
     [todayRunDetail],
   );
   const todayPageLoadChecks = useMemo(
-    () => (todayRunDetail?.pageChecks ?? []).filter((check) => check.checkType === 'PageLoad'),
+    () =>
+      (todayRunDetail?.pageChecks ?? []).filter(
+        (check) => check.checkType === 'PageLoad' && !check.pageName.startsWith('AtlasWidget'),
+      ),
+    [todayRunDetail],
+  );
+  const todayAtlasWidgetChecks = useMemo(
+    () =>
+      (todayRunDetail?.pageChecks ?? []).filter(
+        (check) => check.checkType === 'PageLoad' && check.pageName.startsWith('AtlasWidget'),
+      ),
     [todayRunDetail],
   );
   const todayIndexingChecks = useMemo(
@@ -295,6 +305,19 @@ export default function DashboardScreenController({
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {todayPageLoadChecks.map((check) => (
+                      <PageLoadCheckCardSharedComponent key={check.id} check={check} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {todayAtlasWidgetChecks.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
+                    Atlas Widgets
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {todayAtlasWidgetChecks.map((check) => (
                       <PageLoadCheckCardSharedComponent key={check.id} check={check} />
                     ))}
                   </div>
