@@ -5,6 +5,7 @@ import ApplicationRouteFactory from './Factories/ApplicationRouteFactory';
 import GlobalExceptionHandlingMiddleware from './Middlewares/GlobalExceptionHandlingMiddleware';
 import HealthCheckController from './Features/HealthCheck/HealthCheckController';
 import RunsController from './Features/Runs/RunsController';
+import DataManagementController from './Features/DataManagement/DataManagementController';
 import ApplicationDatabaseProvider from './Providers/ApplicationDatabaseProvider';
 
 async function bootstrap(): Promise<void> {
@@ -18,6 +19,7 @@ async function bootstrap(): Promise<void> {
 
     await fastify.register(HealthCheckController, { prefix: ApplicationRouteFactory.current.healthCheck.CONTROLLER_URL });
     await fastify.register(RunsController, { prefix: ApplicationRouteFactory.current.runs.CONTROLLER_URL });
+    await fastify.register(DataManagementController, { prefix: ApplicationRouteFactory.current.dataManagement.CONTROLLER_URL });
 
     const port = Number(process.env.PORT ?? 4000);
     await fastify.listen({ port, host: '0.0.0.0' });

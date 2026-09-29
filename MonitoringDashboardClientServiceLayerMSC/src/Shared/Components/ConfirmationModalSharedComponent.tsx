@@ -15,6 +15,9 @@ export interface ConfirmationModalSharedComponentProps {
   cancelText?: string;
   variant?: ConfirmationVariant;
   isLoading?: boolean;
+  // Keeps the confirm button disabled regardless of isLoading — e.g. while a
+  // typed confirmation phrase in additionalContent doesn't match yet.
+  confirmDisabled?: boolean;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   additionalContent?: React.ReactNode;
 }
@@ -30,6 +33,7 @@ export default function ConfirmationModalSharedComponent({
   cancelText = 'Cancel',
   variant = 'danger',
   isLoading = false,
+  confirmDisabled = false,
   maxWidth = 'md',
   additionalContent,
 }: ConfirmationModalSharedComponentProps): React.JSX.Element {
@@ -94,7 +98,7 @@ export default function ConfirmationModalSharedComponent({
             type="button"
             variant={variant === 'danger' ? 'danger' : 'primary'}
             size="md"
-            disabled={isLoading}
+            disabled={isLoading || confirmDisabled}
             onClick={handleConfirm}
             className={`w-full sm:w-auto justify-center ${getConfirmButtonClasses()}`}
             icon={

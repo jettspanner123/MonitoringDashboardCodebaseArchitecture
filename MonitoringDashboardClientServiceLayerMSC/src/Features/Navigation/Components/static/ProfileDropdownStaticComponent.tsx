@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, Sun, Moon, LogOut } from 'lucide-react';
+import { Mail, Sun, Moon, LogOut, Trash2, AlertTriangle } from 'lucide-react';
 import ApplicationThemeCON from '../../../../Constants/ApplicationThemeCON';
 import ApplicationThemeUtility from '../../../../Utilities/ApplicationThemeUtility';
 import ApplicationHapticsUtility from '../../../../Utilities/ApplicationHapticsUtility';
 import ConfirmationModalSharedComponent from '../../../../Shared/Components/ConfirmationModalSharedComponent';
+import DataManagementService from '../../../../Services/DataManagementService';
 import NavigationCON from '../../Constants/NavigationCON';
 
 export interface ProfileDropdownStaticComponentProps {
@@ -23,6 +24,10 @@ export default function ProfileDropdownStaticComponent({
   const isDark = currentTheme === ApplicationThemeCON.DARK;
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = React.useState<boolean>(false);
+  const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = React.useState<boolean>(false);
+  const [deleteAllConfirmInput, setDeleteAllConfirmInput] = React.useState<string>('');
+  const [isDeletingAllData, setIsDeletingAllData] = React.useState<boolean>(false);
+  const [deleteAllError, setDeleteAllError] = React.useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -52,6 +57,34 @@ export default function ProfileDropdownStaticComponent({
 
   const handleConfirmSignOut = () => {
     setIsSignOutModalOpen(false);
+  };
+
+  const handleInitiateDeleteAllData = () => {
+    onClose();
+    setDeleteAllConfirmInput('');
+    setDeleteAllError(null);
+    setIsDeleteAllModalOpen(true);
+  };
+
+  const handleCloseDeleteAllModal = () => {
+    if (isDeletingAllData) return;
+    setIsDeleteAllModalOpen(false);
+    setDeleteAllConfirmInput('');
+    setDeleteAllError(null);
+  };
+
+  const handleConfirmDeleteAllData = async () => {
+    setIsDeletingAllData(true);
+    setDeleteAllError(null);
+    try {
+      await DataManagementService.current.wipeAllData();
+      // Full reload so every part of the app (nav included) reflects the now-
+      // empty database, not just whatever's currently mounted under here.
+      window.location.reload();
+    } catch (error) {
+      setDeleteAllError(error instanceof Error ? error.message : 'Failed to delete all data.');
+      setIsDeletingAllData(false);
+    }
   };
 
   return (
@@ -146,8 +179,17 @@ export default function ProfileDropdownStaticComponent({
                 </div>
               </div>
 
-              {/* 3. Footer: Sign Out */}
-              <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+              {/* 3. Footer: Destructive Actions + Sign Out */}
+              <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/80 space-y-0.5">
+                <button
+                  type="button"
+                  onPointerDown={() => ApplicationHapticsUtility.current.triggerHapticFeedback(12)}
+                  onClick={handleInitiateDeleteAllData}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer font-bold text-xs"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete All Data</span>
+                </button>
                 <button
                   type="button"
                   onPointerDown={() => ApplicationHapticsUtility.current.triggerHapticFeedback(12)}
@@ -174,6 +216,50 @@ export default function ProfileDropdownStaticComponent({
         cancelText="Cancel"
         variant="danger"
         maxWidth="md"
+      />
+
+      <ConfirmationModalSharedComponent
+        isOpen={isDeleteAllModalOpen}
+        onClose={handleCloseDeleteAllModal}
+        onConfirm={handleConfirmDeleteAllData}
+        title={NavigationCON.DELETE_ALL_DATA_TITLE}
+        subtitle={NavigationCON.DELETE_ALL_DATA_SUBTITLE}
+        description={NavigationCON.DELETE_ALL_DATA_DESCRIPTION}
+        confirmText="Delete Everything"
+        cancelText="Cancel"
+        variant="danger"
+        maxWidth="md"
+        isLoading={isDeletingAllData}
+        confirmDisabled={deleteAllConfirmInput.trim() !== NavigationCON.DELETE_ALL_DATA_CONFIRM_PHRASE}
+        additionalContent={
+          <div className="space-y-2.5">
+            <div>
+              <span className="text-xs font-medium text-slate-600 dark:text-zinc-400 mb-1.5 block">
+                Type <span className="font-mono font-bold text-slate-900 dark:text-zinc-100">
+                  {NavigationCON.DELETE_ALL_DATA_CONFIRM_PHRASE}
+                </span> to confirm
+              </span>
+              <input
+                type="text"
+                value={deleteAllConfirmInput}
+                onChange={(e) => setDeleteAllConfirmInput(e.target.value)}
+                disabled={isDeletingAllData}
+                placeholder={NavigationCON.DELETE_ALL_DATA_CONFIRM_PHRASE}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                className="w-full h-10 px-3 text-sm font-mono rounded-lg bg-slate-50 dark:bg-[#08080a] text-slate-900 dark:text-zinc-100 placeholder:text-slate-300 dark:placeholder:text-zinc-700 border border-slate-300 dark:border-zinc-800 focus:outline-none focus:border-rose-500 dark:focus:border-rose-500 transition-colors disabled:opacity-60"
+              />
+            </div>
+            {deleteAllError && (
+              <div className="flex items-start gap-2 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 text-xs text-rose-700 dark:text-rose-300">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                <span>{deleteAllError}</span>
+              </div>
+            )}
+          </div>
+        }
       />
     </React.Fragment>
   );

@@ -35,4 +35,10 @@ export default class NavigationCON {
   public static readonly SIGN_OUT_SUBTITLE: string = 'Enterprise Session Termination';
   public static readonly SIGN_OUT_DESCRIPTION: string =
     'Are you sure you want to sign out of your enterprise session? You will need to log back in to access your dashboard.';
+
+  public static readonly DELETE_ALL_DATA_TITLE: string = 'Delete All Test Data';
+  public static readonly DELETE_ALL_DATA_SUBTITLE: string = 'This cannot be undone';
+  public static readonly DELETE_ALL_DATA_DESCRIPTION: string =
+    'This permanently deletes every run and every check recorded in the database — authentication, page load, indexing freshness, and queue status history. Tables are not dropped, only their data. This cannot be undone.';
+  public static readonly DELETE_ALL_DATA_CONFIRM_PHRASE: string = 'DELETE';
 }
