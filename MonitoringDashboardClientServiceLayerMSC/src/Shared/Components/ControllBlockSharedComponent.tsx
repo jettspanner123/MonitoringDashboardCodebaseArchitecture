@@ -56,7 +56,7 @@ export default function ControllBlockSharedComponent<T extends string>({
           onChange={handleChange}
           options={options}
           layoutId={layoutId}
-          fullWidthOnMobile
+          alwaysFullWidth
           hapticFeedback
           activeTextClassName="text-slate-900 dark:text-white font-bold"
           inactiveTextClassName="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
