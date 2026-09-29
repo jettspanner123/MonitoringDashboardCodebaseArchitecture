@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Sun, Moon, LogOut, Trash2, AlertTriangle, Sparkles, Square } from 'lucide-react';
 import ApplicationThemeCON from '../../../../Constants/ApplicationThemeCON';
-import ApplicationThemeUtility from '../../../../Utilities/ApplicationThemeUtility';
 import ApplicationHapticsUtility from '../../../../Utilities/ApplicationHapticsUtility';
 import ConfirmationModalSharedComponent from '../../../../Shared/Components/ConfirmationModalSharedComponent';
+import ControllBlockSharedComponent from '../../../../Shared/Components/ControllBlockSharedComponent';
 import DataManagementService from '../../../../Services/DataManagementService';
 import NavigationCON from '../../Constants/NavigationCON';
 
@@ -25,7 +25,6 @@ export default function ProfileDropdownStaticComponent({
   gradientsEnabled,
   onToggleGradients,
 }: ProfileDropdownStaticComponentProps): React.JSX.Element {
-  const isDark = currentTheme === ApplicationThemeCON.DARK;
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = React.useState<boolean>(false);
   const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = React.useState<boolean>(false);
@@ -135,99 +134,27 @@ export default function ProfileDropdownStaticComponent({
                   Preferences & Controls
                 </span>
 
-                {/* Theme Mode Control Block */}
-                <div className="space-y-2 p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80">
-                  <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-200 font-medium">
-                    {isDark ? (
-                      <Moon className="w-4 h-4 text-slate-400 shrink-0" />
-                    ) : (
-                      <Sun className="w-4 h-4 text-slate-400 shrink-0" />
-                    )}
-                    <span className="font-semibold text-xs">Theme Mode</span>
-                  </div>
+                <ControllBlockSharedComponent
+                  label="Theme Mode"
+                  layoutId="themeModeControlPill"
+                  value={currentTheme}
+                  onChange={() => onToggleTheme()}
+                  options={[
+                    { value: ApplicationThemeCON.LIGHT, label: 'Light Mode', icon: <Sun className="w-3.5 h-3.5" /> },
+                    { value: ApplicationThemeCON.DARK, label: 'Dark Mode', icon: <Moon className="w-3.5 h-3.5" /> },
+                  ]}
+                />
 
-                  <div className="flex items-center p-1 rounded-xl bg-slate-200/80 dark:bg-zinc-800 border border-slate-300/60 dark:border-zinc-700/60 h-11 sm:h-9 w-full">
-                    <button
-                      type="button"
-                      onPointerDown={() => ApplicationHapticsUtility.current.triggerHapticFeedback(12)}
-                      onClick={(e) =>
-                        isDark &&
-                        ApplicationThemeUtility.current.executeAnimatedThemeToggle(e.currentTarget, onToggleTheme)
-                      }
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1 h-9 sm:h-7 rounded-lg sm:rounded-md text-xs font-bold transition-all cursor-pointer ${
-                        !isDark
-                          ? 'bg-white dark:bg-zinc-700 text-slate-900 dark:text-white shadow-xs'
-                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      <Sun className="w-3.5 h-3.5" />
-                      <span>Light Mode</span>
-                    </button>
-                    <button
-                      type="button"
-                      onPointerDown={() => ApplicationHapticsUtility.current.triggerHapticFeedback(12)}
-                      onClick={(e) =>
-                        !isDark &&
-                        ApplicationThemeUtility.current.executeAnimatedThemeToggle(e.currentTarget, onToggleTheme)
-                      }
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1 h-9 sm:h-7 rounded-lg sm:rounded-md text-xs font-bold transition-all cursor-pointer ${
-                        isDark
-                          ? 'bg-white dark:bg-zinc-700 text-slate-900 dark:text-white shadow-xs'
-                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      <Moon className="w-3.5 h-3.5" />
-                      <span>Dark Mode</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Gradient Backgrounds Control Block */}
-                <div className="space-y-2 p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80">
-                  <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-200 font-medium">
-                    {gradientsEnabled ? (
-                      <Sparkles className="w-4 h-4 text-slate-400 shrink-0" />
-                    ) : (
-                      <Square className="w-4 h-4 text-slate-400 shrink-0" />
-                    )}
-                    <span className="font-semibold text-xs">Gradient Backgrounds</span>
-                  </div>
-
-                  <div className="flex items-center p-1 rounded-xl bg-slate-200/80 dark:bg-zinc-800 border border-slate-300/60 dark:border-zinc-700/60 h-11 sm:h-9 w-full">
-                    <button
-                      type="button"
-                      onPointerDown={() => ApplicationHapticsUtility.current.triggerHapticFeedback(12)}
-                      onClick={(e) =>
-                        !gradientsEnabled &&
-                        ApplicationThemeUtility.current.executeAnimatedThemeToggle(e.currentTarget, onToggleGradients)
-                      }
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1 h-9 sm:h-7 rounded-lg sm:rounded-md text-xs font-bold transition-all cursor-pointer ${
-                        gradientsEnabled
-                          ? 'bg-white dark:bg-zinc-700 text-slate-900 dark:text-white shadow-xs'
-                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>On</span>
-                    </button>
-                    <button
-                      type="button"
-                      onPointerDown={() => ApplicationHapticsUtility.current.triggerHapticFeedback(12)}
-                      onClick={(e) =>
-                        gradientsEnabled &&
-                        ApplicationThemeUtility.current.executeAnimatedThemeToggle(e.currentTarget, onToggleGradients)
-                      }
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1 h-9 sm:h-7 rounded-lg sm:rounded-md text-xs font-bold transition-all cursor-pointer ${
-                        !gradientsEnabled
-                          ? 'bg-white dark:bg-zinc-700 text-slate-900 dark:text-white shadow-xs'
-                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      <Square className="w-3.5 h-3.5" />
-                      <span>Off</span>
-                    </button>
-                  </div>
-                </div>
+                <ControllBlockSharedComponent
+                  label="Gradient Backgrounds"
+                  layoutId="gradientBackgroundsControlPill"
+                  value={gradientsEnabled ? 'on' : 'off'}
+                  onChange={() => onToggleGradients()}
+                  options={[
+                    { value: 'on', label: 'On', icon: <Sparkles className="w-3.5 h-3.5" /> },
+                    { value: 'off', label: 'Off', icon: <Square className="w-3.5 h-3.5" /> },
+                  ]}
+                />
               </div>
 
               {/* 3. Footer: Destructive Actions + Sign Out */}
