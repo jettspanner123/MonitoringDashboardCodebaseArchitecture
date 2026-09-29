@@ -17,9 +17,10 @@ export default function IndexingFreshnessCardSharedComponent({
   const indexTime = typeof details.indexTime === 'string' ? details.indexTime : null;
   const machineTime = typeof details.machineTime === 'string' ? details.machineTime : null;
   const isFresh = check.status === 'Pass';
+  const gradient = isFresh ? 'from-emerald-600/10 via-slate-600/5' : 'from-amber-500/10 via-slate-500/5';
 
   return (
-    <CardSharedComponent className="!p-0 overflow-hidden">
+    <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
       <div className="flex items-center justify-between px-5 pt-5">
         <div className="flex items-center gap-2 min-w-0">
           <Database className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
@@ -38,9 +39,9 @@ export default function IndexingFreshnessCardSharedComponent({
       </div>
 
       <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800 mt-4">
-        <div className="px-5 py-4">
-          <div className="font-serif-headline text-slate-900 dark:text-zinc-50 leading-none flex items-baseline gap-0.5">
-            <span className="text-5xl tracking-tight">
+        <div className="px-5 py-4 text-left">
+          <div className="font-mono font-extrabold text-slate-900 dark:text-zinc-50 leading-none tracking-tight flex items-baseline gap-0.5">
+            <span className="text-5xl">
               {timeDifferenceMinutes !== null ? timeDifferenceMinutes.toFixed(1) : '—'}
             </span>
             <span className="text-2xl text-slate-400 dark:text-zinc-600">m</span>
@@ -49,8 +50,8 @@ export default function IndexingFreshnessCardSharedComponent({
             Index Delay
           </div>
         </div>
-        <div className="px-5 py-4">
-          <div className="font-serif-headline text-5xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
+        <div className="px-5 py-4 text-right">
+          <div className="font-mono font-extrabold text-5xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
             {resultCount !== null ? resultCount.toLocaleString() : '—'}
           </div>
           <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
