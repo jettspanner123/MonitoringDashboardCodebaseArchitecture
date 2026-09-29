@@ -56,6 +56,7 @@ model PageLoadCheck {
   success    Boolean
   message    String
   statusCode Int?
+  durationMs Int?
   createdAt  DateTime @default(now())
 
   testRunId String

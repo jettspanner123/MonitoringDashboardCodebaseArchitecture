@@ -17,10 +17,16 @@ function statusTone(status: PageCheckType['status']): { gradient: string; iconBg
   return { gradient: 'from-rose-600/10 via-slate-600/5', iconBg: 'bg-rose-800' };
 }
 
+function formatLoadDuration(durationMs: number): string {
+  if (durationMs < 1000) return `${durationMs}ms`;
+  return `${(durationMs / 1000).toFixed(1)}s`;
+}
+
 export default function PageLoadCheckCardSharedComponent({
   check,
 }: PageLoadCheckCardSharedComponentProps): React.JSX.Element {
   const statusCode = typeof check.details?.statusCode === 'number' ? check.details.statusCode : null;
+  const durationMs = typeof check.details?.durationMs === 'number' ? check.details.durationMs : null;
   const tone = statusTone(check.status);
 
   return (
@@ -43,12 +49,22 @@ export default function PageLoadCheckCardSharedComponent({
 
       <div className="mx-5 mt-4 border-t border-slate-200/70 dark:border-zinc-800/80" />
 
-      <div className="px-5 py-4 text-left">
-        <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
-          {statusCode !== null ? statusCode : '—'}
+      <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800">
+        <div className="px-5 py-4 text-left">
+          <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
+            {statusCode !== null ? statusCode : '—'}
+          </div>
+          <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
+            HTTP Status
+          </div>
         </div>
-        <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
-          HTTP Status
+        <div className="px-5 py-4 text-right">
+          <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
+            {durationMs !== null ? formatLoadDuration(durationMs) : '—'}
+          </div>
+          <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
+            Load Time
+          </div>
         </div>
       </div>
 

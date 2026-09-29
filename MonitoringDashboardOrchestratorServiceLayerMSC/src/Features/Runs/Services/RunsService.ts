@@ -103,7 +103,7 @@ export default class RunsService {
                 checkType: 'PageLoad',
                 status: check.success ? 'Pass' : 'Fail',
                 message: check.message,
-                details: { statusCode: check.statusCode },
+                details: { statusCode: check.statusCode, durationMs: check.durationMs },
                 createdAt: check.createdAt.toISOString(),
             });
         }
