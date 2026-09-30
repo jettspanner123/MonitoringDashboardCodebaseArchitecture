@@ -63,6 +63,17 @@ function healthBadgeVariant(health: HealthType): 'success' | 'warning' | 'danger
   return 'danger';
 }
 
+function checkStatusBadgeVariant(status: string): 'success' | 'warning' | 'danger' {
+  if (status === 'Pass') return 'success';
+  if (status === 'Warning') return 'warning';
+  return 'danger';
+}
+
+// "AuthenticationPing" -> "Authentication Ping"
+function formatCheckTypeLabel(checkType: string): string {
+  return checkType.replace(/([A-Z])/g, ' $1').trim();
+}
+
 export default function DashboardScreenController({
   runs,
   isLoading,
@@ -99,6 +110,14 @@ export default function DashboardScreenController({
   const [scopeFilter, setScopeFilter] = useState<ScopeFilterType>('Today');
   const [todayRunDetail, setTodayRunDetail] = useState<RunDetail | null>(null);
   const [isLoadingTodayRun, setIsLoadingTodayRun] = useState<boolean>(false);
+  const [todaySearchQuery, setTodaySearchQuery] = useState<string>('');
+  // Decorative for now - there's no environment concept anywhere in the
+  // database yet, so selecting a different one doesn't change what's shown.
+  const [todayEnvironment, setTodayEnvironment] = useState<string>(
+    DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS[0].value,
+  );
+  const [todayViewMode, setTodayViewMode] = useState<ViewModeType>('grid');
+  const [todayGridColumns, setTodayGridColumns] = useState<GridColumnsType>(3);
 
   const todayRun = useMemo(() => {
     const now = new Date();
@@ -128,35 +147,51 @@ export default function DashboardScreenController({
     };
   }, [todayRun]);
 
+  const todaySearchFilteredChecks = useMemo(() => {
+    const checks = todayRunDetail?.pageChecks ?? [];
+    const term = todaySearchQuery.trim().toLowerCase();
+    if (!term) return checks;
+    return checks.filter((check) => {
+      return (
+        check.pageName.toLowerCase().includes(term) ||
+        check.checkType.toLowerCase().includes(term) ||
+        check.status.toLowerCase().includes(term) ||
+        check.message.toLowerCase().includes(term)
+      );
+    });
+  }, [todayRunDetail, todaySearchQuery]);
+
   const todayAuthChecks = useMemo(
     () =>
-      (todayRunDetail?.pageChecks ?? []).filter(
+      todaySearchFilteredChecks.filter(
         (check) => check.checkType === 'AuthenticationPing' || check.checkType === 'AuthenticationLogin',
       ),
-    [todayRunDetail],
+    [todaySearchFilteredChecks],
   );
   const todayPageLoadChecks = useMemo(
     () =>
-      (todayRunDetail?.pageChecks ?? []).filter(
+      todaySearchFilteredChecks.filter(
         (check) => check.checkType === 'PageLoad' && !check.pageName.startsWith('AtlasWidget'),
       ),
-    [todayRunDetail],
+    [todaySearchFilteredChecks],
   );
   const todayAtlasWidgetChecks = useMemo(
     () =>
-      (todayRunDetail?.pageChecks ?? []).filter(
+      todaySearchFilteredChecks.filter(
         (check) => check.checkType === 'PageLoad' && check.pageName.startsWith('AtlasWidget'),
       ),
-    [todayRunDetail],
+    [todaySearchFilteredChecks],
   );
   const todayIndexingChecks = useMemo(
-    () => (todayRunDetail?.pageChecks ?? []).filter((check) => check.checkType === 'IndexingFreshness'),
-    [todayRunDetail],
+    () => todaySearchFilteredChecks.filter((check) => check.checkType === 'IndexingFreshness'),
+    [todaySearchFilteredChecks],
   );
   const todayQueueChecks = useMemo(
-    () => (todayRunDetail?.pageChecks ?? []).filter((check) => check.checkType === 'QueueStatus'),
-    [todayRunDetail],
+    () => todaySearchFilteredChecks.filter((check) => check.checkType === 'QueueStatus'),
+    [todaySearchFilteredChecks],
   );
+  const isTodayRefetching = isRefetching || isLoadingTodayRun;
+  const todayGridColsClass = todayGridColumns === 3 ? 'lg:grid-cols-3' : '';
 
   const totalRuns = runs.length;
   const healthyCount = runs.filter((run) => run.health === 'Healthy').length;
@@ -264,6 +299,72 @@ export default function DashboardScreenController({
           transition={{ duration: 0.2 }}
           className="space-y-6"
         >
+          {/* Controls Toolbar */}
+          <CardSharedComponent className="p-4 space-y-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <div className="relative flex-1 min-w-0 sm:max-w-md">
+                  <Search className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={todaySearchQuery}
+                    onChange={(e) => setTodaySearchQuery(e.target.value)}
+                    placeholder="Search by page, check type, status, or message..."
+                    className="w-full h-11 sm:h-9 pl-11 pr-4 text-base sm:text-xs rounded-xl sm:rounded-lg bg-slate-50 dark:bg-[#08080a] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 border border-slate-300 dark:border-zinc-800 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors"
+                  />
+                </div>
+                <ButtonSharedComponent
+                  variant="outline"
+                  size="sm"
+                  disabled={isTodayRefetching}
+                  isLoading={isTodayRefetching}
+                  onClick={onRefetch}
+                  icon={<RefreshCw className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-500 dark:text-zinc-400" />}
+                  className="shrink-0 !px-3 sm:!px-2.5 !h-11 sm:!h-9"
+                >
+                  <span className="sr-only">Refetch</span>
+                </ButtonSharedComponent>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800/80 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Environment:</span>
+                <CustomSelectSharedComponent
+                  value={todayEnvironment}
+                  options={DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS}
+                  onChange={setTodayEnvironment}
+                  size="sm"
+                  className="w-full sm:w-60"
+                />
+              </div>
+
+              <div className="hidden sm:flex items-center gap-3">
+                {todayViewMode === 'grid' && (
+                  <SegmentedControlSharedComponent<GridColumnsLabelType>
+                    value={todayGridColumns === 2 ? '2 Per Row' : '3 Per Row'}
+                    onChange={(val) => setTodayGridColumns(val === '2 Per Row' ? 2 : 3)}
+                    layoutId="todayGridDensityPill"
+                    options={[
+                      { value: '2 Per Row', label: '2 Per Row' },
+                      { value: '3 Per Row', label: '3 Per Row' },
+                    ]}
+                  />
+                )}
+
+                <SegmentedControlSharedComponent<ViewModeType>
+                  value={todayViewMode}
+                  onChange={setTodayViewMode}
+                  layoutId="todayViewModePill"
+                  options={[
+                    { value: 'table', label: 'Table', icon: <List className="w-3.5 h-3.5" /> },
+                    { value: 'grid', label: 'Grid', icon: <LayoutGrid className="w-3.5 h-3.5" /> },
+                  ]}
+                />
+              </div>
+            </div>
+          </CardSharedComponent>
+
           {isLoadingTodayRun ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((placeholderKey) => (
@@ -279,6 +380,50 @@ export default function DashboardScreenController({
                 className="w-full py-8"
               />
             </CardSharedComponent>
+          ) : todaySearchFilteredChecks.length === 0 ? (
+            <CardSharedComponent>
+              <EmptyStateSharedComponent
+                icon={<Search className="w-5 h-5" />}
+                title="No Matching Checks"
+                description="No checks match the current search."
+                className="w-full py-8"
+              />
+            </CardSharedComponent>
+          ) : todayViewMode === 'table' ? (
+            <CardSharedComponent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-300 dark:border-zinc-800 text-slate-500 dark:text-zinc-500 font-mono">
+                      <th className="py-2.5 px-3">Page</th>
+                      <th className="py-2.5 px-3">Check Type</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3">Message</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
+                    {todaySearchFilteredChecks.map((check) => (
+                      <tr key={check.id} className="hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 transition-colors">
+                        <td className="py-3 px-3 font-mono font-medium text-slate-900 dark:text-zinc-100">
+                          {check.pageName}
+                        </td>
+                        <td className="py-3 px-3 font-mono text-slate-500 dark:text-zinc-400">
+                          {formatCheckTypeLabel(check.checkType)}
+                        </td>
+                        <td className="py-3 px-3">
+                          <BadgeSharedComponent variant={checkStatusBadgeVariant(check.status)} size="sm">
+                            {check.status}
+                          </BadgeSharedComponent>
+                        </td>
+                        <td className="py-3 px-3 text-slate-500 dark:text-zinc-400 max-w-md truncate">
+                          {check.message}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardSharedComponent>
           ) : (
             <>
               {todayAuthChecks.length > 0 && (
@@ -286,7 +431,7 @@ export default function DashboardScreenController({
                   <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
                     Authentication
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayAuthChecks.map((check) =>
                       check.checkType === 'AuthenticationPing' ? (
                         <PingCheckCardSharedComponent key={check.id} check={check} />
@@ -303,7 +448,7 @@ export default function DashboardScreenController({
                   <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
                     Page Loads
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayPageLoadChecks.map((check) => (
                       <PageLoadCheckCardSharedComponent key={check.id} check={check} />
                     ))}
@@ -316,7 +461,7 @@ export default function DashboardScreenController({
                   <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
                     Atlas Widgets
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayAtlasWidgetChecks.map((check) => (
                       <PageLoadCheckCardSharedComponent key={check.id} check={check} />
                     ))}
@@ -329,7 +474,7 @@ export default function DashboardScreenController({
                   <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
                     Indexing Freshness
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayIndexingChecks.map((check) => (
                       <IndexingFreshnessCardSharedComponent key={check.id} check={check} />
                     ))}
