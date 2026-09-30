@@ -21,7 +21,9 @@ export default function CardSharedComponent({
   } else if (variant === 'deep') {
     surfaceStyle = 'bg-slate-50 dark:bg-[#08080a] border border-slate-300/80 dark:border-zinc-800 shadow-xs dark:shadow-none';
   } else {
-    surfaceStyle = 'bg-white dark:bg-[#0d0d10] border border-slate-300/90 dark:border-zinc-800 shadow-sm dark:shadow-2xs';
+    // Matches the Weekly Data KPI cards' own border/shadow exactly, so every
+    // card in the app reads as one consistent surface treatment.
+    surfaceStyle = 'bg-white dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs';
   }
 
   const hoverClass = hoverable
