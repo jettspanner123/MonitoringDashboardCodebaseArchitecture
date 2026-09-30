@@ -509,7 +509,7 @@ export default function DashboardScreenController({
         >
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 2: Healthy */}
-        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-emerald-600/10 via-slate-600/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
+        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-emerald-600/10 via-slate-600/5 to-transparent dark:bg-[#0d0d10] border border-slate-300/70 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Healthy
@@ -542,7 +542,7 @@ export default function DashboardScreenController({
         </div>
 
         {/* Card 3: Degraded */}
-        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
+        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-300/70 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Degraded
@@ -575,7 +575,7 @@ export default function DashboardScreenController({
         </div>
 
         {/* Card 4: Failed */}
-        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-rose-600/10 via-slate-600/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
+        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-rose-600/10 via-slate-600/5 to-transparent dark:bg-[#0d0d10] border border-slate-300/70 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Failed
@@ -608,7 +608,7 @@ export default function DashboardScreenController({
         </div>
 
         {/* Card 5: Total Runs */}
-        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs">
+        <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-slate-500/5 to-transparent dark:bg-[#0d0d10] border border-slate-300/70 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
               Total Runs

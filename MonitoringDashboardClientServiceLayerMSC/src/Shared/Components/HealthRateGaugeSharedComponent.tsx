@@ -67,7 +67,7 @@ export default function HealthRateGaugeSharedComponent({
 
   if (safeRuns.length === 0 && compact) {
     return (
-      <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-white dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs flex flex-col items-center justify-center h-full text-center">
+      <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-white dark:bg-[#0d0d10] border border-slate-300/70 dark:border-zinc-800/80 shadow-xs flex flex-col items-center justify-center h-full text-center">
         <Activity className="w-4 h-4 text-slate-300 dark:text-zinc-600 mb-1.5" />
         <span className="text-xs font-mono text-slate-400 dark:text-zinc-500">No data yet</span>
       </div>
@@ -89,7 +89,7 @@ export default function HealthRateGaugeSharedComponent({
 
   if (compact) {
     return (
-      <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-white dark:bg-[#0d0d10] border border-slate-200/70 dark:border-zinc-800/80 shadow-xs flex flex-col items-center justify-center h-full">
+      <div className="rounded-2xl p-3.5 sm:p-5 relative overflow-hidden bg-white dark:bg-[#0d0d10] border border-slate-300/70 dark:border-zinc-800/80 shadow-xs flex flex-col items-center justify-center h-full">
         <div className="relative w-full aspect-[2/1] overflow-hidden flex items-end justify-center">
           <svg className="w-full h-full overflow-visible" viewBox="0 0 200 100">
             <g strokeLinecap="round">

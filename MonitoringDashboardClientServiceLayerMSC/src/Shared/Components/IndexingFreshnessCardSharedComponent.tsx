@@ -45,7 +45,7 @@ export default function IndexingFreshnessCardSharedComponent({
         <CardOptionsMenuSharedComponent />
       </div>
 
-      <div className="mx-5 mt-4 border-t border-slate-200/70 dark:border-zinc-800/80" />
+      <div className="mx-5 mt-4 border-t border-slate-300/70 dark:border-zinc-800/80" />
 
       <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800 mt-4">
         <div className="px-5 py-4 text-left">

@@ -61,7 +61,7 @@ export default function LoginCheckCardSharedComponent({
         <CardOptionsMenuSharedComponent />
       </div>
 
-      <div className="mx-5 mt-4 border-t border-slate-200/70 dark:border-zinc-800/80" />
+      <div className="mx-5 mt-4 border-t border-slate-300/70 dark:border-zinc-800/80" />
 
       <div className="px-5 py-4">
         <div className="relative flex items-center gap-3 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-white/60 dark:bg-zinc-900/40 px-4 py-3 min-w-0">
