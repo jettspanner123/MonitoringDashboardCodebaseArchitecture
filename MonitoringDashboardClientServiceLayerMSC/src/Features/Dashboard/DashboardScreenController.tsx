@@ -406,7 +406,6 @@ export default function DashboardScreenController({
                     placeholder="No runs"
                     size="sm"
                     className="w-full sm:w-52"
-                    animatedTransition
                   />
                 </div>
               </div>
