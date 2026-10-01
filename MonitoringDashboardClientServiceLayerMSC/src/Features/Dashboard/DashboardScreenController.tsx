@@ -536,7 +536,11 @@ export default function DashboardScreenController({
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayAuthChecks.map((check) => (
-                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                      <ShimmerOverlaySharedComponent
+                        key={`${check.pageName}::${check.checkType}`}
+                        isLoading={isLoadingTodayRun}
+                        className="rounded-xl"
+                      >
                         {check.checkType === 'AuthenticationPing' ? (
                           <PingCheckCardSharedComponent check={check} />
                         ) : (
@@ -555,7 +559,11 @@ export default function DashboardScreenController({
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayPageLoadChecks.map((check) => (
-                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                      <ShimmerOverlaySharedComponent
+                        key={`${check.pageName}::${check.checkType}`}
+                        isLoading={isLoadingTodayRun}
+                        className="rounded-xl"
+                      >
                         <PageLoadCheckCardSharedComponent check={check} />
                       </ShimmerOverlaySharedComponent>
                     ))}
@@ -570,7 +578,11 @@ export default function DashboardScreenController({
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayAtlasWidgetChecks.map((check) => (
-                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                      <ShimmerOverlaySharedComponent
+                        key={`${check.pageName}::${check.checkType}`}
+                        isLoading={isLoadingTodayRun}
+                        className="rounded-xl"
+                      >
                         <PageLoadCheckCardSharedComponent check={check} />
                       </ShimmerOverlaySharedComponent>
                     ))}
@@ -585,7 +597,11 @@ export default function DashboardScreenController({
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayIndexingChecks.map((check) => (
-                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                      <ShimmerOverlaySharedComponent
+                        key={`${check.pageName}::${check.checkType}`}
+                        isLoading={isLoadingTodayRun}
+                        className="rounded-xl"
+                      >
                         <IndexingFreshnessCardSharedComponent check={check} />
                       </ShimmerOverlaySharedComponent>
                     ))}
@@ -600,7 +616,11 @@ export default function DashboardScreenController({
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {todayQueueChecks.map((check) => (
-                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                      <ShimmerOverlaySharedComponent
+                        key={`${check.pageName}::${check.checkType}`}
+                        isLoading={isLoadingTodayRun}
+                        className="rounded-xl"
+                      >
                         <QueueStatusCardSharedComponent check={check} />
                       </ShimmerOverlaySharedComponent>
                     ))}
