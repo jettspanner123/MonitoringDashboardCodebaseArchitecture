@@ -363,7 +363,7 @@ export default function DashboardScreenController({
                   isLoading={isTodayRefetching}
                   onClick={onRefetch}
                   icon={<RefreshCw className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-500 dark:text-zinc-400" />}
-                  className="shrink-0 !px-3 sm:!px-2.5 !h-11 sm:!h-9"
+                  className="shrink-0 !w-11 !h-11 sm:!w-9 sm:!h-9 !p-0"
                 >
                   <span className="sr-only">Refetch</span>
                 </ButtonSharedComponent>
@@ -743,7 +743,7 @@ export default function DashboardScreenController({
               isLoading={isRefetching}
               onClick={onRefetch}
               icon={<RefreshCw className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-500 dark:text-zinc-400" />}
-              className="shrink-0 !px-3 sm:!px-2.5 !h-11 sm:!h-9"
+              className="shrink-0 !w-11 !h-11 sm:!w-9 sm:!h-9 !p-0"
             >
               <span className="sr-only">Refetch</span>
             </ButtonSharedComponent>
