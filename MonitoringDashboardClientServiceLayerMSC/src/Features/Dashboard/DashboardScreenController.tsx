@@ -21,6 +21,7 @@ import ButtonSharedComponent from '../../Shared/Components/ButtonSharedComponent
 import PrimaryActionButtonSharedComponent from '../../Shared/Components/PrimaryActionButtonSharedComponent';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
 import CustomSelectSharedComponent, { type SelectOption } from '../../Shared/Components/CustomSelectSharedComponent';
+import DatePickerSharedComponent from '../../Shared/Components/DatePickerSharedComponent';
 import ConfirmationModalSharedComponent from '../../Shared/Components/ConfirmationModalSharedComponent';
 import HealthByDayBarChartSharedComponent from '../../Shared/Components/HealthByDayBarChartSharedComponent';
 import SegmentedControlSharedComponent from '../../Shared/Components/SegmentedControlSharedComponent';
@@ -34,13 +35,14 @@ import RunsService from '../../Services/RunsService';
 import type { RunSummary, RunDetail, HealthType } from '../../Types';
 import DashboardCON from './Constants/DashboardCON';
 
-function isSameCalendarDay(isoString: string, reference: Date): boolean {
-  const target = new Date(isoString);
-  return (
-    target.getFullYear() === reference.getFullYear() &&
-    target.getMonth() === reference.getMonth() &&
-    target.getDate() === reference.getDate()
-  );
+// Local-calendar date key ('YYYY-MM-DD') - matches how DatePickerSharedComponent
+// keys dates, so a run's createdAt and the picker's selection compare directly.
+function toDateKey(isoString: string): string {
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export interface DashboardScreenControllerProps {
@@ -108,6 +110,9 @@ export default function DashboardScreenController({
 
   const isAuthenticationLoginUnchecked = !selectedTestIds.has(DashboardCON.AUTHENTICATION_LOGIN_TEST_ID);
   const [scopeFilter, setScopeFilter] = useState<ScopeFilterType>('Today');
+  // todayRunDetail/isLoadingTodayRun hold whichever run is currently
+  // selected below (defaults to today's most recent run, but the date
+  // picker + run dropdown can point this at any past date that has data).
   const [todayRunDetail, setTodayRunDetail] = useState<RunDetail | null>(null);
   const [isLoadingTodayRun, setIsLoadingTodayRun] = useState<boolean>(false);
   const [todaySearchQuery, setTodaySearchQuery] = useState<string>('');
@@ -119,20 +124,58 @@ export default function DashboardScreenController({
   const [todayViewMode, setTodayViewMode] = useState<ViewModeType>('grid');
   const [todayGridColumns, setTodayGridColumns] = useState<GridColumnsType>(3);
 
-  const todayRun = useMemo(() => {
-    const now = new Date();
-    return runs.find((run) => isSameCalendarDay(run.createdAt, now)) ?? null;
+  const todayDateKey = useMemo(() => toDateKey(new Date().toISOString()), []);
+  const [selectedDateKey, setSelectedDateKey] = useState<string>(todayDateKey);
+  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+
+  // Every run, grouped by the local calendar day it happened on - drives
+  // both which dates the picker allows and which runs the dropdown lists.
+  const runsByDateKey = useMemo(() => {
+    const map = new Map<string, RunSummary[]>();
+    for (const run of runs) {
+      const key = toDateKey(run.createdAt);
+      const existing = map.get(key);
+      if (existing) {
+        existing.push(run);
+      } else {
+        map.set(key, [run]);
+      }
+    }
+    for (const list of map.values()) {
+      list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    return map;
   }, [runs]);
 
+  const runsForSelectedDate = useMemo(
+    () => runsByDateKey.get(selectedDateKey) ?? [],
+    [runsByDateKey, selectedDateKey],
+  );
+
+  const isDateUnavailable = (dateKey: string): boolean => !runsByDateKey.has(dateKey);
+
+  // If the selected date has no run matching the currently selected run id
+  // (new date picked, or first mount), default to that date's most recent run.
   useEffect(() => {
-    if (!todayRun) {
+    if (runsForSelectedDate.length === 0) {
+      setSelectedRunId(null);
+      return;
+    }
+    if (!runsForSelectedDate.some((run) => run.id === selectedRunId)) {
+      setSelectedRunId(runsForSelectedDate[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runsForSelectedDate]);
+
+  useEffect(() => {
+    if (!selectedRunId) {
       setTodayRunDetail(null);
       return;
     }
     let cancelled = false;
     setIsLoadingTodayRun(true);
     RunsService.current
-      .getRunById(todayRun.id)
+      .getRunById(selectedRunId)
       .then((detail) => {
         if (!cancelled) setTodayRunDetail(detail);
       })
@@ -145,7 +188,7 @@ export default function DashboardScreenController({
     return () => {
       cancelled = true;
     };
-  }, [todayRun]);
+  }, [selectedRunId]);
 
   const todaySearchFilteredChecks = useMemo(() => {
     const checks = todayRunDetail?.pageChecks ?? [];
@@ -327,6 +370,35 @@ export default function DashboardScreenController({
               </div>
             </div>
 
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800/80 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Date:</span>
+                <DatePickerSharedComponent
+                  value={selectedDateKey}
+                  onChange={setSelectedDateKey}
+                  isDateDisabled={isDateUnavailable}
+                  size="sm"
+                  className="w-full sm:w-44"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Run:</span>
+                <CustomSelectSharedComponent
+                  value={selectedRunId ?? ''}
+                  options={runsForSelectedDate.map((run) => ({
+                    value: run.id,
+                    label: DateFormatterUtility.current.formatTime(run.createdAt),
+                    sublabel: run.id,
+                  }))}
+                  onChange={setSelectedRunId}
+                  placeholder="No runs"
+                  size="sm"
+                  className="w-full sm:w-52"
+                />
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800/80 text-xs">
               <div className="flex items-center gap-2">
                 <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Environment:</span>
@@ -375,8 +447,12 @@ export default function DashboardScreenController({
             <CardSharedComponent>
               <EmptyStateSharedComponent
                 icon={<CalendarDays className="w-5 h-5" />}
-                title="No Test Run Today Yet"
-                description="The morning smoke test hasn't run yet today — check back after 8:30 AM."
+                title={selectedDateKey === todayDateKey ? 'No Test Run Today Yet' : 'No Test Run Recorded'}
+                description={
+                  selectedDateKey === todayDateKey
+                    ? "The morning smoke test hasn't run yet today — check back after 8:30 AM."
+                    : 'This run has no page check results.'
+                }
                 className="w-full py-8"
               />
             </CardSharedComponent>
