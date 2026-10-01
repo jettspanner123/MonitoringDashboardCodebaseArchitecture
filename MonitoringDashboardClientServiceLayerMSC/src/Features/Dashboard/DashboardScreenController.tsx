@@ -364,9 +364,8 @@ export default function DashboardScreenController({
                   onClick={onRefetch}
                   icon={<RefreshCw className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-500 dark:text-zinc-400" />}
                   className="shrink-0 !w-11 !h-11 sm:!w-9 sm:!h-9 !p-0"
-                >
-                  <span className="sr-only">Refetch</span>
-                </ButtonSharedComponent>
+                  ariaLabel="Refetch"
+                />
               </div>
 
               <div className="flex items-center gap-2">
@@ -744,9 +743,8 @@ export default function DashboardScreenController({
               onClick={onRefetch}
               icon={<RefreshCw className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-500 dark:text-zinc-400" />}
               className="shrink-0 !w-11 !h-11 sm:!w-9 sm:!h-9 !p-0"
-            >
-              <span className="sr-only">Refetch</span>
-            </ButtonSharedComponent>
+              ariaLabel="Refetch"
+            />
           </div>
           <ButtonSharedComponent
             variant="outline"

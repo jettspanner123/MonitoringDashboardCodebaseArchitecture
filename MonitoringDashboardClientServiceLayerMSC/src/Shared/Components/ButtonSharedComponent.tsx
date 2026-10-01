@@ -3,7 +3,10 @@ import { motion } from 'motion/react';
 import { Loader2 } from 'lucide-react';
 
 export interface ButtonSharedComponentProps {
-  children: React.ReactNode;
+  // Omit entirely (use ariaLabel instead) for a true icon-only button - any
+  // children, including visually-hidden text, still occupies a flex slot
+  // and throws off icon centering via the button's own gap spacing.
+  children?: React.ReactNode;
   onClick?: () => void;
   variant?: 'primary' | 'ghost' | 'outline' | 'danger';
   size?: 'sm' | 'md' | 'lg';
@@ -15,6 +18,7 @@ export interface ButtonSharedComponentProps {
   type?: 'button' | 'submit' | 'reset';
   className?: string;
   title?: string;
+  ariaLabel?: string;
 }
 
 export default function ButtonSharedComponent({
@@ -30,6 +34,7 @@ export default function ButtonSharedComponent({
   type = 'button',
   className = '',
   title,
+  ariaLabel,
 }: ButtonSharedComponentProps): React.JSX.Element {
   const baseStyles =
     'inline-flex items-center justify-center font-medium rounded-md cursor-pointer select-none transition-colors duration-200 focus:outline-none whitespace-nowrap';
@@ -66,6 +71,7 @@ export default function ButtonSharedComponent({
       onClick={onClick}
       disabled={isButtonDisabled}
       title={title}
+      aria-label={ariaLabel}
       whileHover={isButtonDisabled ? {} : { scale: 1.01 }}
       whileTap={isButtonDisabled ? {} : { scale: 0.98 }}
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -76,7 +82,9 @@ export default function ButtonSharedComponent({
       ) : (
         icon && <span className="inline-flex items-center shrink-0">{icon}</span>
       )}
-      <span className="inline-flex items-center whitespace-nowrap">{children}</span>
+      {children !== undefined && children !== null && (
+        <span className="inline-flex items-center whitespace-nowrap">{children}</span>
+      )}
       {!isLoading && rightIcon && <span className="inline-flex items-center shrink-0">{rightIcon}</span>}
     </motion.button>
   );
