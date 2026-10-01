@@ -22,6 +22,7 @@ import PrimaryActionButtonSharedComponent from '../../Shared/Components/PrimaryA
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
 import CustomSelectSharedComponent, { type SelectOption } from '../../Shared/Components/CustomSelectSharedComponent';
 import DatePickerSharedComponent from '../../Shared/Components/DatePickerSharedComponent';
+import ShimmerOverlaySharedComponent from '../../Shared/Components/ShimmerOverlaySharedComponent';
 import ConfirmationModalSharedComponent from '../../Shared/Components/ConfirmationModalSharedComponent';
 import HealthByDayBarChartSharedComponent from '../../Shared/Components/HealthByDayBarChartSharedComponent';
 import SegmentedControlSharedComponent from '../../Shared/Components/SegmentedControlSharedComponent';
@@ -436,13 +437,18 @@ export default function DashboardScreenController({
             </div>
           </CardSharedComponent>
 
-          {isLoadingTodayRun ? (
+          {isLoadingTodayRun && !todayRunDetail ? (
+            // Nothing on screen yet to shimmer over (very first load only) -
+            // every subsequent date/run change keeps showing the current
+            // content in place, shimmering, until the new data lands.
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((placeholderKey) => (
                 <div key={placeholderKey} className="h-32 rounded-xl bg-slate-100 dark:bg-zinc-800/60 animate-pulse" />
               ))}
             </div>
-          ) : !todayRunDetail || todayRunDetail.pageChecks.length === 0 ? (
+          ) : (
+          <ShimmerOverlaySharedComponent isLoading={isLoadingTodayRun} className="space-y-6">
+          {!todayRunDetail || todayRunDetail.pageChecks.length === 0 ? (
             <CardSharedComponent>
               <EmptyStateSharedComponent
                 icon={<CalendarDays className="w-5 h-5" />}
@@ -570,6 +576,8 @@ export default function DashboardScreenController({
                 </div>
               )}
             </>
+          )}
+          </ShimmerOverlaySharedComponent>
           )}
         </motion.div>
       )}
