@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import ApplicationHapticsUtility from '../../Utilities/ApplicationHapticsUtility';
+import ApplicationThemeUtility from '../../Utilities/ApplicationThemeUtility';
 
 export interface DatePickerSharedComponentProps {
   label?: string;
@@ -16,6 +17,9 @@ export interface DatePickerSharedComponentProps {
   placeholder?: string;
   size?: 'sm' | 'md';
   className?: string;
+  // Plays the same circle-wipe transition the theme toggle uses, originating
+  // from the clicked day cell.
+  animatedTransition?: boolean;
 }
 
 const WEEKDAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -85,6 +89,7 @@ export default function DatePickerSharedComponent({
   placeholder = 'Select date...',
   size = 'md',
   className = 'w-full',
+  animatedTransition = true,
 }: DatePickerSharedComponentProps): React.JSX.Element {
   const today = new Date();
   const [isOpen, setIsOpen] = useState(false);
@@ -137,8 +142,16 @@ export default function DatePickerSharedComponent({
   const handleSelect = (dateKey: string): void => {
     if (disabledCheck(dateKey)) return;
     ApplicationHapticsUtility.current.triggerHapticFeedback(12);
-    onChange(dateKey);
-    setIsOpen(false);
+    const commit = () => {
+      onChange(dateKey);
+      setIsOpen(false);
+    };
+    if (animatedTransition) {
+      const targetElement = gridRef.current?.querySelector<HTMLElement>(`[data-date-key="${dateKey}"]`) ?? null;
+      ApplicationThemeUtility.current.executeAnimatedThemeToggle(targetElement, commit);
+    } else {
+      commit();
+    }
   };
 
   const handleGridKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {

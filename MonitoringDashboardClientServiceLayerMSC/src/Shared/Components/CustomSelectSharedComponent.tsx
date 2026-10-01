@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, Check, Search, Sparkles } from 'lucide-react';
 import ApplicationHapticsUtility from '../../Utilities/ApplicationHapticsUtility';
+import ApplicationThemeUtility from '../../Utilities/ApplicationThemeUtility';
 
 export interface SelectOption {
   value: string;
@@ -34,6 +35,10 @@ export interface CustomSelectSharedComponentProps {
   formatDisplayValue?: (val: string) => string;
   footerAction?: SelectFooterAction;
   onOpenChange?: (isOpen: boolean) => void;
+  // Plays the same circle-wipe transition the theme toggle uses, originating
+  // from the clicked option. Off by default - most selects on this app are
+  // plain filters where that flourish would be noise, not signal.
+  animatedTransition?: boolean;
 }
 
 export default function CustomSelectSharedComponent({
@@ -52,6 +57,7 @@ export default function CustomSelectSharedComponent({
   formatDisplayValue,
   footerAction,
   onOpenChange,
+  animatedTransition = false,
 }: CustomSelectSharedComponentProps): React.JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -216,9 +222,16 @@ export default function CustomSelectSharedComponent({
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => {
-                      onChange(option.value);
-                      setIsOpen(false);
+                    onClick={(event) => {
+                      const commit = () => {
+                        onChange(option.value);
+                        setIsOpen(false);
+                      };
+                      if (animatedTransition) {
+                        ApplicationThemeUtility.current.executeAnimatedThemeToggle(event.currentTarget, commit);
+                      } else {
+                        commit();
+                      }
                     }}
                     className={`w-full min-h-[48px] sm:min-h-0 flex items-center justify-between px-3.5 sm:px-3 py-3 sm:py-2 rounded-xl sm:rounded-lg transition-colors cursor-pointer text-left ${
                       isSelected
