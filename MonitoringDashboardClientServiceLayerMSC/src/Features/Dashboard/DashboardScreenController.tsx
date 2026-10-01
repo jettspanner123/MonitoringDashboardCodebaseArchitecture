@@ -447,7 +447,7 @@ export default function DashboardScreenController({
               ))}
             </div>
           ) : (
-          <ShimmerOverlaySharedComponent isLoading={isLoadingTodayRun} className="space-y-6">
+          <div className="space-y-6">
           {!todayRunDetail || todayRunDetail.pageChecks.length === 0 ? (
             <CardSharedComponent>
               <EmptyStateSharedComponent
@@ -513,13 +513,15 @@ export default function DashboardScreenController({
                     Authentication
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
-                    {todayAuthChecks.map((check) =>
-                      check.checkType === 'AuthenticationPing' ? (
-                        <PingCheckCardSharedComponent key={check.id} check={check} />
-                      ) : (
-                        <LoginCheckCardSharedComponent key={check.id} check={check} />
-                      ),
-                    )}
+                    {todayAuthChecks.map((check) => (
+                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                        {check.checkType === 'AuthenticationPing' ? (
+                          <PingCheckCardSharedComponent check={check} />
+                        ) : (
+                          <LoginCheckCardSharedComponent check={check} />
+                        )}
+                      </ShimmerOverlaySharedComponent>
+                    ))}
                   </div>
                 </div>
               )}
@@ -531,7 +533,9 @@ export default function DashboardScreenController({
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayPageLoadChecks.map((check) => (
-                      <PageLoadCheckCardSharedComponent key={check.id} check={check} />
+                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                        <PageLoadCheckCardSharedComponent check={check} />
+                      </ShimmerOverlaySharedComponent>
                     ))}
                   </div>
                 </div>
@@ -544,7 +548,9 @@ export default function DashboardScreenController({
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayAtlasWidgetChecks.map((check) => (
-                      <PageLoadCheckCardSharedComponent key={check.id} check={check} />
+                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                        <PageLoadCheckCardSharedComponent check={check} />
+                      </ShimmerOverlaySharedComponent>
                     ))}
                   </div>
                 </div>
@@ -557,7 +563,9 @@ export default function DashboardScreenController({
                   </h2>
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${todayGridColsClass} gap-4`}>
                     {todayIndexingChecks.map((check) => (
-                      <IndexingFreshnessCardSharedComponent key={check.id} check={check} />
+                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                        <IndexingFreshnessCardSharedComponent check={check} />
+                      </ShimmerOverlaySharedComponent>
                     ))}
                   </div>
                 </div>
@@ -570,14 +578,16 @@ export default function DashboardScreenController({
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {todayQueueChecks.map((check) => (
-                      <QueueStatusCardSharedComponent key={check.id} check={check} />
+                      <ShimmerOverlaySharedComponent key={check.id} isLoading={isLoadingTodayRun} className="rounded-xl">
+                        <QueueStatusCardSharedComponent check={check} />
+                      </ShimmerOverlaySharedComponent>
                     ))}
                   </div>
                 </div>
               )}
             </>
           )}
-          </ShimmerOverlaySharedComponent>
+          </div>
           )}
         </motion.div>
       )}
