@@ -368,38 +368,7 @@ export default function DashboardScreenController({
                   <span className="sr-only">Refetch</span>
                 </ButtonSharedComponent>
               </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800/80 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Date:</span>
-                <DatePickerSharedComponent
-                  value={selectedDateKey}
-                  onChange={setSelectedDateKey}
-                  isDateDisabled={isDateUnavailable}
-                  size="sm"
-                  className="w-full sm:w-44"
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Run:</span>
-                <CustomSelectSharedComponent
-                  value={selectedRunId ?? ''}
-                  options={runsForSelectedDate.map((run) => ({
-                    value: run.id,
-                    label: DateFormatterUtility.current.formatTime(run.createdAt),
-                    sublabel: run.id,
-                  }))}
-                  onChange={setSelectedRunId}
-                  placeholder="No runs"
-                  size="sm"
-                  className="w-full sm:w-52"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800/80 text-xs">
               <div className="flex items-center gap-2">
                 <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Environment:</span>
                 <CustomSelectSharedComponent
@@ -409,6 +378,37 @@ export default function DashboardScreenController({
                   size="sm"
                   className="w-full sm:w-60"
                 />
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800/80 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Date:</span>
+                  <DatePickerSharedComponent
+                    value={selectedDateKey}
+                    onChange={setSelectedDateKey}
+                    isDateDisabled={isDateUnavailable}
+                    size="sm"
+                    className="w-full sm:w-44"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Run:</span>
+                  <CustomSelectSharedComponent
+                    value={selectedRunId ?? ''}
+                    options={runsForSelectedDate.map((run) => ({
+                      value: run.id,
+                      label: DateFormatterUtility.current.formatTime(run.createdAt),
+                      sublabel: run.id,
+                    }))}
+                    onChange={setSelectedRunId}
+                    placeholder="No runs"
+                    size="sm"
+                    className="w-full sm:w-52"
+                  />
+                </div>
               </div>
 
               <div className="hidden sm:flex items-center gap-3">
