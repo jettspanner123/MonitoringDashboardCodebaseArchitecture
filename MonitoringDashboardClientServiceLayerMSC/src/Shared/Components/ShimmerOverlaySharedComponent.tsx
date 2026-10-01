@@ -15,6 +15,15 @@ export interface ShimmerOverlaySharedComponentProps {
 // underneath is always rendered at its natural size - this only ever adds an
 // absolutely-positioned overlay on top, so nothing it wraps ever shifts
 // position or size while "loading" toggles on and off.
+//
+// This component only reflects isLoading as given - it does not guarantee a
+// minimum shimmer duration itself, since callers that key these per item
+// (e.g. one per list row) will unmount/remount a fresh instance the moment
+// the underlying data changes, resetting any internal "let it finish"
+// state before it could matter. Callers that want "shimmer completes at
+// least one cycle even if data arrives early" need to hold isLoading true
+// for that minimum duration themselves (see DashboardScreenController's
+// data-fetch effect for the reference implementation).
 export default function ShimmerOverlaySharedComponent({
   isLoading,
   children,

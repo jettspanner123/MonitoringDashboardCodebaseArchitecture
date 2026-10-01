@@ -38,6 +38,11 @@ import DashboardCON from './Constants/DashboardCON';
 
 // Local-calendar date key ('YYYY-MM-DD') - matches how DatePickerSharedComponent
 // keys dates, so a run's createdAt and the picker's selection compare directly.
+// Matches ShimmerOverlaySharedComponent's default `speed` (1.4s) - the
+// minimum time a date/run switch's shimmer must play before new data
+// actually appears, even if the fetch itself resolved faster.
+const MIN_SHIMMER_DURATION_MS = 1400;
+
 function toDateKey(isoString: string): string {
   const date = new Date(isoString);
   const year = date.getFullYear();
@@ -174,20 +179,37 @@ export default function DashboardScreenController({
       return;
     }
     let cancelled = false;
+    let pendingRevealTimeout: ReturnType<typeof setTimeout> | undefined;
+    const fetchStartedAt = Date.now();
     setIsLoadingTodayRun(true);
     RunsService.current
       .getRunById(selectedRunId)
       .then((detail) => {
-        if (!cancelled) setTodayRunDetail(detail);
+        if (cancelled) return;
+        // Each check card keys itself by check.id, which differs between
+        // runs - so the moment fresh data lands, React unmounts the old
+        // shimmering card and mounts a new one, destroying any "let the
+        // sweep finish" state the card itself might try to hold. The only
+        // place that can actually guarantee "shimmer completes at least one
+        // full cycle, even if the fetch was faster than that" is here,
+        // before the data (and isLoadingTodayRun) ever change at all.
+        const elapsed = Date.now() - fetchStartedAt;
+        const remaining = Math.max(0, MIN_SHIMMER_DURATION_MS - elapsed);
+        pendingRevealTimeout = setTimeout(() => {
+          if (cancelled) return;
+          setTodayRunDetail(detail);
+          setIsLoadingTodayRun(false);
+        }, remaining);
       })
       .catch(() => {
-        if (!cancelled) setTodayRunDetail(null);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoadingTodayRun(false);
+        if (!cancelled) {
+          setTodayRunDetail(null);
+          setIsLoadingTodayRun(false);
+        }
       });
     return () => {
       cancelled = true;
+      if (pendingRevealTimeout) clearTimeout(pendingRevealTimeout);
     };
   }, [selectedRunId]);
 
