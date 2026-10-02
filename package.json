@@ -20,7 +20,8 @@
     "client:install": "bun install --cwd MonitoringDashboardClientServiceLayerMSC",
     "server:dev": "turbo dev --filter=@monitoring-dashboard/server",
     "server:build": "turbo build --filter=@monitoring-dashboard/server",
-    "server:lint": "turbo lint --filter=@monitoring-dashboard/server"
+    "server:lint": "turbo lint --filter=@monitoring-dashboard/server",
+    "install:deps": "bun install && bun run --cwd MonitoringDashboardOrchestratorServiceLayerMSC prisma:generate"
   },
   "devDependencies": {
     "turbo": "^2.4.4"
