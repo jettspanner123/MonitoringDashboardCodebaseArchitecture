@@ -9,7 +9,7 @@ import ApplicationDatabaseService from "./Services/DatabaseServices/ApplicationD
 import ApplicationDatabaseProvider from "./Providers/ApplicationDatabaseProvider";
 import TestRunIdHelper from "./Helpers/TestRunIdHelper";
 import SmokeEnvironmentHelper from "./Helpers/SmokeEnvironmentHelper";
-import ENVIRONMENT_CONFIGURATION from "./Configurations/EnvironmentConfiguration";
+import EnvironmentConfiguration from "./Configurations/EnvironmentConfiguration";
 
 dotenv.config()
 
@@ -17,7 +17,7 @@ async function globalSetup(config: FullConfig) {
     try {
         const {username, password} = ENValidator.current.checkOrThrowRequiredENVariables();
         const currentEnvironment = SmokeEnvironmentHelper.current.resolveCurrentEnvironment();
-        const envConfig = ENVIRONMENT_CONFIGURATION[currentEnvironment];
+        const envConfig = EnvironmentConfiguration.ALL[currentEnvironment];
         // The login path itself differs between environments (some are
         // /3dpassport/login, others /3dpassport/admin-tools/v2/login), so
         // envConfig.authUrl is the full page to navigate to - baseURL here
@@ -66,8 +66,15 @@ async function globalSetup(config: FullConfig) {
 
         try {
             const errorLocator = page.locator(AuthenticationConfiguration.errorSelector);
-            await Promise.race([
-                page.waitForURL(`${baseURL}${AuthenticationConfiguration.successUrl}`, {timeout: 60000}),
+            const profileCompletionLocator = page.locator(AuthenticationConfiguration.profileCompletionSelector);
+
+            // Some accounts land on a "complete your profile" panel instead
+            // of successUrl after a perfectly valid login - still a success,
+            // just a different landing page. Don't fill or submit that form;
+            // its mere appearance is the signal.
+            const loginOutcome = await Promise.race([
+                page.waitForURL(`${baseURL}${AuthenticationConfiguration.successUrl}`, {timeout: 60000}).then(() => 'success' as const),
+                profileCompletionLocator.waitFor({state: 'visible', timeout: 60000}).then(() => 'profile-completion' as const),
                 errorLocator.waitFor({state: 'visible', timeout: 60000}).then(async () => {
                     const message = await errorLocator.textContent();
                     throw new Error(`Login failed: ${message?.trim() ?? 'unknown error'}`);
@@ -79,7 +86,9 @@ async function globalSetup(config: FullConfig) {
                 username,
                 plainTextPassword: password,
                 success: true,
-                message: 'Login succeeded.',
+                message: loginOutcome === 'profile-completion'
+                    ? 'Login succeeded (landed on profile-completion page).'
+                    : 'Login succeeded.',
             });
         } catch (loginError) {
             const message = loginError instanceof Error ? loginError.message : String(loginError);

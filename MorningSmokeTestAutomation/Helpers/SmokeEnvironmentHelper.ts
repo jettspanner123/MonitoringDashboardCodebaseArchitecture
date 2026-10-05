@@ -1,11 +1,11 @@
 import SmokeEnvironmentNameType from "../Types/SmokeEnvironmentNameType";
 import EnvironmentValueNegativeException from "../Exceptions/EnvironmentValueNegativeException";
-import ENVIRONMENT_CONFIGURATION from "../Configurations/EnvironmentConfiguration";
-
-const VALID_ENVIRONMENT_NAMES = Object.keys(ENVIRONMENT_CONFIGURATION) as SmokeEnvironmentNameType[];
+import EnvironmentConfiguration from "../Configurations/EnvironmentConfiguration";
 
 export default class SmokeEnvironmentHelper {
     public static current = new SmokeEnvironmentHelper();
+
+    private static readonly VALID_ENVIRONMENT_NAMES = Object.keys(EnvironmentConfiguration.ALL) as SmokeEnvironmentNameType[];
 
     // Both GlobalAuthenticationSetup.ts (picking the right login URL) and
     // SmokeTest.spec.ts (picking the right page config) need to agree on
@@ -23,9 +23,9 @@ export default class SmokeEnvironmentHelper {
             );
         }
 
-        if (!VALID_ENVIRONMENT_NAMES.includes(value as SmokeEnvironmentNameType)) {
+        if (!SmokeEnvironmentHelper.VALID_ENVIRONMENT_NAMES.includes(value as SmokeEnvironmentNameType)) {
             throw new EnvironmentValueNegativeException(
-                `Unrecognized SMOKE_ENV "${value}". Expected one of: ${VALID_ENVIRONMENT_NAMES.join(', ')}.`,
+                `Unrecognized SMOKE_ENV "${value}". Expected one of: ${SmokeEnvironmentHelper.VALID_ENVIRONMENT_NAMES.join(', ')}.`,
                 false
             );
         }

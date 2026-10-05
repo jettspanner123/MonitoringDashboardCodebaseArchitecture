@@ -16,16 +16,18 @@ export interface EnvironmentConfigInterface {
     extraChecks: SmokeExtraCheckConfigInterface[];
 }
 
-// Transcribed from Configurations/MorningMonitoringLinksAndENV.xml, with two
-// kinds of values deliberately dropped rather than copied verbatim:
-//   - ;jsessionid=... suffixes - these are live browser session ids captured
-//     off an already-logged-in tab; they're meaningless (and likely expired)
-//     by the time Playwright opens its own fresh, unauthenticated session.
-//   - Production's 3DSpace URL had a `?ticket=ST-...&collabSpace=Default`
-//     query string - a CAS single-use service ticket, even more ephemeral
-//     than a jsessionid (it's consumed on first use). Normalized to the bare
-//     /3dspace path, matching every other environment.
-const ENVIRONMENT_CONFIGURATION: Record<SmokeEnvironmentNameType, EnvironmentConfigInterface> = {
+export default class EnvironmentConfiguration {
+    // Transcribed from Configurations/MorningMonitoringLinksAndENV.xml, with
+    // two kinds of values deliberately dropped rather than copied verbatim:
+    //   - ;jsessionid=... suffixes - these are live browser session ids
+    //     captured off an already-logged-in tab; they're meaningless (and
+    //     likely expired) by the time Playwright opens its own fresh,
+    //     unauthenticated session.
+    //   - Production's 3DSpace URL had a `?ticket=ST-...&collabSpace=Default`
+    //     query string - a CAS single-use service ticket, even more ephemeral
+    //     than a jsessionid (it's consumed on first use). Normalized to the
+    //     bare /3dspace path, matching every other environment.
+    public static readonly ALL: Record<SmokeEnvironmentNameType, EnvironmentConfigInterface> = {
     Training: {
         authUrl: 'https://air3dpassporttrn24x.atlascopco.group/3dpassport/login',
         spaceUrl: 'https://air3dspacetrn24x.atlascopco.group/3dspace',
@@ -95,6 +97,5 @@ const ENVIRONMENT_CONFIGURATION: Record<SmokeEnvironmentNameType, EnvironmentCon
             { name: 'NOCAS', url: 'https://air3dspacenocasdev2.atlascopco.group/internal', kind: 'selector-wait', selector: '#loginForm' },
         ],
     },
-};
-
-export default ENVIRONMENT_CONFIGURATION;
+    };
+}

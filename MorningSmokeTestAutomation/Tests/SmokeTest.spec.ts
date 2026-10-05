@@ -1,33 +1,16 @@
 import { test, expect, type Response } from '@playwright/test';
-import getSmokePageConfiguration from "../Configurations/SmokePageConfiguration";
+import SmokePageConfigurationService from "../Configurations/SmokePageConfiguration";
 import ApplicationDateTimeHelper from "../Helpers/ApplicationDateTimeHelper";
 import ApplicationDatabaseService from "../Services/DatabaseServices/ApplicationDatabaseService";
 import TestRunIdHelper from "../Helpers/TestRunIdHelper";
 import SmokeEnvironmentHelper from "../Helpers/SmokeEnvironmentHelper";
-import DurationFormatHelper from "../Helpers/DurationFormatHelper";
+import SmokeCheckFailureClassifier from "../Helpers/SmokeCheckFailureClassifier";
 
 const MAX_INDEXING_STALENESS_MINUTES = 30;
-const currentEnvironment = SmokeEnvironmentHelper.current.resolveCurrentEnvironment();
 
-// Used by both the main per-page content check and each popup's content
-// check: a genuine Playwright timeout gets the "took more than X" message
-// (when this check has a bounded timeoutMs to report); anything else that
-// goes wrong in this phase (a non-timeout assertion failure, say) gets a
-// neutral fallback instead, since it isn't actually a timing issue.
-function classifyContentCheckFailure(
-  error: unknown,
-  timeoutMs: number | undefined
-): { message: string; technicalReason: string } {
-  const technicalReason = error instanceof Error ? error.message : String(error);
-  const isTimeout = error instanceof Error && (error.name === 'TimeoutError' || /Timeout \d+ms exceeded/.test(error.message));
-  const message = isTimeout && timeoutMs
-    ? `Took more than ${DurationFormatHelper.current.formatMs(timeoutMs)} to load.`
-    : 'Failed to find the expected content on the page.';
-
-  return { message, technicalReason };
-}
-
-for (const pageConfig of getSmokePageConfiguration(currentEnvironment)) {
+for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfiguration(
+  SmokeEnvironmentHelper.current.resolveCurrentEnvironment()
+)) {
   test(`Smoke: ${pageConfig.name}`, async ({ page }) => {
     // This suite intentionally has no per-test cap — several of these pages
     // are known to take a long, variable amount of time to load or produce
@@ -179,7 +162,7 @@ for (const pageConfig of getSmokePageConfiguration(currentEnvironment)) {
         }
       } catch (contentError) {
         if (pageConfig.recordPageLoadCheck) {
-          const { message, technicalReason } = classifyContentCheckFailure(contentError, pageConfig.timeoutMs);
+          const { message, technicalReason } = SmokeCheckFailureClassifier.current.classify(contentError, pageConfig.timeoutMs);
           await ApplicationDatabaseService.current.recordPageLoadCheck({
             testRunId,
             pageName: pageConfig.name,
@@ -349,7 +332,7 @@ for (const pageConfig of getSmokePageConfiguration(currentEnvironment)) {
           await popup.close();
         }
       } catch (contentError) {
-        const { message, technicalReason } = classifyContentCheckFailure(contentError, pageConfig.timeoutMs);
+        const { message, technicalReason } = SmokeCheckFailureClassifier.current.classify(contentError, pageConfig.timeoutMs);
         await ApplicationDatabaseService.current.recordPageLoadCheck({
           testRunId,
           pageName: popupCheck.name,
