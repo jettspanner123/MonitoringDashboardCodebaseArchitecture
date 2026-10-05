@@ -56,6 +56,8 @@ export interface DashboardScreenControllerProps {
   isLoading: boolean;
   isRefetching: boolean;
   onRefetch: () => void;
+  environment: string;
+  onEnvironmentChange: (environment: string) => void;
   onSelectRun: (run: RunSummary) => void;
 }
 
@@ -87,6 +89,8 @@ export default function DashboardScreenController({
   isLoading,
   isRefetching,
   onRefetch,
+  environment,
+  onEnvironmentChange,
   onSelectRun,
 }: DashboardScreenControllerProps): React.JSX.Element {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -122,11 +126,6 @@ export default function DashboardScreenController({
   const [todayRunDetail, setTodayRunDetail] = useState<RunDetail | null>(null);
   const [isLoadingTodayRun, setIsLoadingTodayRun] = useState<boolean>(false);
   const [todaySearchQuery, setTodaySearchQuery] = useState<string>('');
-  // Decorative for now - there's no environment concept anywhere in the
-  // database yet, so selecting a different one doesn't change what's shown.
-  const [todayEnvironment, setTodayEnvironment] = useState<string>(
-    DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS[0].value,
-  );
   const [todayViewMode, setTodayViewMode] = useState<ViewModeType>('grid');
   const [todayGridColumns, setTodayGridColumns] = useState<GridColumnsType>(3);
 
@@ -394,9 +393,9 @@ export default function DashboardScreenController({
               <div className="flex items-center gap-2">
                 <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Environment:</span>
                 <CustomSelectSharedComponent
-                  value={todayEnvironment}
-                  options={DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS}
-                  onChange={setTodayEnvironment}
+                  value={environment}
+                  options={DashboardCON.ENVIRONMENTS}
+                  onChange={onEnvironmentChange}
                   size="sm"
                   className="w-full sm:w-60"
                 />

@@ -6,10 +6,10 @@ export default class TanstackQueryClientService {
   public static current = new TanstackQueryClientService();
 
   public readonly runs = {
-    useRunsQuery: () => {
+    useRunsQuery: (environment?: string) => {
       return useQuery({
-        queryKey: TanstackQueryKeysCON.RUNS,
-        queryFn: () => RunsService.current.getRuns(),
+        queryKey: TanstackQueryKeysCON.runs(environment),
+        queryFn: () => RunsService.current.getRuns(environment),
         staleTime: 1000 * 60,
       });
     },

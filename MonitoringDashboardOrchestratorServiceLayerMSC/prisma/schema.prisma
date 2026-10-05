@@ -10,9 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Environment {
+  PRODUCTION
+  QA
+  TESTING
+  TRAINING
+  DEV1
+  DEV2
+}
+
 model TestRun {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  environment Environment?
 
   pingChecks              AuthenticationPingCheck[]
   loginChecks             AuthenticationLoginCheck[]
@@ -51,13 +61,14 @@ model AuthenticationLoginCheck {
 }
 
 model PageLoadCheck {
-  id         String   @id @default(cuid())
-  pageName   String
-  success    Boolean
-  message    String
-  statusCode Int?
-  durationMs Int?
-  createdAt  DateTime @default(now())
+  id              String   @id @default(cuid())
+  pageName        String
+  success         Boolean
+  message         String
+  technicalReason String?
+  statusCode      Int?
+  durationMs      Int?
+  createdAt       DateTime @default(now())
 
   testRunId String
   testRun   TestRun @relation(fields: [testRunId], references: [id])

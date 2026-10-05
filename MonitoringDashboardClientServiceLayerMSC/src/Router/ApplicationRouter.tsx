@@ -15,6 +15,7 @@ import TanstackQueryClientService from '../Services/TanstackQueryClientService';
 import NavigationController from '../Features/Navigation/NavigationController';
 import DashboardOverviewScreenRoute from '../Routes/DashboardOverviewScreenRoute';
 import RunDetailScreenRoute from '../Routes/RunDetailScreenRoute';
+import { DEFAULT_ENVIRONMENT_VALUE } from '../Features/Dashboard/Constants/DashboardCON';
 
 // ==========================================
 // 1. Root Route & Theme Shell
@@ -30,6 +31,7 @@ const rootRoute = createRootRoute({
 // TanStack Router needs to infer params at compile time.
 interface DashboardSearchParams {
   [ApplicationRouteCON.PARAM_RUN_ID]?: string;
+  [ApplicationRouteCON.PARAM_ENVIRONMENT]?: string;
 }
 
 function RootLayout(): React.JSX.Element {
@@ -95,18 +97,23 @@ const dashboardRoute = createRoute({
       typeof rawSearch[ApplicationRouteCON.PARAM_RUN_ID] === 'string'
         ? (rawSearch[ApplicationRouteCON.PARAM_RUN_ID] as string)
         : undefined,
+    [ApplicationRouteCON.PARAM_ENVIRONMENT]:
+      typeof rawSearch[ApplicationRouteCON.PARAM_ENVIRONMENT] === 'string'
+        ? (rawSearch[ApplicationRouteCON.PARAM_ENVIRONMENT] as string)
+        : undefined,
   }),
   component: function DashboardRouteComponent() {
     const navigate = useNavigate();
     const search = useSearch({ strict: false }) as DashboardSearchParams;
     const selectedRunId = search[ApplicationRouteCON.PARAM_RUN_ID];
+    const selectedEnvironment = search[ApplicationRouteCON.PARAM_ENVIRONMENT] ?? DEFAULT_ENVIRONMENT_VALUE;
 
     const {
       data: runs = [],
       isLoading: isLoadingRuns,
       isFetching: isRefetchingRuns,
       refetch: refetchRuns,
-    } = TanstackQueryClientService.current.runs.useRunsQuery();
+    } = TanstackQueryClientService.current.runs.useRunsQuery(selectedEnvironment);
     const { data: run, isLoading: isLoadingRun } = TanstackQueryClientService.current.runs.useRunDetailQuery(
       selectedRunId ?? ''
     );
@@ -132,6 +139,17 @@ const dashboardRoute = createRoute({
         isLoading={isLoadingRuns}
         isRefetching={isRefetchingRuns}
         onRefetch={() => void refetchRuns()}
+        environment={selectedEnvironment}
+        onEnvironmentChange={(nextEnvironment) =>
+          navigate({
+            to: '.',
+            search: (prev: DashboardSearchParams) => ({
+              ...prev,
+              [ApplicationRouteCON.PARAM_ENVIRONMENT]:
+                nextEnvironment === DEFAULT_ENVIRONMENT_VALUE ? undefined : nextEnvironment,
+            }),
+          })
+        }
         onSelectRun={(selected) =>
           navigate({
             to: '.',

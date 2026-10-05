@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Environment } from '@prisma/client';
 import ApplicationDatabaseProvider from '../../../Providers/ApplicationDatabaseProvider';
 import type HealthType from '../Models/HealthType';
 import type PageCheckDTO from '../Models/PageCheckDTO';
@@ -28,8 +28,13 @@ function computeHealth(pageChecks: PageCheckDTO[]): HealthType {
 export default class RunsService {
     public static current = new RunsService();
 
-    public async listRuns(): Promise<RunSummaryDTO[]> {
+    // environment is filtered here, in the query itself, rather than
+    // fetched unfiltered and narrowed down in the frontend - runs for
+    // environments the caller isn't looking at are never sent over the
+    // wire at all.
+    public async listRuns(environment?: Environment): Promise<RunSummaryDTO[]> {
         const runs = await ApplicationDatabaseProvider.current.client.testRun.findMany({
+            where: environment ? { environment } : undefined,
             orderBy: { createdAt: 'desc' },
             include: RUN_WITH_CHECKS_INCLUDE,
         });
@@ -39,6 +44,7 @@ export default class RunsService {
             return {
                 id: run.id,
                 createdAt: run.createdAt.toISOString(),
+                environment: run.environment,
                 health: computeHealth(pageChecks),
                 pageCheckCount: pageChecks.length,
             };
@@ -59,6 +65,7 @@ export default class RunsService {
         return {
             id: run.id,
             createdAt: run.createdAt.toISOString(),
+            environment: run.environment,
             health: computeHealth(pageChecks),
             pageChecks,
         };
@@ -103,7 +110,11 @@ export default class RunsService {
                 checkType: 'PageLoad',
                 status: check.success ? 'Pass' : 'Fail',
                 message: check.message,
-                details: { statusCode: check.statusCode, durationMs: check.durationMs },
+                details: {
+                    statusCode: check.statusCode,
+                    durationMs: check.durationMs,
+                    technicalReason: check.technicalReason,
+                },
                 createdAt: check.createdAt.toISOString(),
             });
         }

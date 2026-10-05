@@ -7,6 +7,8 @@ export interface DashboardOverviewScreenRouteProps {
   isLoading: boolean;
   isRefetching: boolean;
   onRefetch: () => void;
+  environment: string;
+  onEnvironmentChange: (environment: string) => void;
   onSelectRun: (run: RunSummary) => void;
 }
 
@@ -15,6 +17,8 @@ export default function DashboardOverviewScreenRoute({
   isLoading,
   isRefetching,
   onRefetch,
+  environment,
+  onEnvironmentChange,
   onSelectRun,
 }: DashboardOverviewScreenRouteProps): React.JSX.Element {
   return (
@@ -23,6 +27,8 @@ export default function DashboardOverviewScreenRoute({
       isLoading={isLoading}
       isRefetching={isRefetching}
       onRefetch={onRefetch}
+      environment={environment}
+      onEnvironmentChange={onEnvironmentChange}
       onSelectRun={onSelectRun}
     />
   );
