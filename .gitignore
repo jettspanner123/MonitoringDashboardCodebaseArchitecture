@@ -3,6 +3,3 @@ dist/
 .turbo/
 .env
 .env.local
-
-# Separate, independently-managed repo — not meant to be nested/tracked here.
-MorningSmokeTestAutomation/

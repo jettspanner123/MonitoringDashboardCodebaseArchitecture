@@ -1,0 +1,29 @@
+{
+  "name": "morning-smoke-test-automation",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:headed:training": "cross-env SMOKE_ENV=Training playwright test --headed",
+    "test:headed:production": "cross-env SMOKE_ENV=Production playwright test --headed",
+    "test:headed:qa": "cross-env SMOKE_ENV=QA playwright test --headed",
+    "test:headed:dev1": "cross-env SMOKE_ENV=Dev1 playwright test --headed",
+    "test:headed:testing": "cross-env SMOKE_ENV=Testing playwright test --headed",
+    "test:headed:dev2": "cross-env SMOKE_ENV=Dev2 playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.0.0",
+    "boxen": "^5.1.2",
+    "chalk": "^4.1.2",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "prisma": "^6.19.3",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
+  }
+}

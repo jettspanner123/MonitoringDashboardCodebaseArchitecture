@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Environments>
+
+    <Training>
+        <Service>
+            <ServiceName>3DPassport (Auth)</ServiceName>
+            <ServiceURL>https://air3dpassporttrn24x.atlascopco.group/3dpassport/login</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DSpace</ServiceName>
+            <ServiceURL>https://air3dspacetrn24x.atlascopco.group/3dspace</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DExperiencePlatformGW</ServiceName>
+            <ServiceURL>http://air3dgwtrnsrv.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=36DB0EA963314D38DC78B98D508D207A</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>XPDMGW</ServiceName>
+            <ServiceURL>http://air3dxpdmgwtrnsrv.atlascopco.group:8050/XPDMGW/;jsessionid=2A42A20B26A942D7709278279ABD13C4</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>FCS Server</ServiceName>
+            <ServiceURL>https://air3dfcstrn24x.atlascopco.group/fcs/servlet/fcs/about</ServiceURL>
+        </Service>
+    </Training>
+
+
+    <Production>
+        <Service>
+            <ServiceName>3DPassport (Auth)</ServiceName>
+            <ServiceURL>https://air3dxpassport.atlascopco.group/3dpassport/admin-tools/v2/login</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DSpace</ServiceName>
+            <ServiceURL>https://air3dxspace.atlascopco.group/3dspace/common/emxNavigator.jsp?ticket=ST-69844-Lo1oHcHQxNpUx1SbkhJN-cas&amp;collabSpace=Default</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>XPDMGW</ServiceName>
+            <ServiceURL>http://air3dxgw1srv.atlascopco.group:8050/XPDMGW/;jsessionid=FD58DDB400498478BF3894E6672EF92E.platgw-inst1-web01;jsessionid=6AB68F33B0E5D37891548D9A09240F98.platgw-inst1-web01</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DExperiencePlatformGW</ServiceName>
+            <ServiceURL>http://air3dxxpdmgw1srv.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=B67880FA050F19FC1A3FA798B9048462.3dxpgw-inst1-web01</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>Admin Controlls</ServiceName>
+            <ServiceURL>http://air3dxspaceidxmtr.atlascopco.group:19001/admin/</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>JRDS</ServiceName>
+            <ServiceURL>http://air3dxspaceidxmtr.atlascopco.group:19001/monitoring-ui/</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>NOCAS</ServiceName>
+            <ServiceURL>https://air3dxspacenocas.atlascopco.group/internal/</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>FCS-1</ServiceName>
+            <ServiceURL>https://air3dxfcswuxi.atlascopco.group/fcs/servlet/fcs/about</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>FCS-2</ServiceName>
+            <ServiceURL>https://air3dfcsgecia.atlascopco.group/fcs/servlet/fcs/about</ServiceURL>
+        </Service>
+    </Production>
+
+
+    <QA>
+        <Service>
+            <ServiceName>3DPassport (Auth)</ServiceName>
+            <ServiceURL>https://air3dpassportqa.atlascopco.group/3dpassport/admin-tools/v2/login</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DSpace</ServiceName>
+            <ServiceURL>https://air3dspaceqa.atlascopco.group/3dspace</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>XPDMGW</ServiceName>
+            <ServiceURL>http://air3dgw1qasrv.atlascopco.group:8050/XPDMGW/</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DExperiencePlatformGW</ServiceName>
+            <ServiceURL>http://air3dxpdmgw1qasrv.atlascopco.group:8040/3DEXPERIENCEPlatformGW/</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>Admin Controlls</ServiceName>
+            <ServiceURL>http://aiasnlas0054.atlascopco.group:19001/admin/#home</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>NOCAS</ServiceName>
+            <ServiceURL>https://air3dspacenocasqa.atlascopco.group/internal/</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>FCS-Huston</ServiceName>
+            <ServiceURL>https://air3dfcshoustonqa.atlascopco.group/fcs/servlet/fcs/about</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>FCS-Gecia</ServiceName>
+            <ServiceURL>https://air3dfcsgeciaqa.atlascopco.group/fcs/servlet/fcs/about</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>FCS-3</ServiceName>
+            <ServiceURL>https://air3dfcswuxiqa.atlascopco.group/fcs/servlet/fcs/about</ServiceURL>
+        </Service>
+    </QA>
+
+
+    <Dev1>
+        <Service>
+            <ServiceName>3DPassport (Auth)</ServiceName>
+            <ServiceURL>https://air3dpassportdev124x.atlascopco.group/3dpassport/login</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DSpace</ServiceName>
+            <ServiceURL>https://air3dspacedev124x.atlascopco.group/3dspace</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>XPDMGW</ServiceName>
+            <ServiceURL>http://air3dxpdmgwdev124x.atlascopco.group:8050/XPDMGW/;jsessionid=7A2BE2053D63514C74A035011998F376</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DExperiencePlatformGW</ServiceName>
+            <ServiceURL>http://air3dxgwdev124x.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=1614AA207CEC9804760B459D1DFCE693</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>NOCAS</ServiceName>
+            <ServiceURL>https://air3dspacenocasdev124x.atlascopco.group/internal/common/emxSecurityContextSelection.jsp</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>FCS</ServiceName>
+            <ServiceURL>https://air3dfcsdev124x.atlascopco.group/fcs/servlet/fcs/about</ServiceURL>
+        </Service>
+    </Dev1>
+
+
+    <Testing>
+        <Service>
+            <ServiceName>3DPassport (Auth)</ServiceName>
+            <ServiceURL>https://air3dpassporttst24x.atlascopco.group/3dpassport/admin-tools/v2</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DSpace</ServiceName>
+            <ServiceURL>https://air3dspacetst24x.atlascopco.group/3dspace</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>NOCAS</ServiceName>
+            <ServiceURL>http://air3dspacenocastst24x.atlascopco.group/internal/emxLogin.jsp</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>Admin Controlls</ServiceName>
+            <ServiceURL>http://air3dspaceidxtstsrv.atlascopco.group:19001/admin/#home</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>XPDMGW</ServiceName>
+            <ServiceURL>http://air3dgwtstsrv.atlascopco.group:8050/XPDMGW/;jsessionid=CE6D7B01DC840E82CBA1EBD91D0E1F73.3dspace-nocas-inst2-web01</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DExperiencePlatformGW</ServiceName>
+            <ServiceURL>http://air3dgwtstsrv.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=DD5BA6DCAD2DB9F4C1E5BD76058BF995</ServiceURL>
+        </Service>
+    </Testing>
+
+
+    <Dev2>
+        <Service>
+            <ServiceName>3DPassport (Auth)</ServiceName>
+            <ServiceURL>https://air3dpassportdev2.atlascopco.group/3dpassport/login</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DSpace</ServiceName>
+            <ServiceURL>https://air3dspacedev2.atlascopco.group/3dspace</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>NOCAS</ServiceName>
+            <ServiceURL>https://air3dspacenocasdev2.atlascopco.group/internal</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>XPDMGW</ServiceName>
+            <ServiceURL>http://air3dspacedev224x.atlascopco.group:8050/XPDMGW/;jsessionid=9483545C14948F7DDEC028744E1F3665</ServiceURL>
+        </Service>
+
+        <Service>
+            <ServiceName>3DExperiencePlatformGW</ServiceName>
+            <ServiceURL>http://air3dspacedev224x.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=1D515FB04FE4CDB976CEBD2504CDE72B</ServiceURL>
+        </Service>
+    </Dev2>
+
+</Environments>

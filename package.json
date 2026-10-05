@@ -22,7 +22,13 @@
     "server:build": "turbo build --filter=@monitoring-dashboard/server",
     "server:lint": "turbo lint --filter=@monitoring-dashboard/server",
     "install:deps": "bun install && bun run --cwd MonitoringDashboardOrchestratorServiceLayerMSC prisma:generate",
-    "smoke:test:headed": "bun run --cwd MorningSmokeTestAutomation test:headed"
+    "smoke:test:headed": "bun run --cwd MorningSmokeTestAutomation test:headed",
+    "smoke:test:headed:training": "bun run --cwd MorningSmokeTestAutomation test:headed:training",
+    "smoke:test:headed:production": "bun run --cwd MorningSmokeTestAutomation test:headed:production",
+    "smoke:test:headed:qa": "bun run --cwd MorningSmokeTestAutomation test:headed:qa",
+    "smoke:test:headed:dev1": "bun run --cwd MorningSmokeTestAutomation test:headed:dev1",
+    "smoke:test:headed:testing": "bun run --cwd MorningSmokeTestAutomation test:headed:testing",
+    "smoke:test:headed:dev2": "bun run --cwd MorningSmokeTestAutomation test:headed:dev2"
   },
   "devDependencies": {
     "turbo": "^2.4.4"

@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Matches Types/SmokeEnvironmentNameType.ts one-to-one, just upper-cased to
+// fit Prisma/Postgres enum convention - SmokeEnvironmentHelper is the single
+// place that converts between the two.
+enum Environment {
+  PRODUCTION
+  QA
+  TESTING
+  TRAINING
+  DEV1
+  DEV2
+}
+
+// One row per `npx playwright test` invocation. Every check below links back
+// to the run it happened during, so the dashboard can group results by run.
+model TestRun {
+  id        String       @id @default(cuid())
+  createdAt DateTime     @default(now())
+  // Nullable - runs recorded before this column existed have no reliable way
+  // to know which environment they targeted, so they're left null rather
+  // than guessed at.
+  environment Environment?
+
+  pingChecks              AuthenticationPingCheck[]
+  loginChecks             AuthenticationLoginCheck[]
+  pageLoadChecks          PageLoadCheck[]
+  indexingFreshnessChecks IndexingFreshnessCheck[]
+  queueStatusChecks       QueueStatusCheck[]
+
+  @@map("MD_TestRunTBL")
+}
+
+// Recorded right after GlobalAuthenticationSetup navigates to the login page.
+// statusCode is null for network-level failures (DNS, connection refused,
+// TLS errors, timeouts) — those never produce an HTTP response at all.
+model AuthenticationPingCheck {
+  id         String   @id @default(cuid())
+  success    Boolean
+  message    String
+  statusCode Int?
+  createdAt  DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_AuthenticationPingCheckTBL")
+}
+
+// Recorded right after the login attempt resolves, success or failure.
+// The password is encrypted before it ever reaches this table — see
+// Helpers/EncryptionHelper.ts.
+model AuthenticationLoginCheck {
+  id        String   @id @default(cuid())
+  username  String
+  password  String
+  success   Boolean
+  message   String
+  createdAt DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_AuthenticationLoginCheckTBL")
+}
+
+// Shared across every smoke-test page (3DSpace, XPDMGW, etc.) rather than one
+// table per page — pageName distinguishes which page each row belongs to.
+// Recorded right after that page's SmokeTest.spec.ts navigates to it.
+model PageLoadCheck {
+  id         String   @id @default(cuid())
+  pageName   String
+  success    Boolean
+  // Clean, situation-specific sentence - "Failed opening the page.",
+  // "Took more than 2.5 minutes to load.", "Page responded with HTTP 404.",
+  // "Page loaded successfully (HTTP 200)."
+  message    String
+  // The raw underlying error text (Playwright/Node's own exception message),
+  // when one exists - populated for "failed opening" and "timed out"
+  // failures; null for a clean HTTP-status failure or success, since there's
+  // nothing beyond `message` to add in those cases.
+  technicalReason String?
+  statusCode Int?
+  durationMs Int?
+  createdAt  DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_PageLoadCheckTBL")
+}
+
+// Recorded after the "prd" search results and indexing tooltip are both
+// read. indexTime is the timestamp reported in the tooltip; it should always
+// be at or behind machineTime (the server can't index in the future) — see
+// Helpers/ApplicationDateTimeHelper.ts for the wraparound-aware diff.
+// Column names are snake_case for this table specifically, per request.
+model IndexingFreshnessCheck {
+  id             String   @id @default(cuid())
+  resultCount    Int      @map("result_count")
+  indexTime      DateTime @map("index_time")
+  machineTime    DateTime @map("machine_time")
+  timeDifference Float    @map("time_difference")
+  isFresh        Boolean  @map("is_fresh")
+  message        String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  testRunId String  @map("test_run_id")
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_IndexingFreshnessCheckTBL")
+}
+
+// Shared across every gateway queue-status page (XPDMGW, 3DEXPERIENCE
+// Platform GW, ...) — pageName distinguishes which page each row belongs to.
+// One row per state (Blocking, Waiting for Processing, Finished, ...); the
+// number of rows written per check varies by page (XPDMGW has 7, 3DEXPERIENCE
+// Platform GW has 5) since the table shows a different set of states, but the
+// structure is identical. Time-bucket values are stored as strings, not
+// numbers — the "Finished" row can show "999+", which isn't a valid number.
+model QueueStatusCheck {
+  id                String   @id @default(cuid())
+  pageName          String
+  state             String
+  lessThan10Min     String
+  lessThan1Hour     String
+  lessThan4Hours    String
+  greaterThan4Hours String
+  createdAt         DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@map("MD_QueueStatusCheckTBL")
+}
