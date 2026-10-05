@@ -14,16 +14,16 @@ export interface RunSmokeTestItemDef {
   icon: LucideIcon;
 }
 
-// The default environment shown/selected on first load (no ?environment= in
-// the URL yet).
-export const DEFAULT_ENVIRONMENT_VALUE = 'PRODUCTION';
-
-const ENV_ICON_CLASS = 'w-3.5 h-3.5 text-slate-500 dark:text-zinc-400';
-
 export default class DashboardCON {
   public static readonly TITLE: string = 'Morning Monitoring';
   public static readonly SUBTITLE: string =
     'Automated daily smoke tests across 3DEXPERIENCE and 3DSpace — tracking authentication, page load, indexing, and queue health.';
+
+  // The default environment shown/selected on first load (no ?environment=
+  // in the URL yet).
+  public static readonly DEFAULT_ENVIRONMENT_VALUE = 'PRODUCTION';
+
+  private static readonly ENV_ICON_CLASS = 'w-3.5 h-3.5 text-slate-500 dark:text-zinc-400';
 
   // The canonical six environments MorningSmokeTestAutomation can run
   // against - matches Prisma's Environment enum exactly (schema.prisma),
@@ -32,12 +32,12 @@ export default class DashboardCON {
   // Today's Test tab's real environment filter and the (still
   // non-functional) Run Smoke Test modal.
   public static readonly ENVIRONMENTS: RunSmokeTestEnvironmentOption[] = [
-    { value: 'PRODUCTION', label: 'Production', icon: <Rocket className={ENV_ICON_CLASS} /> },
-    { value: 'QA', label: 'QA', icon: <ClipboardCheck className={ENV_ICON_CLASS} /> },
-    { value: 'TESTING', label: 'Testing', icon: <FlaskConical className={ENV_ICON_CLASS} /> },
-    { value: 'TRAINING', label: 'Training', icon: <GraduationCap className={ENV_ICON_CLASS} /> },
-    { value: 'DEV1', label: 'Dev1', icon: <Code2 className={ENV_ICON_CLASS} /> },
-    { value: 'DEV2', label: 'Dev2', icon: <Code2 className={ENV_ICON_CLASS} /> },
+    { value: 'PRODUCTION', label: 'Production', icon: <Rocket className={DashboardCON.ENV_ICON_CLASS} /> },
+    { value: 'QA', label: 'QA', icon: <ClipboardCheck className={DashboardCON.ENV_ICON_CLASS} /> },
+    { value: 'TESTING', label: 'Testing', icon: <FlaskConical className={DashboardCON.ENV_ICON_CLASS} /> },
+    { value: 'TRAINING', label: 'Training', icon: <GraduationCap className={DashboardCON.ENV_ICON_CLASS} /> },
+    { value: 'DEV1', label: 'Dev1', icon: <Code2 className={DashboardCON.ENV_ICON_CLASS} /> },
+    { value: 'DEV2', label: 'Dev2', icon: <Code2 className={DashboardCON.ENV_ICON_CLASS} /> },
   ];
 
   public static readonly RUN_SMOKE_TEST_ENVIRONMENTS: RunSmokeTestEnvironmentOption[] = DashboardCON.ENVIRONMENTS;

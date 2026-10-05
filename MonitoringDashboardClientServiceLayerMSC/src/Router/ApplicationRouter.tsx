@@ -15,7 +15,7 @@ import TanstackQueryClientService from '../Services/TanstackQueryClientService';
 import NavigationController from '../Features/Navigation/NavigationController';
 import DashboardOverviewScreenRoute from '../Routes/DashboardOverviewScreenRoute';
 import RunDetailScreenRoute from '../Routes/RunDetailScreenRoute';
-import { DEFAULT_ENVIRONMENT_VALUE } from '../Features/Dashboard/Constants/DashboardCON';
+import DashboardCON from '../Features/Dashboard/Constants/DashboardCON';
 
 // ==========================================
 // 1. Root Route & Theme Shell
@@ -106,7 +106,7 @@ const dashboardRoute = createRoute({
     const navigate = useNavigate();
     const search = useSearch({ strict: false }) as DashboardSearchParams;
     const selectedRunId = search[ApplicationRouteCON.PARAM_RUN_ID];
-    const selectedEnvironment = search[ApplicationRouteCON.PARAM_ENVIRONMENT] ?? DEFAULT_ENVIRONMENT_VALUE;
+    const selectedEnvironment = search[ApplicationRouteCON.PARAM_ENVIRONMENT] ?? DashboardCON.DEFAULT_ENVIRONMENT_VALUE;
 
     const {
       data: runs = [],
@@ -146,7 +146,7 @@ const dashboardRoute = createRoute({
             search: (prev: DashboardSearchParams) => ({
               ...prev,
               [ApplicationRouteCON.PARAM_ENVIRONMENT]:
-                nextEnvironment === DEFAULT_ENVIRONMENT_VALUE ? undefined : nextEnvironment,
+                nextEnvironment === DashboardCON.DEFAULT_ENVIRONMENT_VALUE ? undefined : nextEnvironment,
             }),
           })
         }

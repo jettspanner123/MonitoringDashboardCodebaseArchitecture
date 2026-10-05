@@ -6,7 +6,9 @@ import ValidationCException from '../../Exceptions/ValidationCException';
 import ApiResponseClass from '../../Models/Classes/ApiResponseClass';
 import RunsService from './Services/RunsService';
 
-const VALID_ENVIRONMENTS = Object.values(Environment);
+class RunsValidationCON {
+    public static readonly VALID_ENVIRONMENTS = Object.values(Environment);
+}
 
 export default async function RunsController(fastify: FastifyInstance): Promise<void> {
     fastify.get<{ Querystring: { environment?: string } }>(
@@ -14,9 +16,9 @@ export default async function RunsController(fastify: FastifyInstance): Promise<
         async (request, reply) => {
             const { environment } = request.query;
 
-            if (environment !== undefined && !VALID_ENVIRONMENTS.includes(environment as Environment)) {
+            if (environment !== undefined && !RunsValidationCON.VALID_ENVIRONMENTS.includes(environment as Environment)) {
                 throw new ValidationCException(
-                    `Invalid environment "${environment}". Expected one of: ${VALID_ENVIRONMENTS.join(', ')}.`
+                    `Invalid environment "${environment}". Expected one of: ${RunsValidationCON.VALID_ENVIRONMENTS.join(', ')}.`
                 );
             }
 
