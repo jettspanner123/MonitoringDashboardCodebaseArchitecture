@@ -35,6 +35,7 @@ import DateFormatterUtility from '../../Utilities/DateFormatterUtility';
 import RunsService from '../../Services/RunsService';
 import type { RunSummary, RunDetail, HealthType } from '../../Types';
 import DashboardCON from './Constants/DashboardCON';
+import LiveRunProgressModalComponent from './Components/LiveRunProgressModalComponent';
 
 // Local-calendar date key ('YYYY-MM-DD') - matches how DatePickerSharedComponent
 // keys dates, so a run's createdAt and the picker's selection compare directly.
@@ -101,6 +102,7 @@ export default function DashboardScreenController({
   const [isRunTestModalOpen, setIsRunTestModalOpen] = useState<boolean>(false);
   const [isTriggeringRun, setIsTriggeringRun] = useState<boolean>(false);
   const [triggerRunError, setTriggerRunError] = useState<string | null>(null);
+  const [liveTestRunId, setLiveTestRunId] = useState<string | null>(null);
   const [selectedEnvironment, setSelectedEnvironment] = useState<string>(
     DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS[0].value,
   );
@@ -329,8 +331,9 @@ export default function DashboardScreenController({
     setIsTriggeringRun(true);
     setTriggerRunError(null);
     try {
-      await RunsService.current.triggerRun(selectedEnvironment);
+      const testRunId = await RunsService.current.triggerRun(selectedEnvironment);
       setIsRunTestModalOpen(false);
+      setLiveTestRunId(testRunId);
     } catch (error) {
       setTriggerRunError(error instanceof Error ? error.message : 'Failed to trigger the smoke test.');
     } finally {
@@ -1029,6 +1032,12 @@ export default function DashboardScreenController({
             </div>
           </div>
         }
+      />
+
+      <LiveRunProgressModalComponent
+        isOpen={liveTestRunId !== null}
+        onClose={() => setLiveTestRunId(null)}
+        testRunId={liveTestRunId}
       />
     </div>
   );
