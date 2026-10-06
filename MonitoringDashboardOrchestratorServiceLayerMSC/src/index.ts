@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import websocket from '@fastify/websocket';
 import ApplicationRouteFactory from './Factories/ApplicationRouteFactory';
 import GlobalExceptionHandlingMiddleware from './Middlewares/GlobalExceptionHandlingMiddleware';
 import HealthCheckController from './Features/HealthCheck/HealthCheckController';
@@ -14,6 +15,9 @@ async function bootstrap(): Promise<void> {
     await fastify.register(cors, {
         origin: process.env.CORS_ORIGIN ?? true,
     });
+    // Must be registered before any routes - it intercepts the upgrade
+    // request for routes declared with { websocket: true }.
+    await fastify.register(websocket);
 
     fastify.setErrorHandler(GlobalExceptionHandlingMiddleware);
 

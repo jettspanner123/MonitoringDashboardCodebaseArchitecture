@@ -9,6 +9,7 @@ class RunsRoutes {
     public static readonly GET_ALL = '/';
     public static readonly GET_BY_ID = '/:id';
     public static readonly TRIGGER = '/trigger';
+    public static readonly LIVE = '/:testRunId/live';
 }
 
 class DataManagementRoutes {
