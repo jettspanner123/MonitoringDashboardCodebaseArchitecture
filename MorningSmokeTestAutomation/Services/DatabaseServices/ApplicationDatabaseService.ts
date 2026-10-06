@@ -67,4 +67,21 @@ export default class ApplicationDatabaseService {
             data: rows,
         });
     }
+
+    // Marks a check as "in flight" for the live progress feed — paired with
+    // markCheckFinished, which must always run afterwards (success or fail),
+    // or this row is left behind forever.
+    public async markCheckStarted(testRunId: string, checkName: string): Promise<void> {
+        await ApplicationDatabaseProvider.current.client.inProgressCheck.create({
+            data: {testRunId, checkName},
+        });
+    }
+
+    // deleteMany (not delete) - safe to call even if the row is already gone,
+    // so callers can use this unconditionally in a finally block.
+    public async markCheckFinished(testRunId: string, checkName: string): Promise<void> {
+        await ApplicationDatabaseProvider.current.client.inProgressCheck.deleteMany({
+            where: {testRunId, checkName},
+        });
+    }
 }

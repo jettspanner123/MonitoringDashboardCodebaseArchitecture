@@ -35,8 +35,28 @@ model TestRun {
   pageLoadChecks          PageLoadCheck[]
   indexingFreshnessChecks IndexingFreshnessCheck[]
   queueStatusChecks       QueueStatusCheck[]
+  inProgressChecks        InProgressCheck[]
 
   @@map("MD_TestRunTBL")
+}
+
+// A transient marker, not a historical record like the Check tables below -
+// one row exists for exactly as long as its check is in flight, inserted
+// right before the check is attempted and deleted right after it finishes
+// (success or fail). fullyParallel + workers:4 (playwright.config.ts) means
+// several checks are genuinely in flight at once, so this is a set of rows
+// per run rather than a single "currently running" column that one worker's
+// write would just clobber.
+model InProgressCheck {
+  id        String   @id @default(cuid())
+  checkName String
+  startedAt DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@unique([testRunId, checkName])
+  @@map("MD_InProgressCheckTBL")
 }
 
 // Recorded right after GlobalAuthenticationSetup navigates to the login page.
