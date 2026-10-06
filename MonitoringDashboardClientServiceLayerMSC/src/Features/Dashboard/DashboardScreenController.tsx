@@ -391,7 +391,7 @@ export default function DashboardScreenController({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-slate-500 dark:text-zinc-400 font-mono shrink-0">Environment:</span>
+                <span className="text-xs text-slate-500 dark:text-zinc-400 font-mono shrink-0">Environment:</span>
                 <CustomSelectSharedComponent
                   value={environment}
                   options={DashboardCON.ENVIRONMENTS}
