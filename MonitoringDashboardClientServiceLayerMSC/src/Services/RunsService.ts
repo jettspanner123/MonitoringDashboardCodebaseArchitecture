@@ -24,4 +24,21 @@ export default class RunsService {
     }
     return body.data;
   }
+
+  // environment is the Prisma Environment enum value (e.g. "PRODUCTION").
+  // Resolves once the triggered run's own row exists in the database (so the
+  // caller has a testRunId to open the live-progress feed with) - not once
+  // the run itself finishes.
+  public async triggerRun(environment: string): Promise<string> {
+    const response = await fetch(`${ApplicationNetworkAPIConfiguration.BASE_URL}/api/v1/runs/trigger`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ environment }),
+    });
+    const body: ApiResponseType<{ testRunId: string }> = await response.json();
+    if (!body.success || !body.data) {
+      throw new Error(body.message || 'Failed to trigger the smoke test.');
+    }
+    return body.data.testRunId;
+  }
 }

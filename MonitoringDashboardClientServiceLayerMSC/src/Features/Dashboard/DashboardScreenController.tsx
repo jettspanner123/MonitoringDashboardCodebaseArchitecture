@@ -99,6 +99,8 @@ export default function DashboardScreenController({
   const [gridColumns, setGridColumns] = useState<GridColumnsType>(2);
   const [isExportingCsv, setIsExportingCsv] = useState<boolean>(false);
   const [isRunTestModalOpen, setIsRunTestModalOpen] = useState<boolean>(false);
+  const [isTriggeringRun, setIsTriggeringRun] = useState<boolean>(false);
+  const [triggerRunError, setTriggerRunError] = useState<string | null>(null);
   const [selectedEnvironment, setSelectedEnvironment] = useState<string>(
     DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS[0].value,
   );
@@ -318,6 +320,24 @@ export default function DashboardScreenController({
     }
   };
 
+  const handleOpenRunTestModal = (): void => {
+    setTriggerRunError(null);
+    setIsRunTestModalOpen(true);
+  };
+
+  const handleConfirmRunTest = async (): Promise<void> => {
+    setIsTriggeringRun(true);
+    setTriggerRunError(null);
+    try {
+      await RunsService.current.triggerRun(selectedEnvironment);
+      setIsRunTestModalOpen(false);
+    } catch (error) {
+      setTriggerRunError(error instanceof Error ? error.message : 'Failed to trigger the smoke test.');
+    } finally {
+      setIsTriggeringRun(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-zinc-800/80 pb-6">
@@ -344,7 +364,7 @@ export default function DashboardScreenController({
           />
 
           <PrimaryActionButtonSharedComponent
-            onClick={() => setIsRunTestModalOpen(true)}
+            onClick={handleOpenRunTestModal}
             icon={<Play className="w-4 h-4 sm:w-3.5 sm:h-3.5 !text-white" />}
             className="w-full sm:w-auto justify-center !h-11 sm:!h-9 px-4 sm:px-3.5 text-sm sm:text-xs font-bold"
           >
@@ -938,10 +958,11 @@ export default function DashboardScreenController({
       <ConfirmationModalSharedComponent
         isOpen={isRunTestModalOpen}
         onClose={() => setIsRunTestModalOpen(false)}
-        onConfirm={() => setIsRunTestModalOpen(false)}
+        onConfirm={() => void handleConfirmRunTest()}
+        isLoading={isTriggeringRun}
         title="Run Smoke Test"
         subtitle="Automated Morning Check"
-        description="Smoke tests run automatically every morning via the scheduled MorningSmokeTestAutomation script. Manually triggering a run from this dashboard isn't available yet."
+        description="This runs the full morning smoke test suite against the selected environment, using the same checks and credentials as the scheduled 8:30 AM run."
         confirmText="Start Test"
         cancelText="Cancel"
         variant="primary"
@@ -955,23 +976,33 @@ export default function DashboardScreenController({
               options={DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS}
               size="sm"
             />
+            {triggerRunError && (
+              <div className="flex items-start gap-2 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 text-xs text-rose-800 dark:text-rose-300">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                <span>{triggerRunError}</span>
+              </div>
+            )}
             <div>
               <span className="text-xs font-medium text-slate-600 dark:text-zinc-400 mb-1.5 block">
                 Tests that will run
               </span>
+              <p className="text-xs text-slate-400 dark:text-zinc-500 mb-1.5">
+                Every run always exercises the full suite for now - picking individual tests isn't available yet.
+              </p>
               <div className="rounded-lg border border-slate-200 dark:border-zinc-800 divide-y divide-slate-100 dark:divide-zinc-800/60 overflow-hidden">
                 {DashboardCON.RUN_SMOKE_TEST_ITEMS.map((item) => {
                   const isChecked = selectedTestIds.has(item.id);
                   return (
                     <label
                       key={item.id}
-                      className="flex items-center gap-2.5 px-3 py-2 text-xs cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-zinc-900/40 transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs select-none opacity-60 cursor-not-allowed"
                     >
                       <input
                         type="checkbox"
                         checked={isChecked}
+                        disabled
                         onChange={() => toggleTestSelection(item.id)}
-                        className="w-3.5 h-3.5 rounded border-slate-300 dark:border-zinc-700 text-[#0C2086] focus:ring-[#0C2086] shrink-0"
+                        className="w-3.5 h-3.5 rounded border-slate-300 dark:border-zinc-700 text-[#0C2086] focus:ring-[#0C2086] shrink-0 cursor-not-allowed"
                       />
                       <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-zinc-800/80 text-slate-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
                         <item.icon className="w-3.5 h-3.5" />
