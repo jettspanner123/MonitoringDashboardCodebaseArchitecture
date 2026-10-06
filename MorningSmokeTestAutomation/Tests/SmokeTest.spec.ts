@@ -32,6 +32,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
     // finishes, so the row reflects the true final outcome rather than
     // just "the page opened".
     if (pageConfig.recordPageLoadCheck) {
+      await ApplicationDatabaseService.current.markCheckStarted(testRunId, pageConfig.name);
       let pageOpenFailure: { message: string; technicalReason: string | null } | null = null;
 
       try {
@@ -56,6 +57,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
           statusCode,
           durationMs: Date.now() - openStartedAt,
         });
+        await ApplicationDatabaseService.current.markCheckFinished(testRunId, pageConfig.name);
         throw new Error(pageOpenFailure.message);
       }
 
@@ -69,6 +71,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
           statusCode,
           durationMs: Date.now() - openStartedAt,
         });
+        await ApplicationDatabaseService.current.markCheckFinished(testRunId, pageConfig.name);
       }
     } else {
       await page.goto(pageConfig.url, { timeout: pageConfig.timeoutMs ?? 0 });
@@ -159,6 +162,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
             statusCode,
             durationMs: Date.now() - openStartedAt,
           });
+          await ApplicationDatabaseService.current.markCheckFinished(testRunId, pageConfig.name);
         }
       } catch (contentError) {
         if (pageConfig.recordPageLoadCheck) {
@@ -172,6 +176,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
             statusCode,
             durationMs: Date.now() - openStartedAt,
           });
+          await ApplicationDatabaseService.current.markCheckFinished(testRunId, pageConfig.name);
         }
         throw contentError;
       }
@@ -231,6 +236,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
     // so it shows up as its own "Page Load" card on the dashboard.
     for (const popupCheck of pageConfig.popupChecks ?? []) {
       const popupOpenStartedAt = Date.now();
+      await ApplicationDatabaseService.current.markCheckStarted(testRunId, popupCheck.name);
 
       // The popup's own initial-navigation response can already be loading
       // by the time the 'page' event fires (Playwright's own docs call this
@@ -297,6 +303,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
           statusCode: null,
           durationMs: Date.now() - popupOpenStartedAt,
         });
+        await ApplicationDatabaseService.current.markCheckFinished(testRunId, popupCheck.name);
         throw new Error(popupOpenFailure.message);
       }
 
@@ -341,6 +348,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
           statusCode,
           durationMs: Date.now() - popupOpenStartedAt,
         });
+        await ApplicationDatabaseService.current.markCheckFinished(testRunId, popupCheck.name);
 
         // Close the new tab if we're told we're done with it.
         if (popupCheck.closePopupAfterCheck) {
@@ -357,6 +365,7 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
           statusCode: null,
           durationMs: Date.now() - popupOpenStartedAt,
         });
+        await ApplicationDatabaseService.current.markCheckFinished(testRunId, popupCheck.name);
         throw contentError;
       }
     }

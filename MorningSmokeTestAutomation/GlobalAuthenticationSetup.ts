@@ -38,6 +38,7 @@ async function globalSetup(config: FullConfig) {
         // never produces an HTTP response, so statusCode stays null; an
         // HTTP-level response (even a 404/500) resolves normally with a real
         // status code.
+        await ApplicationDatabaseService.current.markCheckStarted(testRunId, 'Authentication Ping');
         try {
             const response = await page.goto(envConfig.authUrl);
             const statusCode = response?.status() ?? null;
@@ -51,6 +52,8 @@ async function globalSetup(config: FullConfig) {
             const message = pingError instanceof Error ? pingError.message : String(pingError);
             await ApplicationDatabaseService.current.recordAuthenticationPingCheck({testRunId, success: false, message, statusCode: null});
             throw pingError;
+        } finally {
+            await ApplicationDatabaseService.current.markCheckFinished(testRunId, 'Authentication Ping');
         }
 
         const usernameField = page.locator(AuthenticationConfiguration.usernameSelector);
@@ -64,6 +67,7 @@ async function globalSetup(config: FullConfig) {
         await submitButton.waitFor({state: 'attached'});
         await submitButton.click();
 
+        await ApplicationDatabaseService.current.markCheckStarted(testRunId, 'Authentication Login');
         try {
             const errorLocator = page.locator(AuthenticationConfiguration.errorSelector);
             const profileCompletionLocator = page.locator(AuthenticationConfiguration.profileCompletionSelector);
@@ -100,6 +104,8 @@ async function globalSetup(config: FullConfig) {
                 message,
             });
             throw loginError;
+        } finally {
+            await ApplicationDatabaseService.current.markCheckFinished(testRunId, 'Authentication Login');
         }
 
         await page.context().storageState({path: 'auth.json'});
