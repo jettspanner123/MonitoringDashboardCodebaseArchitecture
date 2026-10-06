@@ -8,6 +8,7 @@ class RunsRoutes {
     public static readonly CONTROLLER_URL = '/api/v1/runs';
     public static readonly GET_ALL = '/';
     public static readonly GET_BY_ID = '/:id';
+    public static readonly TRIGGER = '/trigger';
 }
 
 class DataManagementRoutes {
