@@ -13,9 +13,10 @@ Every morning, someone has to get up early and manually check a set of PLM pages
 - Reading results from a database that the automation script writes to as it runs
 - Showing each Run's Health, and drilling into individual PageCheck/PopupCheckResult Outcomes
 - Keeping full history of every past Run (no retention window)
+- Manually triggering a Run against a chosen environment from the dashboard's "Run Smoke Test" button — the backend spawns the same `smoke:test:headed:<env>` script you'd run by hand, enforces a single-run-at-a-time lock (the automation suite's own run-id handoff isn't safe for two concurrent runs), and streams live "which check is running / which has finished" progress back over a WebSocket. No auth gate on this yet, and it still only runs the full suite (no per-check selection) — see `ArchitectureDecisionRecords/` if one gets written for this
 
 **Out of scope (for now, explicitly)**:
-- Triggering or scheduling the Run itself — handled entirely by the automation script, external to this project
+- Scheduling the automatic daily Run — still handled entirely by the automation script's own schedule, external to this project
 - Ingesting results from more than one automation source/client
 - Any notification/alerting on failures
 
