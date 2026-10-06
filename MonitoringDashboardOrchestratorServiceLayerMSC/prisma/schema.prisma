@@ -29,8 +29,21 @@ model TestRun {
   pageLoadChecks          PageLoadCheck[]
   indexingFreshnessChecks IndexingFreshnessCheck[]
   queueStatusChecks       QueueStatusCheck[]
+  inProgressChecks        InProgressCheck[]
 
   @@map("MD_TestRunTBL")
+}
+
+model InProgressCheck {
+  id        String   @id @default(cuid())
+  checkName String
+  startedAt DateTime @default(now())
+
+  testRunId String
+  testRun   TestRun @relation(fields: [testRunId], references: [id])
+
+  @@unique([testRunId, checkName])
+  @@map("MD_InProgressCheckTBL")
 }
 
 model AuthenticationPingCheck {
