@@ -7,6 +7,7 @@ export default class SmokePageConfigurationService {
 
     private static readonly EXTRA_CHECK_TIMEOUT_MS = 60000;
     private static readonly QUEUE_STATUS_TIMEOUT_MS = 150000; // 2.5 minutes
+    private static readonly POPUP_CHECK_TIMEOUT_MS = 120000; // 2 minutes
 
     public getSmokePageConfiguration(environment: SmokeEnvironmentNameType): Array<SmokePageTypeInterface> {
         const envConfig = EnvironmentConfiguration.ALL[environment];
@@ -25,6 +26,7 @@ export default class SmokePageConfigurationService {
                 hoverTooltipSelector: '.maximumResultsTooltip',
                 recordIndexingFreshnessCheck: true,
                 postResultsClickSelector: '#compass_ctn',
+                timeoutMs: SmokePageConfigurationService.POPUP_CHECK_TIMEOUT_MS,
                 popupChecks: [
                     { name: '3DDashboard', menuItemSelector: '[data-search="3DDashboard"]' },
                     { name: '3DSwym', menuItemSelector: '[data-search="3DSwym"]', expectedElementSelector: '#communities-tab' },

@@ -307,11 +307,26 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
       }
 
       // Confirm the new tab actually shows the expected content, or at
-      // least that it navigated somewhere real.
+      // least that it navigated somewhere real. A popup whose backing
+      // service isn't started commonly renders a Tomcat-style "HTTP Status
+      // 404 - Not Found" page instead of ever producing the expected
+      // element, which would otherwise hang this wait until the timeout
+      // with a confusing generic failure - detect it explicitly up front so
+      // it fails fast with a clear reason instead.
+      const notFoundHeading = popup.locator('h1', { hasText: /HTTP Status 404/i }).first();
+
       try {
         if (popupCheck.expectedElementSelector) {
-          await popup.locator(popupCheck.expectedElementSelector).first().waitFor({ state: 'attached', timeout: pageConfig.timeoutMs ?? 0 });
+          await Promise.race([
+            popup.locator(popupCheck.expectedElementSelector).first().waitFor({ state: 'attached', timeout: pageConfig.timeoutMs ?? 0 }),
+            notFoundHeading.waitFor({ state: 'visible', timeout: pageConfig.timeoutMs ?? 0 }).then(() => {
+              throw new Error(`${SmokeCheckFailureClassifier.NOT_FOUND_ERROR_PREFIX}: Popup rendered an HTTP Status 404 error page.`);
+            }),
+          ]);
         } else {
+          if (await notFoundHeading.isVisible().catch(() => false)) {
+            throw new Error(`${SmokeCheckFailureClassifier.NOT_FOUND_ERROR_PREFIX}: Popup rendered an HTTP Status 404 error page.`);
+          }
           expect(popup.url()).not.toBe('about:blank');
         }
 
