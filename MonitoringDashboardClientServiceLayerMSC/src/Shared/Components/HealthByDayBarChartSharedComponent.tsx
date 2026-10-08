@@ -70,7 +70,7 @@ export default function HealthByDayBarChartSharedComponent({
           <h3 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline">
             Health by Day
           </h3>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1.5">Activity Overview</p>
+          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0">Activity Overview</p>
         </div>
       </div>
 
