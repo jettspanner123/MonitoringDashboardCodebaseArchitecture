@@ -1,22 +1,25 @@
 import ApplicationNetworkAPIConfiguration from '../Configurations/ApplicationNetworkAPIConfiguration';
 import type { ApiResponseType } from '../Types';
 
-// Converts the VAPID public key (URL-safe base64, as the backend/web-push
-// convention hands it over) into the raw Uint8Array the Push API itself
-// requires for `applicationServerKey`.
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; i += 1) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-
 export default class PushSubscriptionService {
   public static current = new PushSubscriptionService();
+
+  // Converts the VAPID public key (URL-safe base64, as the backend/web-push
+  // convention hands it over) into the raw Uint8Array the Push API itself
+  // requires for `applicationServerKey`. Explicitly backed by a plain
+  // ArrayBuffer (not just `new Uint8Array(length)`, which types as
+  // Uint8Array<ArrayBufferLike>) - the DOM's BufferSource type requires
+  // exactly that, and newer TypeScript lib.dom typings reject the looser one.
+  private urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(new ArrayBuffer(rawData.length));
+    for (let i = 0; i < rawData.length; i += 1) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
 
   public isSupported(): boolean {
     return typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
@@ -47,7 +50,7 @@ export default class PushSubscriptionService {
     const { publicKey } = await this.fetchVapidPublicKey();
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
+      applicationServerKey: this.urlBase64ToUint8Array(publicKey),
     });
 
     const json = subscription.toJSON();
