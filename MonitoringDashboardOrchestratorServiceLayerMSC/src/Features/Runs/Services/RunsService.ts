@@ -15,18 +15,21 @@ const RUN_WITH_CHECKS_INCLUDE = {
 
 type RunWithChecks = Prisma.TestRunGetPayload<{ include: typeof RUN_WITH_CHECKS_INCLUDE }>;
 
-function computeHealth(pageChecks: PageCheckDTO[]): HealthType {
-    if (pageChecks.some((check) => check.status === 'Fail' || check.status === 'Error')) {
-        return 'Failed';
-    }
-    if (pageChecks.some((check) => check.status === 'Warning')) {
-        return 'Degraded';
-    }
-    return 'Healthy';
-}
-
 export default class RunsService {
     public static current = new RunsService();
+
+    // Public - PushNotificationService reuses this exact logic so a run's
+    // computed health can never drift between what the dashboard displays
+    // and what decides whether a push notification fires for it.
+    public computeHealth(pageChecks: PageCheckDTO[]): HealthType {
+        if (pageChecks.some((check) => check.status === 'Fail' || check.status === 'Error')) {
+            return 'Failed';
+        }
+        if (pageChecks.some((check) => check.status === 'Warning')) {
+            return 'Degraded';
+        }
+        return 'Healthy';
+    }
 
     // environment is filtered here, in the query itself, rather than
     // fetched unfiltered and narrowed down in the frontend - runs for
@@ -45,7 +48,7 @@ export default class RunsService {
                 id: run.id,
                 createdAt: run.createdAt.toISOString(),
                 environment: run.environment,
-                health: computeHealth(pageChecks),
+                health: this.computeHealth(pageChecks),
                 pageCheckCount: pageChecks.length,
             };
         });
@@ -66,7 +69,7 @@ export default class RunsService {
             id: run.id,
             createdAt: run.createdAt.toISOString(),
             environment: run.environment,
-            health: computeHealth(pageChecks),
+            health: this.computeHealth(pageChecks),
             pageChecks,
         };
     }
