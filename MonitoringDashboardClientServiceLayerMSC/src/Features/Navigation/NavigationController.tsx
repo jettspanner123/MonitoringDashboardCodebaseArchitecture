@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ProfileDropdownStaticComponent from './Components/static/ProfileDropdownStaticComponent';
 import SegmentedControlSharedComponent from '../../Shared/Components/SegmentedControlSharedComponent';
+import NotificationBellToggleSharedComponent from '../../Shared/Components/NotificationBellToggleSharedComponent';
 import NavigationCON from './Constants/NavigationCON';
 import weplmLogo from '../../Assets/weplm.jpeg';
 
@@ -60,6 +61,8 @@ export default function NavigationController({
                 disabled: item.disabled,
               }))}
             />
+
+            <NotificationBellToggleSharedComponent />
 
             <div className="relative">
               <button

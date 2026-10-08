@@ -13,6 +13,7 @@ import ApplicationThemeUtility from '../Utilities/ApplicationThemeUtility';
 import ApplicationGradientUtility from '../Utilities/ApplicationGradientUtility';
 import TanstackQueryClientService from '../Services/TanstackQueryClientService';
 import NavigationController from '../Features/Navigation/NavigationController';
+import RunFailureAlarmSharedComponent from '../Shared/Components/RunFailureAlarmSharedComponent';
 import DashboardOverviewScreenRoute from '../Routes/DashboardOverviewScreenRoute';
 import RunDetailScreenRoute from '../Routes/RunDetailScreenRoute';
 import DashboardCON from '../Features/Dashboard/Constants/DashboardCON';
@@ -74,15 +75,18 @@ function RootLayout(): React.JSX.Element {
   };
 
   return (
-    <NavigationController
-      currentTheme={currentTheme}
-      onToggleTheme={handleToggleTheme}
-      gradientsEnabled={gradientsEnabled}
-      onToggleGradients={handleToggleGradients}
-      onNavigateHome={handleNavigateHome}
-    >
-      <Outlet />
-    </NavigationController>
+    <>
+      <RunFailureAlarmSharedComponent />
+      <NavigationController
+        currentTheme={currentTheme}
+        onToggleTheme={handleToggleTheme}
+        gradientsEnabled={gradientsEnabled}
+        onToggleGradients={handleToggleGradients}
+        onNavigateHome={handleNavigateHome}
+      >
+        <Outlet />
+      </NavigationController>
+    </>
   );
 }
 
