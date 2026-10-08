@@ -1,6 +1,14 @@
-// This schema mirrors tables owned and migrated by MorningSmokeTestAutomation
-// (a separate repo/process). This backend is read-only with respect to
-// schema — never run `prisma migrate` here; only `prisma generate`.
+// Most of this schema mirrors tables owned and migrated by
+// MorningSmokeTestAutomation (a separate repo/process) - this backend is
+// read-only with respect to THOSE tables; never run `prisma migrate` here
+// for them. The two push-notification models below are the exception: they
+// belong to this backend alone (a pure dashboard/browser concern the
+// automation script has no reason to know about), so this backend owns and
+// evolves them - but still never via `prisma migrate`, since that would
+// collide with MorningSmokeTestAutomation's own tracked migration history in
+// this same database. See prisma/manual-sql/ for how they were created, and
+// add future changes to these two models the same way (raw SQL, applied by
+// hand, then `prisma generate`).
 generator client {
   provider = "prisma-client-js"
 }
@@ -119,4 +127,28 @@ model QueueStatusCheck {
   testRun   TestRun @relation(fields: [testRunId], references: [id])
 
   @@map("MD_QueueStatusCheckTBL")
+}
+
+// One row per browser that has granted notification permission and
+// subscribed. There's no login system, so this is per-device, not
+// per-person - every subscribed browser gets every Degraded/Failed push.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dhKey String
+  authKey   String
+  createdAt DateTime @default(now())
+
+  @@map("MD_PushSubscriptionTBL")
+}
+
+// Single-row cursor (id is always 1) - the most recent run a push has
+// already been sent for, so a check running every few minutes doesn't
+// re-notify for the same run on every tick before the next real smoke test.
+model NotificationCheckpoint {
+  id                Int      @id @default(1)
+  lastNotifiedRunId String?
+  updatedAt         DateTime @updatedAt
+
+  @@map("MD_NotificationCheckpointTBL")
 }
