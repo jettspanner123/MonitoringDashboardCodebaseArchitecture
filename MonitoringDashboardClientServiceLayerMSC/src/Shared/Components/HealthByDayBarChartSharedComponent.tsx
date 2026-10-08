@@ -66,9 +66,12 @@ export default function HealthByDayBarChartSharedComponent({
   return (
     <div className="rounded-2xl p-6 bg-white dark:bg-[#0d0d10] border border-slate-200/90 dark:border-zinc-800/80 shadow-xs hover:shadow-md transition-shadow duration-300 flex flex-col justify-between h-full">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline">
-          Health by Day
-        </h3>
+        <div>
+          <h3 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline">
+            Health by Day
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1.5">Activity Overview</p>
+        </div>
       </div>
 
       <div className="py-6 flex flex-col justify-end">

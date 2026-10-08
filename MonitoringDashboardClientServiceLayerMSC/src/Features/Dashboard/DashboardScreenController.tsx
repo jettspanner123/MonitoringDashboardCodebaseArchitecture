@@ -799,7 +799,7 @@ export default function DashboardScreenController({
       </div>
 
       {/* Charts: 7-day health history */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch">
         <HealthByDayBarChartSharedComponent runs={runs} />
       </div>
 
