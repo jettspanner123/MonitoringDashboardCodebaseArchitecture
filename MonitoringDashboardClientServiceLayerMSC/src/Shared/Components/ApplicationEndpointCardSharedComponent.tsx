@@ -40,7 +40,10 @@ export default function ApplicationEndpointCardSharedComponent({
 }: ApplicationEndpointCardSharedComponentProps): React.JSX.Element {
   const hitMutation = TanstackQueryClientService.current.applicationMonitor.useHitEndpointMutation();
   const configSummary = formatConfigSummary(endpoint.config);
-  const result = hitMutation.data;
+  // A fresh click always wins; otherwise fall back to the last recorded hit
+  // (from the page's own initial load) so the card stays populated across
+  // navigation and reloads instead of resetting to "never hit".
+  const result = hitMutation.data ?? endpoint.lastHit ?? undefined;
   const [isResponseModalOpen, setIsResponseModalOpen] = useState<boolean>(false);
   const hasResponseBody = result ? result.responseBody !== null && result.responseBody !== undefined : false;
   const tone = resultTone(result);

@@ -1,7 +1,8 @@
 import React from 'react';
-import { ServerOff } from 'lucide-react';
+import { ServerOff, Clock } from 'lucide-react';
 import ApplicationEndpointCardSharedComponent from '../../Shared/Components/ApplicationEndpointCardSharedComponent';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
+import DateFormatterUtility from '../../Utilities/DateFormatterUtility';
 import type { ApplicationEndpoint, MonitoredApplication } from '../../Types';
 
 export interface ApplicationMonitorScreenControllerProps {
@@ -17,6 +18,16 @@ class ApplicationMonitorCON {
   public static readonly CHECK_TYPE_HEADINGS: Record<string, string> = {
     HttpEndpoint: 'HTTP Endpoints',
   };
+}
+
+// ISO 8601 strings sort correctly as plain strings, so no Date parsing is
+// needed just to find the latest one - any hit counts, success or failure.
+function getMostRecentHitTimestamp(endpoints: ApplicationEndpoint[]): string | null {
+  const timestamps = endpoints
+    .map((endpoint) => endpoint.lastHit?.checkedAt)
+    .filter((checkedAt): checkedAt is string => Boolean(checkedAt));
+  if (timestamps.length === 0) return null;
+  return timestamps.reduce((latest, current) => (current > latest ? current : latest));
 }
 
 function groupEndpointsByCheckType(endpoints: ApplicationEndpoint[]): Array<[string, ApplicationEndpoint[]]> {
@@ -38,6 +49,7 @@ export default function ApplicationMonitorScreenController({
   activeAppSlug,
 }: ApplicationMonitorScreenControllerProps): React.JSX.Element {
   const application = applications.find((candidate) => candidate.slug === activeAppSlug);
+  const mostRecentHitTimestamp = application ? getMostRecentHitTimestamp(application.endpoints) : null;
 
   if (isLoading) {
     return (
@@ -67,7 +79,15 @@ export default function ApplicationMonitorScreenController({
           <h1 className="text-3xl sm:text-4xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
             {application.name}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl">{application.baseUrl}</p>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl flex items-center flex-wrap gap-2">
+            <span>{application.baseUrl}</span>
+            {mostRecentHitTimestamp && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 border border-slate-200/80 dark:border-zinc-700/60">
+                <Clock className="w-3 h-3" />
+                Last hit {DateFormatterUtility.current.formatRelativeTime(mostRecentHitTimestamp)}
+              </span>
+            )}
+          </p>
         </div>
       </div>
 
