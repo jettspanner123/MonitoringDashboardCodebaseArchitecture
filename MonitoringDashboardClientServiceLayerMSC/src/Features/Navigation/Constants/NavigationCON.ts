@@ -15,11 +15,13 @@ export default class NavigationCON {
   // Top-nav capsule, ported 1:1 (visual + shared-layout-pill mechanics) from SignForge's
   // HeaderStaticComponent internal view switcher. Unlike SignForge's version (which
   // switches between real internal views of the same app), these options represent
-  // separate sibling applications. Only this app's own entry is enabled today; the
-  // others are intentionally disabled placeholders until wired up.
+  // separate sibling applications. Each enabled entry's id doubles as the
+  // MonitoredApplication.slug it switches ApplicationMonitorScreenController to display
+  // (see ApplicationRouteCON.PARAM_APP) - entries without a seeded application row stay
+  // disabled placeholders until one exists.
   public static readonly PRIMARY_NAV_ITEMS: NavItemDef[] = [
     { id: 'morning-smoke-test', label: 'Morning Smoke Test', icon: Activity },
-    { id: 'assetsphere', label: 'Assetsphere', icon: Boxes, disabled: true },
+    { id: 'assetsphere', label: 'Assetsphere', icon: Boxes },
     { id: 'signforge', label: 'SignForge', icon: FileSignature, disabled: true },
   ];
 

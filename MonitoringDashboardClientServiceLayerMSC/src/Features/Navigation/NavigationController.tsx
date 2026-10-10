@@ -11,6 +11,11 @@ export interface NavigationControllerProps {
   gradientsEnabled: boolean;
   onToggleGradients: () => void;
   onNavigateHome: () => void;
+  // Owned by the router (driven by ApplicationRouteCON.PARAM_APP in the URL),
+  // not local state - a sibling-application tab needs to actually change
+  // what's rendered below, not just which pill looks active.
+  activeView: string;
+  onActiveViewChange: (view: string) => void;
   children: React.ReactNode;
 }
 
@@ -20,10 +25,11 @@ export default function NavigationController({
   gradientsEnabled,
   onToggleGradients,
   onNavigateHome,
+  activeView,
+  onActiveViewChange,
   children,
 }: NavigationControllerProps): React.JSX.Element {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
-  const [currentView, setCurrentView] = useState<string>('morning-smoke-test');
 
   return (
     <div className="min-h-screen bg-(--color-canvas) text-(--color-ink)">
@@ -48,8 +54,8 @@ export default function NavigationController({
           <div className="flex items-center gap-3">
             {/* Suite Navigation Capsule (Morning Smoke Test / Assetsphere / SignForge) */}
             <SegmentedControlSharedComponent
-              value={currentView}
-              onChange={setCurrentView}
+              value={activeView}
+              onChange={onActiveViewChange}
               layoutId="activeTopNavPill"
               desktopOnly
               activeTextClassName="text-[#0C2086] dark:text-zinc-100 font-semibold"

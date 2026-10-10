@@ -16,7 +16,9 @@ import NavigationController from '../Features/Navigation/NavigationController';
 import RunFailureAlarmSharedComponent from '../Shared/Components/RunFailureAlarmSharedComponent';
 import DashboardOverviewScreenRoute from '../Routes/DashboardOverviewScreenRoute';
 import RunDetailScreenRoute from '../Routes/RunDetailScreenRoute';
+import ApplicationMonitorScreenRoute from '../Routes/ApplicationMonitorScreenRoute';
 import DashboardCON from '../Features/Dashboard/Constants/DashboardCON';
+import NavigationCON from '../Features/Navigation/Constants/NavigationCON';
 
 // ==========================================
 // 1. Root Route & Theme Shell
@@ -33,10 +35,24 @@ const rootRoute = createRootRoute({
 interface DashboardSearchParams {
   [ApplicationRouteCON.PARAM_RUN_ID]?: string;
   [ApplicationRouteCON.PARAM_ENVIRONMENT]?: string;
+  [ApplicationRouteCON.PARAM_APP]?: string;
 }
 
 function RootLayout(): React.JSX.Element {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as DashboardSearchParams;
+  const activeView = search[ApplicationRouteCON.PARAM_APP] ?? NavigationCON.PRIMARY_NAV_ITEMS[0].id;
+
+  const handleActiveViewChange = (view: string): void => {
+    navigate({
+      to: '.',
+      search: (prev: DashboardSearchParams) => ({
+        ...prev,
+        [ApplicationRouteCON.PARAM_APP]: view === NavigationCON.PRIMARY_NAV_ITEMS[0].id ? undefined : view,
+      }),
+    });
+  };
+
   const [currentTheme, setCurrentTheme] = useState<string>(() => {
     const saved = ApplicationThemeUtility.current.getSavedTheme();
     ApplicationThemeUtility.current.applyTheme(saved);
@@ -83,6 +99,8 @@ function RootLayout(): React.JSX.Element {
         gradientsEnabled={gradientsEnabled}
         onToggleGradients={handleToggleGradients}
         onNavigateHome={handleNavigateHome}
+        activeView={activeView}
+        onActiveViewChange={handleActiveViewChange}
       >
         <Outlet />
       </NavigationController>
@@ -105,12 +123,20 @@ const dashboardRoute = createRoute({
       typeof rawSearch[ApplicationRouteCON.PARAM_ENVIRONMENT] === 'string'
         ? (rawSearch[ApplicationRouteCON.PARAM_ENVIRONMENT] as string)
         : undefined,
+    [ApplicationRouteCON.PARAM_APP]:
+      typeof rawSearch[ApplicationRouteCON.PARAM_APP] === 'string'
+        ? (rawSearch[ApplicationRouteCON.PARAM_APP] as string)
+        : undefined,
   }),
   component: function DashboardRouteComponent() {
     const navigate = useNavigate();
     const search = useSearch({ strict: false }) as DashboardSearchParams;
     const selectedRunId = search[ApplicationRouteCON.PARAM_RUN_ID];
     const selectedEnvironment = search[ApplicationRouteCON.PARAM_ENVIRONMENT] ?? DashboardCON.DEFAULT_ENVIRONMENT_VALUE;
+    const activeAppSlug = search[ApplicationRouteCON.PARAM_APP];
+
+    const { data: applications = [], isLoading: isLoadingApplications } =
+      TanstackQueryClientService.current.applicationMonitor.useApplicationsQuery();
 
     const {
       data: runs = [],
@@ -121,6 +147,16 @@ const dashboardRoute = createRoute({
     const { data: run, isLoading: isLoadingRun } = TanstackQueryClientService.current.runs.useRunDetailQuery(
       selectedRunId ?? ''
     );
+
+    if (activeAppSlug) {
+      return (
+        <ApplicationMonitorScreenRoute
+          applications={applications}
+          isLoading={isLoadingApplications}
+          activeAppSlug={activeAppSlug}
+        />
+      );
+    }
 
     if (selectedRunId) {
       return (

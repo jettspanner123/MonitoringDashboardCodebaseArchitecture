@@ -6,4 +6,8 @@ export default class TanstackQueryKeysCON {
   public static runDetail(runId: string): string[] {
     return ['runs', 'detail', runId];
   }
+
+  public static applications(): string[] {
+    return ['application-monitor', 'applications'];
+  }
 }

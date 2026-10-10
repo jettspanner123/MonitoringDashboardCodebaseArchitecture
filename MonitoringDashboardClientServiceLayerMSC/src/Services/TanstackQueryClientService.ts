@@ -1,9 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import TanstackQueryKeysCON from '../Constants/TanstackQueryKeysCON';
 import RunsService from './RunsService';
+import ApplicationMonitorService from './ApplicationMonitorService';
 
 export default class TanstackQueryClientService {
   public static current = new TanstackQueryClientService();
+
+  public readonly applicationMonitor = {
+    useApplicationsQuery: () => {
+      return useQuery({
+        queryKey: TanstackQueryKeysCON.applications(),
+        queryFn: () => ApplicationMonitorService.current.getApplications(),
+        staleTime: 1000 * 60,
+      });
+    },
+    useHitEndpointMutation: () => {
+      return useMutation({
+        mutationFn: (endpointId: string) => ApplicationMonitorService.current.hitEndpoint(endpointId),
+      });
+    },
+  };
 
   public readonly runs = {
     useRunsQuery: (environment?: string) => {
