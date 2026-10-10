@@ -2,12 +2,34 @@ import React from 'react';
 import { ServerOff } from 'lucide-react';
 import ApplicationEndpointCardSharedComponent from '../../Shared/Components/ApplicationEndpointCardSharedComponent';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
-import type { MonitoredApplication } from '../../Types';
+import type { ApplicationEndpoint, MonitoredApplication } from '../../Types';
 
 export interface ApplicationMonitorScreenControllerProps {
   applications: MonitoredApplication[];
   isLoading: boolean;
   activeAppSlug: string;
+}
+
+class ApplicationMonitorCON {
+  // "HttpEndpoint" is the only checkType today; a future "DatabaseConnection"
+  // etc. just needs its own entry here - the grouping below already handles
+  // any number of groups, it just has one today.
+  public static readonly CHECK_TYPE_HEADINGS: Record<string, string> = {
+    HttpEndpoint: 'HTTP Endpoints',
+  };
+}
+
+function groupEndpointsByCheckType(endpoints: ApplicationEndpoint[]): Array<[string, ApplicationEndpoint[]]> {
+  const groups = new Map<string, ApplicationEndpoint[]>();
+  for (const endpoint of endpoints) {
+    const existing = groups.get(endpoint.checkType);
+    if (existing) {
+      existing.push(endpoint);
+    } else {
+      groups.set(endpoint.checkType, [endpoint]);
+    }
+  }
+  return Array.from(groups.entries());
 }
 
 export default function ApplicationMonitorScreenController({
@@ -57,11 +79,18 @@ export default function ApplicationMonitorScreenController({
           className="w-full py-8"
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {application.endpoints.map((endpoint) => (
-            <ApplicationEndpointCardSharedComponent key={endpoint.id} endpoint={endpoint} />
-          ))}
-        </div>
+        groupEndpointsByCheckType(application.endpoints).map(([checkType, endpoints]) => (
+          <div key={checkType} className="space-y-3">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
+              {ApplicationMonitorCON.CHECK_TYPE_HEADINGS[checkType] ?? checkType}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {endpoints.map((endpoint) => (
+                <ApplicationEndpointCardSharedComponent key={endpoint.id} endpoint={endpoint} />
+              ))}
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

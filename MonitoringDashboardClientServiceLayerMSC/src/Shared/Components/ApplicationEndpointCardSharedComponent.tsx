@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Zap, CheckCircle2, XCircle, FileJson } from 'lucide-react';
+import { Globe, FileJson } from 'lucide-react';
 import CardSharedComponent from './CardSharedComponent';
-import PrimaryActionButtonSharedComponent from './PrimaryActionButtonSharedComponent';
 import ButtonSharedComponent from './ButtonSharedComponent';
+import ShimmerOverlaySharedComponent from './ShimmerOverlaySharedComponent';
 import ApplicationEndpointResponseModalSharedComponent from './ApplicationEndpointResponseModalSharedComponent';
 import TanstackQueryClientService from '../../Services/TanstackQueryClientService';
-import type { ApplicationEndpoint } from '../../Types';
+import type { ApplicationEndpoint, EndpointHitResult } from '../../Types';
 
 export interface ApplicationEndpointCardSharedComponentProps {
   endpoint: ApplicationEndpoint;
@@ -19,6 +19,22 @@ function formatConfigSummary(config: unknown): string | null {
   return `${method} ${path}`;
 }
 
+// Mirrors PageLoadCheckCardSharedComponent's own tone mapping exactly -
+// neutral/slate before a result exists, then emerald/rose once one does.
+function resultTone(result: EndpointHitResult | undefined): { gradient: string; iconBg: string } {
+  if (!result) {
+    return { gradient: 'from-slate-500/5 via-slate-500/2', iconBg: 'bg-slate-500 dark:bg-zinc-700' };
+  }
+  return result.success
+    ? { gradient: 'from-emerald-600/7 via-slate-600/3', iconBg: 'bg-emerald-800' }
+    : { gradient: 'from-rose-600/7 via-slate-600/3', iconBg: 'bg-rose-800' };
+}
+
+function formatDuration(durationMs: number): string {
+  if (durationMs < 1000) return `${durationMs}ms`;
+  return `${(durationMs / 1000).toFixed(1)}s`;
+}
+
 export default function ApplicationEndpointCardSharedComponent({
   endpoint,
 }: ApplicationEndpointCardSharedComponentProps): React.JSX.Element {
@@ -27,90 +43,93 @@ export default function ApplicationEndpointCardSharedComponent({
   const result = hitMutation.data;
   const [isResponseModalOpen, setIsResponseModalOpen] = useState<boolean>(false);
   const hasResponseBody = result ? result.responseBody !== null && result.responseBody !== undefined : false;
+  const tone = resultTone(result);
 
   return (
     <motion.div layout transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
-      <CardSharedComponent className="!p-0 overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-5 pt-5">
-          <div className="min-w-0">
-            <div className="text-sm font-bold text-slate-900 dark:text-zinc-100 truncate">{endpoint.label}</div>
-            {configSummary && (
-              <div className="text-[11px] font-mono text-slate-400 dark:text-zinc-500 mt-0.5 truncate">
-                {configSummary}
+      <ShimmerOverlaySharedComponent isLoading={hitMutation.isPending} className="rounded-xl">
+        <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10]`}>
+          <div className="flex items-center justify-between gap-3 px-5 pt-5">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0`}
+              >
+                <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-            )}
-          </div>
-          <PrimaryActionButtonSharedComponent
-            onClick={() => hitMutation.mutate(endpoint.id)}
-            disabled={hitMutation.isPending}
-            isLoading={hitMutation.isPending}
-            icon={<Zap className="w-3.5 h-3.5 !text-white" />}
-            className="!h-9 px-3.5 text-xs font-bold shrink-0"
-          >
-            Hit
-          </PrimaryActionButtonSharedComponent>
-        </div>
-
-        <div className="mx-5 mt-4 border-t border-slate-300/70 dark:border-zinc-800/80" />
-
-        <motion.div layout className="px-5 py-4">
-          {!result && !hitMutation.isError && (
-            <p className="text-xs text-slate-400 dark:text-zinc-500">Click "Hit" to call this endpoint.</p>
-          )}
-
-          {hitMutation.isError && (
-            <div className="flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400">
-              <XCircle className="w-4 h-4 shrink-0" />
-              {hitMutation.error instanceof Error ? hitMutation.error.message : 'Failed to hit the endpoint.'}
-            </div>
-          )}
-
-          {result && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-4 flex-wrap">
-                <div className="flex items-center gap-1.5 text-xs font-semibold">
-                  {result.success ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
-                  )}
-                  <span className={result.success ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}>
-                    {result.success ? 'Reached' : 'Failed'}
-                  </span>
+              <div className="min-w-0">
+                <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
+                  {endpoint.label}
                 </div>
-                {result.statusCode !== null && (
-                  <span className="text-xs font-mono text-slate-500 dark:text-zinc-400">HTTP {result.statusCode}</span>
-                )}
-                <span className="text-xs font-mono text-slate-400 dark:text-zinc-500">{result.durationMs}ms</span>
+                <div className="text-[11px] text-slate-400 dark:text-zinc-500 -mt-0.5 leading-tight truncate">
+                  {configSummary || 'Endpoint check'}
+                </div>
               </div>
-
-              {result.errorMessage && (
-                <p className="text-xs text-rose-600 dark:text-rose-400">{result.errorMessage}</p>
-              )}
-
-              <AnimatePresence>
-                {hasResponseBody && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ButtonSharedComponent
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsResponseModalOpen(true)}
-                      icon={<FileJson className="w-3.5 h-3.5" />}
-                    >
-                      View Response
-                    </ButtonSharedComponent>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
-          )}
-        </motion.div>
-      </CardSharedComponent>
+            <ButtonSharedComponent
+              variant="outline"
+              size="sm"
+              onClick={() => hitMutation.mutate(endpoint.id)}
+              disabled={hitMutation.isPending}
+              isLoading={hitMutation.isPending}
+              className="shrink-0"
+            >
+              Hit
+            </ButtonSharedComponent>
+          </div>
+
+          <div className="mx-5 mt-4 border-t border-slate-300/70 dark:border-zinc-800/80" />
+
+          <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800">
+            <div className="px-5 py-4 text-left">
+              <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
+                {result?.statusCode ?? '—'}
+              </div>
+              <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
+                HTTP Status
+              </div>
+            </div>
+            <div className="px-5 py-4 text-right">
+              <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
+                {result ? formatDuration(result.durationMs) : '—'}
+              </div>
+              <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 mt-2.5">
+                Response Time
+              </div>
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={!result ? 'idle' : hasResponseBody ? 'view-response' : 'message'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="px-5 py-3.5 mt-3 border-t border-slate-100 dark:border-zinc-800/60 bg-slate-50/60 dark:bg-zinc-900/30"
+            >
+              {!result && (
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500">Click "Hit" to check this endpoint.</p>
+              )}
+              {result && hasResponseBody && (
+                <ButtonSharedComponent
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsResponseModalOpen(true)}
+                  icon={<FileJson className="w-3.5 h-3.5" />}
+                  className="!h-auto !p-0 text-[11px]"
+                >
+                  View Response
+                </ButtonSharedComponent>
+              )}
+              {result && !hasResponseBody && (
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+                  {result.errorMessage || 'No additional details.'}
+                </p>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </CardSharedComponent>
+      </ShimmerOverlaySharedComponent>
 
       <ApplicationEndpointResponseModalSharedComponent
         isOpen={isResponseModalOpen}
