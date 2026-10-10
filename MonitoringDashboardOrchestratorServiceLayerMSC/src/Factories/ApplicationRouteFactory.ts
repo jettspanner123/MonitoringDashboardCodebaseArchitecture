@@ -17,6 +17,12 @@ class DataManagementRoutes {
     public static readonly WIPE_ALL = '/wipe-all';
 }
 
+class ApplicationMonitorRoutes {
+    public static readonly CONTROLLER_URL = '/api/v1/application-monitor';
+    public static readonly GET_APPLICATIONS = '/applications';
+    public static readonly HIT_ENDPOINT = '/endpoints/:id/hit';
+}
+
 class NotificationsRoutes {
     public static readonly CONTROLLER_URL = '/api/v1/notifications';
     public static readonly GET_VAPID_PUBLIC_KEY = '/vapid-public-key';
@@ -33,4 +39,5 @@ export default class ApplicationRouteFactory {
     public readonly runs = RunsRoutes;
     public readonly dataManagement = DataManagementRoutes;
     public readonly notifications = NotificationsRoutes;
+    public readonly applicationMonitor = ApplicationMonitorRoutes;
 }
