@@ -1,5 +1,5 @@
 import React from 'react';
-import { Boxes, ServerOff } from 'lucide-react';
+import { ServerOff } from 'lucide-react';
 import ApplicationEndpointCardSharedComponent from '../../Shared/Components/ApplicationEndpointCardSharedComponent';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
 import type { MonitoredApplication } from '../../Types';
@@ -10,20 +10,12 @@ export interface ApplicationMonitorScreenControllerProps {
   activeAppSlug: string;
 }
 
-// Icon names are stored as plain strings in the database (MonitoredApplication.iconName)
-// so a new application's row never needs a code change to pick a valid icon -
-// just add its name here once its icon is known.
-const ICONS_BY_NAME: Record<string, React.ComponentType<{ className?: string }>> = {
-  Boxes,
-};
-
 export default function ApplicationMonitorScreenController({
   applications,
   isLoading,
   activeAppSlug,
 }: ApplicationMonitorScreenControllerProps): React.JSX.Element {
   const application = applications.find((candidate) => candidate.slug === activeAppSlug);
-  const AppIcon = (application?.iconName && ICONS_BY_NAME[application.iconName]) || Boxes;
 
   if (isLoading) {
     return (
@@ -48,15 +40,12 @@ export default function ApplicationMonitorScreenController({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 pb-6 border-b border-slate-200/80 dark:border-zinc-800/80">
-        <div className="w-10 h-10 rounded-xl bg-[#0C2086] text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0">
-          <AppIcon className="w-5 h-5" />
-        </div>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-zinc-800/80 pb-6">
         <div>
-          <h1 className="text-2xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
             {application.name}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 font-mono">{application.baseUrl}</p>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl">{application.baseUrl}</p>
         </div>
       </div>
 
