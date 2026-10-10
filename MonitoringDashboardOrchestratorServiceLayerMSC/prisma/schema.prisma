@@ -1,14 +1,14 @@
 // Most of this schema mirrors tables owned and migrated by
 // MorningSmokeTestAutomation (a separate repo/process) - this backend is
 // read-only with respect to THOSE tables; never run `prisma migrate` here
-// for them. The two push-notification models below are the exception: they
-// belong to this backend alone (a pure dashboard/browser concern the
-// automation script has no reason to know about), so this backend owns and
-// evolves them - but still never via `prisma migrate`, since that would
-// collide with MorningSmokeTestAutomation's own tracked migration history in
-// this same database. See prisma/manual-sql/ for how they were created, and
-// add future changes to these two models the same way (raw SQL, applied by
-// hand, then `prisma generate`).
+// for them. The push-notification and application-monitor models below are
+// the exception: they belong to this backend alone (concerns the automation
+// script has no reason to know about), so this backend owns and evolves
+// them - but still never via `prisma migrate`, since that would collide with
+// MorningSmokeTestAutomation's own tracked migration history in this same
+// database. See prisma/manual-sql/ for how they were created, and add future
+// changes to these models the same way (raw SQL, applied by hand, then
+// `prisma generate`).
 generator client {
   provider = "prisma-client-js"
 }
@@ -151,4 +151,68 @@ model NotificationCheckpoint {
   updatedAt         DateTime @updatedAt
 
   @@map("MD_NotificationCheckpointTBL")
+}
+
+// One row per sibling application ObservaCore monitors (AssetSphere,
+// SignForge, ...) - not just AssetSphere's endpoints specifically, so a
+// second app's rows are just a second seeded Application + its Endpoints,
+// no schema change.
+model MonitoredApplication {
+  id        String   @id @default(cuid())
+  // Stable, code-facing identifier (matches NavigationCON's nav item id,
+  // e.g. "assetsphere") - the display name can change without touching this.
+  slug      String   @unique
+  name      String
+  baseUrl   String
+  // A lucide-react icon name (e.g. "Boxes"), rendered the same way
+  // NavigationCON's own NavItemDef icons are.
+  iconName  String?
+  createdAt DateTime @default(now())
+
+  endpoints ApplicationEndpoint[]
+
+  @@map("MD_ApplicationConstantTBL")
+}
+
+// One row per check an application exposes (a health check, a ping, and -
+// later - a database connection check or similar). `config` is free-form
+// JSON text whose shape depends on `checkType`, so a new check type never
+// needs a schema change, only a new checkType value and a different config
+// shape (see ApplicationMonitorService's HttpEndpointConfig for today's
+// only shape).
+model ApplicationEndpoint {
+  id            String   @id @default(cuid())
+  applicationId String
+  application   MonitoredApplication @relation(fields: [applicationId], references: [id])
+
+  label      String
+  // "HttpEndpoint" is the only value today.
+  checkType  String
+  config     String
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  hitHistory ApplicationEndpointHit[]
+
+  @@map("MD_ApplicationEndpointConstantTBL")
+}
+
+// One row per time a check button was actually clicked - a history of real
+// hits, not a scheduled/synthetic monitor.
+model ApplicationEndpointHit {
+  id           String   @id @default(cuid())
+  endpointId   String
+  endpoint     ApplicationEndpoint @relation(fields: [endpointId], references: [id])
+
+  success      Boolean
+  statusCode   Int?
+  // JSON text of whatever the endpoint returned, truncated at the service
+  // layer if it's ever unexpectedly huge.
+  responseBody String?
+  durationMs   Int
+  errorMessage String?
+  checkedAt    DateTime @default(now())
+
+  @@map("MD_ApplicationEndpointHitHistoryTBL")
 }
