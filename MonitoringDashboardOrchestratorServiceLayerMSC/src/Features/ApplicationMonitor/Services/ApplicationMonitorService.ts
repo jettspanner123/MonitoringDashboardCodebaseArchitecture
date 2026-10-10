@@ -15,6 +15,12 @@ export interface ApplicationEndpointDTO {
     label: string;
     checkType: string;
     config: unknown;
+    // The most recently recorded hit for this endpoint (from
+    // MD_ApplicationEndpointHitHistoryTBL), regardless of success/failure -
+    // null if it has never been hit. Lets a card and the page header show
+    // "as of last time" state immediately on load, not just after a fresh
+    // click this session.
+    lastHit: (EndpointHitResultDTO & { checkedAt: string }) | null;
 }
 
 export interface MonitoredApplicationDTO {
@@ -57,18 +63,46 @@ export default class ApplicationMonitorService {
             orderBy: { name: 'asc' },
         });
 
+        const endpointIds = applications.flatMap((application) => application.endpoints.map((endpoint) => endpoint.id));
+
+        // distinct + orderBy gives "the newest row per endpointId" in one
+        // query rather than one query per endpoint.
+        const latestHits = endpointIds.length > 0
+            ? await ApplicationDatabaseProvider.current.client.applicationEndpointHit.findMany({
+                where: { endpointId: { in: endpointIds } },
+                orderBy: { checkedAt: 'desc' },
+                distinct: ['endpointId'],
+            })
+            : [];
+        const latestHitByEndpointId = new Map(latestHits.map((hit) => [hit.endpointId, hit]));
+
         return applications.map((application) => ({
             id: application.id,
             slug: application.slug,
             name: application.name,
             baseUrl: application.baseUrl,
             iconName: application.iconName,
-            endpoints: application.endpoints.map((endpoint) => ({
-                id: endpoint.id,
-                label: endpoint.label,
-                checkType: endpoint.checkType,
-                config: JSON.parse(endpoint.config) as unknown,
-            })),
+            endpoints: application.endpoints.map((endpoint) => {
+                const latestHit = latestHitByEndpointId.get(endpoint.id);
+
+                return {
+                    id: endpoint.id,
+                    label: endpoint.label,
+                    checkType: endpoint.checkType,
+                    config: JSON.parse(endpoint.config) as unknown,
+                    lastHit: latestHit
+                        ? {
+                            success: latestHit.success,
+                            statusCode: latestHit.statusCode,
+                            responseBody:
+                                latestHit.responseBody !== null ? (JSON.parse(latestHit.responseBody) as unknown) : null,
+                            durationMs: latestHit.durationMs,
+                            errorMessage: latestHit.errorMessage,
+                            checkedAt: latestHit.checkedAt.toISOString(),
+                        }
+                        : null,
+                };
+            }),
         }));
     }
 
