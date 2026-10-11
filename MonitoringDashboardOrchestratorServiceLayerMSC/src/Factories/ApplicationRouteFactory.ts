@@ -21,6 +21,7 @@ class ApplicationMonitorRoutes {
     public static readonly CONTROLLER_URL = '/api/v1/application-monitor';
     public static readonly GET_APPLICATIONS = '/applications';
     public static readonly HIT_ENDPOINT = '/endpoints/:id/hit';
+    public static readonly HIT_LIVE = '/hit-attempts/:hitAttemptId/live';
 }
 
 class NotificationsRoutes {

@@ -1,5 +1,5 @@
 import ApplicationNetworkAPIConfiguration from '../Configurations/ApplicationNetworkAPIConfiguration';
-import type { ApiResponseType, MonitoredApplication, EndpointHitResult } from '../Types';
+import type { ApiResponseType, MonitoredApplication } from '../Types';
 
 export default class ApplicationMonitorService {
   public static current = new ApplicationMonitorService();
@@ -13,15 +13,19 @@ export default class ApplicationMonitorService {
     return body.data;
   }
 
-  public async hitEndpoint(endpointId: string): Promise<EndpointHitResult> {
+  // Starts the retry-aware hit server-side and returns right away with an id
+  // to watch - it does not wait for the final outcome. Pair with a WebSocket
+  // to `${ApplicationNetworkAPIConfiguration.WS_BASE_URL}/api/v1/application-monitor/hit-attempts/${hitAttemptId}/live`
+  // for live attempt progress and the eventual result.
+  public async startHit(endpointId: string): Promise<string> {
     const response = await fetch(
       `${ApplicationNetworkAPIConfiguration.BASE_URL}/api/v1/application-monitor/endpoints/${endpointId}/hit`,
       { method: 'POST' }
     );
-    const body: ApiResponseType<EndpointHitResult> = await response.json();
+    const body: ApiResponseType<{ hitAttemptId: string }> = await response.json();
     if (!body.success || !body.data) {
-      throw new Error(body.message || 'Failed to hit the endpoint.');
+      throw new Error(body.message || 'Failed to start the endpoint hit.');
     }
-    return body.data;
+    return body.data.hitAttemptId;
   }
 }

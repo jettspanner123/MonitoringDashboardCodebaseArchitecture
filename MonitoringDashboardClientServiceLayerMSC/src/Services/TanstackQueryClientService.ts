@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import TanstackQueryKeysCON from '../Constants/TanstackQueryKeysCON';
 import RunsService from './RunsService';
 import ApplicationMonitorService from './ApplicationMonitorService';
@@ -12,11 +12,6 @@ export default class TanstackQueryClientService {
         queryKey: TanstackQueryKeysCON.applications(),
         queryFn: () => ApplicationMonitorService.current.getApplications(),
         staleTime: 1000 * 60,
-      });
-    },
-    useHitEndpointMutation: () => {
-      return useMutation({
-        mutationFn: (endpointId: string) => ApplicationMonitorService.current.hitEndpoint(endpointId),
       });
     },
   };

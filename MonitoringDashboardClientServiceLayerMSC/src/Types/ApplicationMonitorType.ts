@@ -23,3 +23,19 @@ export interface MonitoredApplication {
   iconName: string | null;
   endpoints: ApplicationEndpoint[];
 }
+
+export type HitAttemptOutcome = 'retrying' | 'succeeded' | 'failed';
+
+export interface HitAttemptEntry {
+  attemptNumber: number;
+  statusCode: number | null;
+  errorMessage: string | null;
+  attemptedAt: string;
+  outcome: HitAttemptOutcome;
+}
+
+export interface HitAttemptSnapshot {
+  attempts: HitAttemptEntry[];
+  finished: boolean;
+  result: EndpointHitResult | null;
+}

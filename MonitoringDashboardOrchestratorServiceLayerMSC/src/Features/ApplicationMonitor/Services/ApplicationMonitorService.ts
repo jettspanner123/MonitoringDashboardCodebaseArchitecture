@@ -1,6 +1,8 @@
+import { randomUUID } from 'node:crypto';
 import ApplicationDatabaseProvider from '../../../Providers/ApplicationDatabaseProvider';
 import EntityNotFoundCException from '../../../Exceptions/EntityNotFoundCException';
 import ValidationCException from '../../../Exceptions/ValidationCException';
+import ApplicationEndpointHitAttemptTrackerService from './ApplicationEndpointHitAttemptTrackerService';
 
 // Today's only checkType - a new check type (e.g. "DatabaseConnection") gets
 // its own config shape and its own branch in executeCheck, no schema change.
@@ -46,12 +48,19 @@ export interface EndpointHitResultDTO {
 }
 
 class ApplicationMonitorCON {
-    // Generous but bounded - an unreachable sibling app shouldn't hang this
-    // request forever. Sibling apps are themselves on Render's free tier and
-    // can need 30-50s to cold-start after being idle, so this has to clear
-    // that comfortably or every "first click of the day" would read as a
-    // false failure.
-    public static readonly FETCH_TIMEOUT_MS = 60000;
+    // A sibling app on Render's free tier spins down after ~15 minutes idle;
+    // the next request wakes it, and Render's own edge proxy answers with a
+    // fast 502/503/504 (not a hang) for every request that arrives before the
+    // app has bound to its port - repeatedly, for the whole cold-start window
+    // (documented at 30-60s, sometimes up to ~2 minutes). So a single fetch
+    // with a long timeout doesn't help; this has to retry across that window
+    // instead. Per-attempt timeout stays short since a 502 passthrough is
+    // fast - it's only a safety net for a genuinely hung attempt, not meant
+    // to itself cover the cold-start wait.
+    public static readonly PER_ATTEMPT_TIMEOUT_MS = 10000;
+    public static readonly RETRY_INTERVAL_MS = 3000;
+    public static readonly MAX_RETRY_BUDGET_MS = 75000;
+    public static readonly RETRYABLE_STATUS_CODES: number[] = [502, 503, 504];
 }
 
 export default class ApplicationMonitorService {
@@ -111,7 +120,13 @@ export default class ApplicationMonitorService {
         }));
     }
 
-    public async hitEndpoint(endpointId: string): Promise<EndpointHitResultDTO> {
+    // Validates the endpoint up front (so a bad id still 404s on this call
+    // immediately, same as before) then kicks off the retry-aware hit in the
+    // background and returns right away. The caller's HTTP response is just
+    // this id - the frontend watches the actual outcome live via the paired
+    // GET .../hit-attempts/:hitAttemptId/live websocket instead of the
+    // original POST blocking for up to the full retry budget.
+    public async startHit(endpointId: string): Promise<string> {
         const endpoint = await ApplicationDatabaseProvider.current.client.applicationEndpoint.findUnique({
             where: { id: endpointId },
             include: { application: true },
@@ -126,47 +141,91 @@ export default class ApplicationMonitorService {
         }
 
         const config = JSON.parse(endpoint.config) as HttpEndpointConfigInterface;
-        const url = `${endpoint.application.baseUrl}${config.path}`;
+        const hitAttemptId = randomUUID();
+        ApplicationEndpointHitAttemptTrackerService.current.startTracking(hitAttemptId);
 
-        const startedAt = Date.now();
+        void this.executeHitWithRetries(endpoint.id, endpoint.application.baseUrl, config, hitAttemptId);
+
+        return hitAttemptId;
+    }
+
+    private async executeHitWithRetries(
+        endpointId: string,
+        baseUrl: string,
+        config: HttpEndpointConfigInterface,
+        hitAttemptId: string
+    ): Promise<void> {
+        const url = `${baseUrl}${config.path}`;
+        const overallStartedAt = Date.now();
+        let attemptNumber = 0;
         let result: EndpointHitResultDTO;
 
-        try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), ApplicationMonitorCON.FETCH_TIMEOUT_MS);
+        for (;;) {
+            attemptNumber += 1;
 
-            const response = await fetch(url, { method: config.method, signal: controller.signal });
-            clearTimeout(timeout);
+            let attemptStatusCode: number | null = null;
+            let attemptErrorMessage: string | null = null;
+            let responseBody: unknown = null;
+            let isRetryableOutcome = false;
 
-            const durationMs = Date.now() - startedAt;
-            const rawBody = await response.text();
-            let responseBody: unknown = rawBody;
             try {
-                responseBody = JSON.parse(rawBody);
-            } catch {
-                // Not JSON - keep the raw text as-is.
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), ApplicationMonitorCON.PER_ATTEMPT_TIMEOUT_MS);
+                const response = await fetch(url, { method: config.method, signal: controller.signal });
+                clearTimeout(timeout);
+
+                attemptStatusCode = response.status;
+                isRetryableOutcome = ApplicationMonitorCON.RETRYABLE_STATUS_CODES.includes(response.status);
+
+                const rawBody = await response.text();
+                try {
+                    responseBody = JSON.parse(rawBody);
+                } catch {
+                    responseBody = rawBody;
+                }
+            } catch (error) {
+                // A network-level failure (connection refused, DNS, the
+                // per-attempt timeout) reads the same as a gateway 502 here -
+                // both just mean "not answering yet" during a cold start.
+                attemptErrorMessage = error instanceof Error ? error.message : String(error);
+                isRetryableOutcome = true;
             }
 
-            result = {
-                success: true,
-                statusCode: response.status,
-                responseBody,
-                durationMs,
-                errorMessage: null,
-            };
-        } catch (error) {
-            result = {
-                success: false,
-                statusCode: null,
-                responseBody: null,
-                durationMs: Date.now() - startedAt,
-                errorMessage: error instanceof Error ? error.message : String(error),
-            };
+            const elapsedMs = Date.now() - overallStartedAt;
+            const budgetExhausted = elapsedMs >= ApplicationMonitorCON.MAX_RETRY_BUDGET_MS;
+            const isFinalAttempt = !isRetryableOutcome || budgetExhausted;
+
+            ApplicationEndpointHitAttemptTrackerService.current.recordAttempt(hitAttemptId, {
+                attemptNumber,
+                statusCode: attemptStatusCode,
+                errorMessage: attemptErrorMessage,
+                attemptedAt: new Date().toISOString(),
+                outcome: !isFinalAttempt ? 'retrying' : isRetryableOutcome ? 'failed' : 'succeeded',
+            });
+
+            if (isFinalAttempt) {
+                const succeeded = !isRetryableOutcome;
+                result = {
+                    success: succeeded,
+                    statusCode: attemptStatusCode,
+                    responseBody: succeeded ? responseBody : null,
+                    durationMs: Date.now() - overallStartedAt,
+                    errorMessage: succeeded
+                        ? null
+                        : attemptErrorMessage ??
+                          `Server did not come up after ${attemptNumber} attempt(s) over ${Math.round(
+                              (Date.now() - overallStartedAt) / 1000
+                          )}s (last status: ${attemptStatusCode ?? 'network error'}).`,
+                };
+                break;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, ApplicationMonitorCON.RETRY_INTERVAL_MS));
         }
 
         await ApplicationDatabaseProvider.current.client.applicationEndpointHit.create({
             data: {
-                endpointId: endpoint.id,
+                endpointId,
                 success: result.success,
                 statusCode: result.statusCode,
                 responseBody: result.responseBody !== null ? JSON.stringify(result.responseBody) : null,
@@ -175,6 +234,6 @@ export default class ApplicationMonitorService {
             },
         });
 
-        return result;
+        ApplicationEndpointHitAttemptTrackerService.current.finish(hitAttemptId, result);
     }
 }

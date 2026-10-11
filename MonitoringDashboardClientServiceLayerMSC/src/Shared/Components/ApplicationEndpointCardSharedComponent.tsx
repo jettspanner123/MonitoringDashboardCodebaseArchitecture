@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { Globe, FileJson, Zap, Link2, ArrowUpFromLine, ArrowDownToLine } from 'lucide-react';
@@ -8,9 +8,18 @@ import ShimmerOverlaySharedComponent from './ShimmerOverlaySharedComponent';
 import ApplicationEndpointResponseModalSharedComponent from './ApplicationEndpointResponseModalSharedComponent';
 import ContextMenuSharedComponent, { type ContextMenuItem } from './ContextMenuSharedComponent';
 import CopyConfirmationToastSharedComponent from './CopyConfirmationToastSharedComponent';
-import TanstackQueryClientService from '../../Services/TanstackQueryClientService';
+import EndpointWakeUpProgressModalSharedComponent from './EndpointWakeUpProgressModalSharedComponent';
+import ApplicationMonitorService from '../../Services/ApplicationMonitorService';
+import ApplicationNetworkAPIConfiguration from '../../Configurations/ApplicationNetworkAPIConfiguration';
 import ClipboardUtility from '../../Utilities/ClipboardUtility';
-import type { ApplicationEndpoint, EndpointHitResult } from '../../Types';
+import type { ApplicationEndpoint, EndpointHitResult, HitAttemptEntry, HitAttemptSnapshot } from '../../Types';
+
+class ApplicationEndpointHitFlowCON {
+  // Give a successful (server-was-already-awake) outcome a moment on screen
+  // before the wake-up modal auto-closes, rather than instantly yanking it
+  // away the same frame the card updates.
+  public static readonly AUTO_CLOSE_ON_SUCCESS_DELAY_MS = 1500;
+}
 
 export interface ApplicationEndpointCardSharedComponentProps {
   endpoint: ApplicationEndpoint;
@@ -72,12 +81,77 @@ export default function ApplicationEndpointCardSharedComponent({
   baseUrl,
   enableContextMenu,
 }: ApplicationEndpointCardSharedComponentProps): React.JSX.Element {
-  const hitMutation = TanstackQueryClientService.current.applicationMonitor.useHitEndpointMutation();
   const configSummary = formatConfigSummary(endpoint.config);
+  const [isHitPending, setIsHitPending] = useState<boolean>(false);
+  const [hitResult, setHitResult] = useState<EndpointHitResult | null>(null);
+  const [liveAttempts, setLiveAttempts] = useState<HitAttemptEntry[]>([]);
+  const [isWakeUpModalOpen, setIsWakeUpModalOpen] = useState<boolean>(false);
+  const activeSocketRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    return () => {
+      activeSocketRef.current?.close();
+    };
+  }, []);
+
+  const handleHit = async (): Promise<void> => {
+    setIsHitPending(true);
+    setLiveAttempts([]);
+
+    try {
+      const hitAttemptId = await ApplicationMonitorService.current.startHit(endpoint.id);
+      const socket = new WebSocket(
+        `${ApplicationNetworkAPIConfiguration.WS_BASE_URL}/api/v1/application-monitor/hit-attempts/${hitAttemptId}/live`
+      );
+      activeSocketRef.current = socket;
+
+      socket.onmessage = (event: MessageEvent<string>) => {
+        const snapshot: HitAttemptSnapshot = JSON.parse(event.data);
+        setLiveAttempts(snapshot.attempts);
+
+        // Only once the backend is actually detected as down (a retryable
+        // 502/503/504) does the wake-up modal appear - a warm server that
+        // resolves on its first attempt never shows it at all.
+        if (snapshot.attempts.some((attempt) => attempt.outcome === 'retrying')) {
+          setIsWakeUpModalOpen(true);
+        }
+
+        if (snapshot.finished) {
+          socket.close();
+          setIsHitPending(false);
+          setHitResult(snapshot.result);
+          if (snapshot.result?.success) {
+            setTimeout(() => setIsWakeUpModalOpen(false), ApplicationEndpointHitFlowCON.AUTO_CLOSE_ON_SUCCESS_DELAY_MS);
+          }
+        }
+      };
+
+      socket.onerror = () => {
+        setIsHitPending(false);
+        setHitResult({
+          success: false,
+          statusCode: null,
+          responseBody: null,
+          durationMs: 0,
+          errorMessage: 'Lost connection while watching the hit.',
+        });
+      };
+    } catch (error) {
+      setIsHitPending(false);
+      setHitResult({
+        success: false,
+        statusCode: null,
+        responseBody: null,
+        durationMs: 0,
+        errorMessage: error instanceof Error ? error.message : 'Failed to start the hit.',
+      });
+    }
+  };
+
   // A fresh click always wins; otherwise fall back to the last recorded hit
   // (from the page's own initial load) so the card stays populated across
   // navigation and reloads instead of resetting to "never hit".
-  const result = hitMutation.data ?? endpoint.lastHit ?? undefined;
+  const result = hitResult ?? endpoint.lastHit ?? undefined;
   const [isResponseModalOpen, setIsResponseModalOpen] = useState<boolean>(false);
   const hasResponseBody = result ? result.responseBody !== null && result.responseBody !== undefined : false;
   const tone = resultTone(result);
@@ -109,8 +183,8 @@ export default function ApplicationEndpointCardSharedComponent({
       id: 'hit',
       label: 'Hit',
       icon: <Zap className="w-3.5 h-3.5" />,
-      disabled: hitMutation.isPending,
-      onClick: () => hitMutation.mutate(endpoint.id),
+      disabled: isHitPending,
+      onClick: () => void handleHit(),
     },
     {
       id: 'copy-url',
@@ -154,7 +228,7 @@ export default function ApplicationEndpointCardSharedComponent({
 
   return (
     <motion.div layout transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
-      <ShimmerOverlaySharedComponent isLoading={hitMutation.isPending} className="rounded-xl">
+      <ShimmerOverlaySharedComponent isLoading={isHitPending} className="rounded-xl">
         <CardSharedComponent
           onContextMenu={handleContextMenu}
           className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10] ${
@@ -180,9 +254,9 @@ export default function ApplicationEndpointCardSharedComponent({
             <ButtonSharedComponent
               variant="outline"
               size="sm"
-              onClick={() => hitMutation.mutate(endpoint.id)}
-              disabled={hitMutation.isPending}
-              isLoading={hitMutation.isPending}
+              onClick={() => void handleHit()}
+              disabled={isHitPending}
+              isLoading={isHitPending}
               className="shrink-0"
             >
               Hit
@@ -248,6 +322,12 @@ export default function ApplicationEndpointCardSharedComponent({
         onClose={() => setIsResponseModalOpen(false)}
         label={endpoint.label}
         responseBody={result?.responseBody}
+      />
+
+      <EndpointWakeUpProgressModalSharedComponent
+        isOpen={isWakeUpModalOpen}
+        onClose={() => setIsWakeUpModalOpen(false)}
+        attempts={liveAttempts}
       />
 
       {enableContextMenu && (
