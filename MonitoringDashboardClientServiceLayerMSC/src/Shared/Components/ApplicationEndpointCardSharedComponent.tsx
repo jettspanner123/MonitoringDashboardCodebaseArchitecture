@@ -173,6 +173,16 @@ export default function ApplicationEndpointCardSharedComponent({
     setContextMenu((prev) => ({ ...prev, isOpen: false }));
   };
 
+  // Same indigo as the card's own right-click ring, so the two dividers read
+  // as part of the same "this card is targeted" highlight rather than their
+  // own separate thing.
+  const horizontalDividerClass = contextMenu.isOpen
+    ? 'border-t-2 border-indigo-500/80 dark:border-indigo-400/80'
+    : 'border-t border-slate-300/70 dark:border-zinc-800/80';
+  const verticalDividerClass = contextMenu.isOpen
+    ? 'border-l-2 border-indigo-500/80 dark:border-indigo-400/80'
+    : 'border-l border-slate-200 dark:border-zinc-800';
+
   const endpointPath = ApplicationEndpointCardHelper.getEndpointPath(endpoint.config);
   const endpointUrl = endpointPath ? `${baseUrl}${endpointPath}` : null;
   const requestBody = ApplicationEndpointCardHelper.getEndpointRequestBody(endpoint.config);
@@ -263,9 +273,9 @@ export default function ApplicationEndpointCardSharedComponent({
             </ButtonSharedComponent>
           </div>
 
-          <div className="mx-5 mt-4 border-t border-slate-300/70 dark:border-zinc-800/80" />
+          <div className={`mx-5 mt-4 transition-colors duration-200 ${horizontalDividerClass}`} />
 
-          <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800">
+          <div className="grid grid-cols-2">
             <div className="px-5 py-4 text-left">
               <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
                 {result?.statusCode ?? '—'}
@@ -274,7 +284,7 @@ export default function ApplicationEndpointCardSharedComponent({
                 HTTP Status
               </div>
             </div>
-            <div className="px-5 py-4 text-right">
+            <div className={`px-5 py-4 text-right transition-colors duration-200 ${verticalDividerClass}`}>
               <div className="font-mono font-extrabold text-3xl text-slate-900 dark:text-zinc-50 leading-none tracking-tight">
                 {result ? formatDuration(result.durationMs) : '—'}
               </div>
