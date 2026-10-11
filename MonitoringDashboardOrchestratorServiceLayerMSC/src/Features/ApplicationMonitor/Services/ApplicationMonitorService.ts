@@ -8,6 +8,11 @@ interface HttpEndpointConfigInterface {
     method: string;
     path: string;
     expectedStatusCode: number;
+    // Absent for today's GET-only health/ping checks. Once POST-style checks
+    // with an actual payload are added, this carries that payload - the
+    // frontend's "Copy Request JSON" context menu item disables itself when
+    // this is undefined.
+    requestBody?: unknown;
 }
 
 export interface ApplicationEndpointDTO {

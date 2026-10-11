@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Globe, FileJson } from 'lucide-react';
+import { toast } from 'sonner';
+import { Globe, FileJson, Zap, Link2, ArrowUpFromLine, ArrowDownToLine } from 'lucide-react';
 import CardSharedComponent from './CardSharedComponent';
 import ButtonSharedComponent from './ButtonSharedComponent';
 import ShimmerOverlaySharedComponent from './ShimmerOverlaySharedComponent';
 import ApplicationEndpointResponseModalSharedComponent from './ApplicationEndpointResponseModalSharedComponent';
+import ContextMenuSharedComponent, { type ContextMenuItem } from './ContextMenuSharedComponent';
+import CopyConfirmationToastSharedComponent from './CopyConfirmationToastSharedComponent';
 import TanstackQueryClientService from '../../Services/TanstackQueryClientService';
+import ClipboardUtility from '../../Utilities/ClipboardUtility';
 import type { ApplicationEndpoint, EndpointHitResult } from '../../Types';
 
 export interface ApplicationEndpointCardSharedComponentProps {
   endpoint: ApplicationEndpoint;
+  baseUrl: string;
+  enableContextMenu: boolean;
 }
 
 function formatConfigSummary(config: unknown): string | null {
@@ -17,6 +23,32 @@ function formatConfigSummary(config: unknown): string | null {
   const { method, path } = config as { method?: string; path?: string };
   if (!method || !path) return null;
   return `${method} ${path}`;
+}
+
+class ApplicationEndpointCardHelper {
+  public static getEndpointPath(config: unknown): string | null {
+    if (!config || typeof config !== 'object') return null;
+    const { path } = config as { path?: string };
+    return path || null;
+  }
+
+  // Absent for today's GET-only health/ping checks - populated once
+  // POST-style checks with an actual payload exist, mirroring the backend's
+  // HttpEndpointConfigInterface.requestBody.
+  public static getEndpointRequestBody(config: unknown): unknown {
+    if (!config || typeof config !== 'object') return undefined;
+    return (config as { requestBody?: unknown }).requestBody;
+  }
+
+  public static async copyToClipboardWithToast(text: string, successLabel: string): Promise<void> {
+    const didSucceed = await ClipboardUtility.current.writeText(text);
+    toast.custom(() => (
+      <CopyConfirmationToastSharedComponent
+        label={didSucceed ? successLabel : 'Copy failed - clipboard access denied'}
+        isError={!didSucceed}
+      />
+    ));
+  }
 }
 
 // Mirrors PageLoadCheckCardSharedComponent's own tone mapping exactly -
@@ -37,6 +69,8 @@ function formatDuration(durationMs: number): string {
 
 export default function ApplicationEndpointCardSharedComponent({
   endpoint,
+  baseUrl,
+  enableContextMenu,
 }: ApplicationEndpointCardSharedComponentProps): React.JSX.Element {
   const hitMutation = TanstackQueryClientService.current.applicationMonitor.useHitEndpointMutation();
   const configSummary = formatConfigSummary(endpoint.config);
@@ -48,10 +82,85 @@ export default function ApplicationEndpointCardSharedComponent({
   const hasResponseBody = result ? result.responseBody !== null && result.responseBody !== undefined : false;
   const tone = resultTone(result);
 
+  const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
+    isOpen: false,
+    x: 0,
+    y: 0,
+  });
+
+  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!enableContextMenu) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setContextMenu({ isOpen: true, x: event.clientX, y: event.clientY });
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const endpointPath = ApplicationEndpointCardHelper.getEndpointPath(endpoint.config);
+  const endpointUrl = endpointPath ? `${baseUrl}${endpointPath}` : null;
+  const requestBody = ApplicationEndpointCardHelper.getEndpointRequestBody(endpoint.config);
+  const hasRequestBody = requestBody !== undefined && requestBody !== null;
+
+  const contextMenuItems: ContextMenuItem[] = [
+    {
+      id: 'hit',
+      label: 'Hit',
+      icon: <Zap className="w-3.5 h-3.5" />,
+      disabled: hitMutation.isPending,
+      onClick: () => hitMutation.mutate(endpoint.id),
+    },
+    {
+      id: 'copy-url',
+      label: 'Copy Endpoint URL',
+      icon: <Link2 className="w-3.5 h-3.5" />,
+      disabled: !endpointUrl,
+      divider: true,
+      onClick: () => {
+        if (endpointUrl) void ApplicationEndpointCardHelper.copyToClipboardWithToast(endpointUrl, 'Endpoint URL copied');
+      },
+    },
+    {
+      id: 'copy-request',
+      label: 'Copy Request JSON',
+      icon: <ArrowUpFromLine className="w-3.5 h-3.5" />,
+      disabled: !hasRequestBody,
+      onClick: () => {
+        if (hasRequestBody) {
+          void ApplicationEndpointCardHelper.copyToClipboardWithToast(
+            JSON.stringify(requestBody, null, 2),
+            'Request JSON copied',
+          );
+        }
+      },
+    },
+    {
+      id: 'copy-response',
+      label: 'Copy Response JSON',
+      icon: <ArrowDownToLine className="w-3.5 h-3.5" />,
+      disabled: !hasResponseBody,
+      onClick: () => {
+        if (hasResponseBody) {
+          void ApplicationEndpointCardHelper.copyToClipboardWithToast(
+            JSON.stringify(result?.responseBody, null, 2),
+            'Response JSON copied',
+          );
+        }
+      },
+    },
+  ];
+
   return (
     <motion.div layout transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
       <ShimmerOverlaySharedComponent isLoading={hitMutation.isPending} className="rounded-xl">
-        <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10]`}>
+        <CardSharedComponent
+          onContextMenu={handleContextMenu}
+          className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10] ${
+            contextMenu.isOpen ? 'ring-2 ring-indigo-500/80 dark:ring-indigo-400/80' : ''
+          }`}
+        >
           <div className="flex items-center justify-between gap-3 px-5 pt-5">
             <div className="flex items-center gap-3 min-w-0">
               <div
@@ -140,6 +249,21 @@ export default function ApplicationEndpointCardSharedComponent({
         label={endpoint.label}
         responseBody={result?.responseBody}
       />
+
+      {enableContextMenu && (
+        <ContextMenuSharedComponent
+          isOpen={contextMenu.isOpen}
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={handleCloseContextMenu}
+          items={contextMenuItems}
+          header={
+            <span className="font-mono text-[10px] uppercase tracking-wider font-semibold">
+              {endpoint.label}
+            </span>
+          }
+        />
+      )}
     </motion.div>
   );
 }

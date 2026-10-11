@@ -18,6 +18,10 @@ class ApplicationMonitorCON {
   public static readonly CHECK_TYPE_HEADINGS: Record<string, string> = {
     HttpEndpoint: 'HTTP Endpoints',
   };
+
+  // Right-click context menu rollout is per-app, not global yet - AssetSphere
+  // only for now. Add a slug here once another app's page is ready for it.
+  public static readonly CONTEXT_MENU_ENABLED_SLUGS: string[] = ['assetsphere'];
 }
 
 // ISO 8601 strings sort correctly as plain strings, so no Date parsing is
@@ -50,6 +54,9 @@ export default function ApplicationMonitorScreenController({
 }: ApplicationMonitorScreenControllerProps): React.JSX.Element {
   const application = applications.find((candidate) => candidate.slug === activeAppSlug);
   const mostRecentHitTimestamp = application ? getMostRecentHitTimestamp(application.endpoints) : null;
+  const isContextMenuEnabled = application
+    ? ApplicationMonitorCON.CONTEXT_MENU_ENABLED_SLUGS.includes(application.slug)
+    : false;
 
   if (isLoading) {
     return (
@@ -106,7 +113,12 @@ export default function ApplicationMonitorScreenController({
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {endpoints.map((endpoint) => (
-                <ApplicationEndpointCardSharedComponent key={endpoint.id} endpoint={endpoint} />
+                <ApplicationEndpointCardSharedComponent
+                  key={endpoint.id}
+                  endpoint={endpoint}
+                  baseUrl={application.baseUrl}
+                  enableContextMenu={isContextMenuEnabled}
+                />
               ))}
             </div>
           </div>
