@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useLayoutEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 
 export interface ContextMenuItem {
@@ -30,7 +31,7 @@ export default function ContextMenuSharedComponent({
   items,
   header,
   minWidth = 190,
-}: ContextMenuSharedComponentProps): React.JSX.Element {
+}: ContextMenuSharedComponentProps): React.JSX.Element | null {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const calculatePosition = useCallback((posX: number, posY: number) => {
@@ -103,7 +104,15 @@ export default function ContextMenuSharedComponent({
     };
   }, [isOpen, onClose]);
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  // Portaled straight to <body> - position: fixed only tracks the viewport
+  // as long as no ancestor has an active transform (a framer-motion `layout`
+  // animation on a parent card applies exactly that), so rendering this
+  // in-place inside a layout-animated card would drag the menu along with
+  // the card's own resize animation instead of staying anchored to the
+  // cursor. Mirrors ModalSharedComponent's own portal for the same reason.
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -181,6 +190,7 @@ export default function ContextMenuSharedComponent({
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

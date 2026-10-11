@@ -242,8 +242,8 @@ export default function ApplicationEndpointCardSharedComponent({
         <CardSharedComponent
           onContextMenu={handleContextMenu}
           className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10] ${
-            contextMenu.isOpen ? 'ring-2 ring-indigo-500/80 dark:ring-indigo-400/80' : ''
-          }`}
+            enableContextMenu ? 'cursor-pointer' : ''
+          } ${contextMenu.isOpen ? 'ring-2 ring-indigo-500/80 dark:ring-indigo-400/80' : ''}`}
         >
           <div className="flex items-center justify-between gap-3 px-5 pt-5">
             <div className="flex items-center gap-3 min-w-0">
