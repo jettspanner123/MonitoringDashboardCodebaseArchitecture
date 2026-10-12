@@ -312,7 +312,7 @@ export default function ApplicationEndpointCardSharedComponent({
                   size="sm"
                   onClick={() => setIsResponseModalOpen(true)}
                   icon={<FileJson className="w-3.5 h-3.5" />}
-                  className="!h-auto !p-0 text-[11px]"
+                  className="text-[11px]"
                 >
                   View Response
                 </ButtonSharedComponent>
