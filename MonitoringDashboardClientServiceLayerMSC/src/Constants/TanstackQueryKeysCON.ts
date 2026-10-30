@@ -11,6 +11,10 @@ export default class TanstackQueryKeysCON {
     return ['application-monitor', 'applications'];
   }
 
+  public static clientMachineRelayStatus(): string[] {
+    return ['client-machine-services', 'relay-status'];
+  }
+
   public static clientMachines(): string[] {
     return ['client-machine-services', 'machines'];
   }

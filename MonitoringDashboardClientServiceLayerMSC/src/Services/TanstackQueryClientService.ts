@@ -3,6 +3,7 @@ import TanstackQueryKeysCON from '../Constants/TanstackQueryKeysCON';
 import RunsService from './RunsService';
 import ApplicationMonitorService from './ApplicationMonitorService';
 import ClientMachineServicesService from './ClientMachineServicesService';
+import ClientMachineAuthService from './ClientMachineAuthService';
 
 export default class TanstackQueryClientService {
   public static current = new TanstackQueryClientService();
@@ -18,6 +19,18 @@ export default class TanstackQueryClientService {
   };
 
   public readonly clientMachineServices = {
+    // Polled (unlike the rest of this feature's "nothing auto-refreshes"
+    // convention) because this also feeds the always-visible navbar
+    // indicator, which needs to reflect live connectivity without the user
+    // being on the Client Machines page at all.
+    useRelayStatusQuery: () => {
+      return useQuery({
+        queryKey: TanstackQueryKeysCON.clientMachineRelayStatus(),
+        queryFn: () => ClientMachineAuthService.current.getRelayStatus(),
+        staleTime: 0,
+        refetchInterval: 30000,
+      });
+    },
     useMachinesQuery: (enabled: boolean) => {
       return useQuery({
         queryKey: TanstackQueryKeysCON.clientMachines(),
