@@ -21,12 +21,15 @@ export default function IndexingFreshnessCardSharedComponent({
   const gradient = isFresh
     ? 'from-emerald-600/7 via-slate-600/3'
     : 'from-amber-500/7 via-slate-500/3';
+  // No true "Fail" state here, only fresh/stale - stale reads as a warning
+  // (consistent with its own amber gradient above), never the fail red.
+  const iconBg = isFresh ? 'bg-[#0d2086]' : 'bg-[#b87414]';
 
   return (
     <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${iconBg} text-white flex items-center justify-center shadow-xs shrink-0`}>
             <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <div className="min-w-0">

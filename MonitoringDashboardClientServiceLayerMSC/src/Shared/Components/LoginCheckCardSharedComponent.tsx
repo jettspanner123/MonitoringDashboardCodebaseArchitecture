@@ -18,6 +18,12 @@ function statusTone(status: PageCheckType['status']): { gradient: string; iconBg
   return { gradient: 'from-rose-600/7 via-slate-600/3', iconBg: 'bg-rose-800' };
 }
 
+function statusHeaderIconBg(status: PageCheckType['status']): string {
+  if (status === 'Warning') return 'bg-[#b87414]';
+  if (status === 'Pass') return 'bg-[#0d2086]';
+  return 'bg-[#ab0e0e]';
+}
+
 function getInitials(username: string | null): string {
   if (!username) return '?';
   const parts = username.split(/[^a-zA-Z0-9]+/).filter(Boolean);
@@ -37,6 +43,7 @@ export default function LoginCheckCardSharedComponent({
 }: LoginCheckCardSharedComponentProps): React.JSX.Element {
   const username = typeof check.details?.username === 'string' ? check.details.username : null;
   const tone = statusTone(check.status);
+  const headerIconBg = statusHeaderIconBg(check.status);
   const initials = getInitials(username);
   const stampText = getStampText(check.status);
 
@@ -44,7 +51,7 @@ export default function LoginCheckCardSharedComponent({
     <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10]`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${headerIconBg} text-white flex items-center justify-center shadow-xs shrink-0`}>
             <KeyRound className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <div className="min-w-0">

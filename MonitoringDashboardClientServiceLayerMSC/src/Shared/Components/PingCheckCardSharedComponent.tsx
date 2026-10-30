@@ -14,17 +14,24 @@ function statusGradient(status: PageCheckType['status']): string {
   return 'from-rose-600/7 via-slate-600/3';
 }
 
+function statusIconBg(status: PageCheckType['status']): string {
+  if (status === 'Warning') return 'bg-[#b87414]';
+  if (status === 'Pass') return 'bg-[#0d2086]';
+  return 'bg-[#ab0e0e]';
+}
+
 export default function PingCheckCardSharedComponent({
   check,
 }: PingCheckCardSharedComponentProps): React.JSX.Element {
   const statusCode = typeof check.details?.statusCode === 'number' ? check.details.statusCode : null;
   const gradient = statusGradient(check.status);
+  const iconBg = statusIconBg(check.status);
 
   return (
     <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${iconBg} text-white flex items-center justify-center shadow-xs shrink-0`}>
             <Radio className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <div className="min-w-0">
