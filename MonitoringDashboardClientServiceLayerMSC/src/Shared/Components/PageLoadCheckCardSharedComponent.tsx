@@ -8,14 +8,10 @@ export interface PageLoadCheckCardSharedComponentProps {
   check: PageCheckType;
 }
 
-function statusTone(status: PageCheckType['status']): { gradient: string; iconBg: string } {
-  if (status === 'Pass') {
-    return { gradient: 'from-emerald-600/7 via-slate-600/3', iconBg: 'bg-emerald-800' };
-  }
-  if (status === 'Warning') {
-    return { gradient: 'from-amber-500/7 via-slate-500/3', iconBg: 'bg-amber-700' };
-  }
-  return { gradient: 'from-rose-600/7 via-slate-600/3', iconBg: 'bg-rose-800' };
+function statusGradient(status: PageCheckType['status']): string {
+  if (status === 'Pass') return 'from-emerald-600/7 via-slate-600/3';
+  if (status === 'Warning') return 'from-amber-500/7 via-slate-500/3';
+  return 'from-rose-600/7 via-slate-600/3';
 }
 
 function formatLoadDuration(durationMs: number): string {
@@ -28,19 +24,17 @@ export default function PageLoadCheckCardSharedComponent({
 }: PageLoadCheckCardSharedComponentProps): React.JSX.Element {
   const statusCode = typeof check.details?.statusCode === 'number' ? check.details.statusCode : null;
   const durationMs = typeof check.details?.durationMs === 'number' ? check.details.durationMs : null;
-  const tone = statusTone(check.status);
+  const gradient = statusGradient(check.status);
 
   return (
-    <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10]`}>
+    <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div className="flex items-center gap-3 min-w-0">
-          <div
-            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0`}
-          >
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">
             <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
+            <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-black dark:text-white font-mono truncate">
               {check.pageName || 'Page Load'}
             </div>
             <div className="text-[11px] text-slate-400 dark:text-zinc-500 -mt-0.5 leading-tight truncate">
