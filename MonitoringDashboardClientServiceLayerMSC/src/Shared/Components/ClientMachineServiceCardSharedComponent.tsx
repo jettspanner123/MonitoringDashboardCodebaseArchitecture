@@ -25,10 +25,12 @@ export interface ClientMachineServiceCardSharedComponentProps {
 }
 
 class ClientMachineServiceCardHelper {
-  public static getTone(status: ClientMachineServiceStatus): { gradient: string; iconBg: string } {
-    if (status.stateCode === 4) return { gradient: 'from-emerald-600/7 via-slate-600/3', iconBg: 'bg-emerald-800' };
-    if (status.stateCode === 1) return { gradient: 'from-rose-600/7 via-slate-600/3', iconBg: 'bg-rose-800' };
-    return { gradient: 'from-slate-500/5 via-slate-500/2', iconBg: 'bg-slate-500 dark:bg-zinc-700' };
+  // Icon stays a fixed brand navy regardless of status now - only the card's
+  // own background gradient still reflects running/stopped/unknown.
+  public static getGradient(status: ClientMachineServiceStatus): string {
+    if (status.stateCode === 4) return 'from-emerald-600/7 via-slate-600/3';
+    if (status.stateCode === 1) return 'from-rose-600/7 via-slate-600/3';
+    return 'from-slate-500/5 via-slate-500/2';
   }
 }
 
@@ -91,21 +93,26 @@ export default function ClientMachineServiceCardSharedComponent({
     }
   };
 
-  const tone = ClientMachineServiceCardHelper.getTone(status);
+  const gradient = ClientMachineServiceCardHelper.getGradient(status);
+  // Don't offer an action that's already true, or one that would fail for a
+  // predictable reason: Restart stops-then-starts, and stopping an
+  // already-stopped service just errors out in sc.exe, so Restart is
+  // dropped alongside Stop rather than left to spuriously fail.
+  const showStartButton = status.stateCode !== 4;
+  const showStopButton = status.stateCode !== 1;
+  const showRestartButton = status.stateCode !== 1;
 
   return (
     <motion.div layout transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
       <ShimmerOverlaySharedComponent isLoading={isActionPending} className="rounded-xl">
-        <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10]`}>
+        <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
           <div className="flex items-center justify-between gap-3 px-5 pt-5">
             <div className="flex items-center gap-3 min-w-0">
-              <div
-                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center shadow-xs shrink-0`}
-              >
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">
                 <Settings2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
               <div className="min-w-0">
-                <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400 font-mono truncate">
+                <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-black dark:text-white font-mono truncate">
                   {status.serviceName}
                 </div>
                 <div className="text-[11px] text-slate-400 dark:text-zinc-500 -mt-0.5 leading-tight truncate">
@@ -118,33 +125,42 @@ export default function ClientMachineServiceCardSharedComponent({
           <div className="mx-5 mt-4 border-t border-slate-300/70 dark:border-zinc-800/80" />
 
           <div className="flex items-center gap-2 px-5 py-4">
-            <ButtonSharedComponent
-              variant="outline"
-              size="sm"
-              onClick={() => void runAction('Start')}
-              disabled={isActionPending}
-              icon={<Play className="w-3.5 h-3.5" />}
-            >
-              Start
-            </ButtonSharedComponent>
-            <ButtonSharedComponent
-              variant="outline"
-              size="sm"
-              onClick={() => setPendingConfirmAction('Stop')}
-              disabled={isActionPending}
-              icon={<Square className="w-3.5 h-3.5" />}
-            >
-              Stop
-            </ButtonSharedComponent>
-            <ButtonSharedComponent
-              variant="outline"
-              size="sm"
-              onClick={() => setPendingConfirmAction('Restart')}
-              disabled={isActionPending}
-              icon={<RotateCw className="w-3.5 h-3.5" />}
-            >
-              Restart
-            </ButtonSharedComponent>
+            {showStartButton && (
+              <ButtonSharedComponent
+                variant="ghost"
+                size="sm"
+                onClick={() => void runAction('Start')}
+                disabled={isActionPending}
+                icon={<Play className="w-3.5 h-3.5" />}
+                className="flex-1"
+              >
+                Start
+              </ButtonSharedComponent>
+            )}
+            {showStopButton && (
+              <ButtonSharedComponent
+                variant="ghost"
+                size="sm"
+                onClick={() => setPendingConfirmAction('Stop')}
+                disabled={isActionPending}
+                icon={<Square className="w-3.5 h-3.5" />}
+                className="flex-1"
+              >
+                Stop
+              </ButtonSharedComponent>
+            )}
+            {showRestartButton && (
+              <ButtonSharedComponent
+                variant="ghost"
+                size="sm"
+                onClick={() => setPendingConfirmAction('Restart')}
+                disabled={isActionPending}
+                icon={<RotateCw className="w-3.5 h-3.5" />}
+                className="flex-1"
+              >
+                Restart
+              </ButtonSharedComponent>
+            )}
           </div>
         </CardSharedComponent>
       </ShimmerOverlaySharedComponent>
