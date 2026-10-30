@@ -48,7 +48,7 @@ export default function NotificationBellToggleSharedComponent(): React.JSX.Eleme
       title={isSubscribed ? 'Disable failed-run push notifications' : 'Enable failed-run push notifications'}
       className={`h-10 w-10 sm:h-9 sm:w-9 rounded-xl sm:rounded-lg hairline-border transition-colors cursor-pointer flex items-center justify-center shrink-0 disabled:opacity-50 ${
         isSubscribed
-          ? 'bg-[#0C2086]/10 text-[#0C2086] dark:bg-sky-950/40 dark:text-sky-400'
+          ? 'bg-[#0d2086] text-white'
           : 'bg-slate-100 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700/80'
       }`}
     >
