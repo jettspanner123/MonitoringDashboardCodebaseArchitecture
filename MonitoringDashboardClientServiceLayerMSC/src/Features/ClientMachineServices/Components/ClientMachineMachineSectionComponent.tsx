@@ -6,17 +6,21 @@ import EmptyStateSharedComponent from '../../../Shared/Components/EmptyStateShar
 import ClientMachineServiceCardSharedComponent from '../../../Shared/Components/ClientMachineServiceCardSharedComponent';
 import TanstackQueryClientService from '../../../Services/TanstackQueryClientService';
 import TanstackQueryKeysCON from '../../../Constants/TanstackQueryKeysCON';
-import type { ClientMachine } from '../../../Types';
+import ClientMachineUserAddedServicesUtility from '../../../Utilities/ClientMachineUserAddedServicesUtility';
+import type { ClientMachine, ClientMachineServiceStatus } from '../../../Types';
 
 export interface ClientMachineMachineSectionComponentProps {
   machine: ClientMachine;
+  // Owned by the page header now - filters whichever list (curated or all)
+  // is currently active for this machine, per the confirmed design.
+  searchQuery: string;
 }
 
 export default function ClientMachineMachineSectionComponent({
   machine,
+  searchQuery,
 }: ClientMachineMachineSectionComponentProps): React.JSX.Element {
   const [showAllServices, setShowAllServices] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const queryClient = useQueryClient();
 
   const curatedQuery = TanstackQueryClientService.current.clientMachineServices.useCuratedServicesQuery(
@@ -28,12 +32,31 @@ export default function ClientMachineMachineSectionComponent({
     showAllServices
   );
 
+  // Frontend-only "also track this" list (never written to
+  // MD_ConfigurationConstantTBL) - while in curated mode, the only way to
+  // get live status for one of these names is to pull the full list once
+  // and pick the matching entries out of it.
+  const userAddedServiceNames = ClientMachineUserAddedServicesUtility.current.getForMachine(machine.id);
+  const needsMergeLookup = !showAllServices && userAddedServiceNames.length > 0;
+  const mergeLookupQuery = TanstackQueryClientService.current.clientMachineServices.useAllServicesQuery(
+    machine.id,
+    needsMergeLookup
+  );
+
   const activeQuery = showAllServices ? allServicesQuery : curatedQuery;
-  const services = activeQuery.data ?? [];
-  const visibleServices =
-    showAllServices && searchQuery.trim()
-      ? services.filter((service) => service.serviceName.toLowerCase().includes(searchQuery.trim().toLowerCase()))
-      : services;
+  let services: ClientMachineServiceStatus[] = activeQuery.data ?? [];
+
+  if (needsMergeLookup && mergeLookupQuery.data) {
+    const existingNames = new Set(services.map((service) => service.serviceName));
+    const userAddedMatches = mergeLookupQuery.data.filter(
+      (service) => userAddedServiceNames.includes(service.serviceName) && !existingNames.has(service.serviceName)
+    );
+    services = [...services, ...userAddedMatches];
+  }
+
+  const visibleServices = searchQuery.trim()
+    ? services.filter((service) => service.serviceName.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+    : services;
 
   const handleActionSettled = (): void => {
     void queryClient.invalidateQueries({ queryKey: TanstackQueryKeysCON.clientMachineCuratedServices(machine.id) });
@@ -46,27 +69,13 @@ export default function ClientMachineMachineSectionComponent({
         <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-mono">
           {machine.nickname}
         </h2>
-        <div className="flex items-center gap-2">
-          {showAllServices && (
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search services…"
-              className="h-8 px-3 text-xs rounded-lg bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 border border-slate-200/80 dark:border-zinc-800 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors"
-            />
-          )}
-          <ButtonSharedComponent
-            variant={showAllServices ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => {
-              setShowAllServices((prev) => !prev);
-              setSearchQuery('');
-            }}
-          >
-            {showAllServices ? 'Show Defaults' : 'Show All Services'}
-          </ButtonSharedComponent>
-        </div>
+        <ButtonSharedComponent
+          variant={showAllServices ? 'primary' : 'outline'}
+          size="sm"
+          onClick={() => setShowAllServices((prev) => !prev)}
+        >
+          {showAllServices ? 'Show Defaults' : 'Show All Services'}
+        </ButtonSharedComponent>
       </div>
 
       {activeQuery.isLoading ? (
@@ -80,8 +89,10 @@ export default function ClientMachineMachineSectionComponent({
           icon={<ServerOff className="w-6 h-6" />}
           title="No Services"
           description={
-            showAllServices
+            searchQuery.trim()
               ? 'No services matched your search.'
+              : showAllServices
+              ? 'No services found on this machine.'
               : `No default services are configured for ${machine.nickname} yet.`
           }
           className="w-full py-8"

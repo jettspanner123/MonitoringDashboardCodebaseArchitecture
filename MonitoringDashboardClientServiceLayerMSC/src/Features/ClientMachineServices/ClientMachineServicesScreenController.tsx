@@ -1,31 +1,37 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Wifi, WifiOff } from 'lucide-react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { RotateCw, Search, WifiOff } from 'lucide-react';
 import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedComponent';
 import ButtonSharedComponent from '../../Shared/Components/ButtonSharedComponent';
+import PrimaryActionButtonSharedComponent from '../../Shared/Components/PrimaryActionButtonSharedComponent';
+import ClientMachineAddServiceModalSharedComponent from '../../Shared/Components/ClientMachineAddServiceModalSharedComponent';
 import ClientMachineMachineSectionComponent from './Components/ClientMachineMachineSectionComponent';
-import ClientMachineAuthService from '../../Services/ClientMachineAuthService';
 import TanstackQueryClientService from '../../Services/TanstackQueryClientService';
+import TanstackQueryKeysCON from '../../Constants/TanstackQueryKeysCON';
 
 class ClientMachineServicesScreenCON {
   public static readonly TITLE = 'Client Machines';
-  public static readonly RELAY_STATUS_QUERY_KEY: string[] = ['client-machine-services', 'relay-status'];
 }
 
 export default function ClientMachineServicesScreenController(): React.JSX.Element {
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isAddServiceModalOpen, setIsAddServiceModalOpen] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+
   const {
     data: isRelayConnected,
     isLoading: isLoadingRelayStatus,
     refetch: refetchRelayStatus,
     isFetching: isRefetchingRelayStatus,
-  } = useQuery({
-    queryKey: ClientMachineServicesScreenCON.RELAY_STATUS_QUERY_KEY,
-    queryFn: () => ClientMachineAuthService.current.getRelayStatus(),
-    staleTime: 0,
-  });
+  } = TanstackQueryClientService.current.clientMachineServices.useRelayStatusQuery();
 
   const { data: machines = [], isLoading: isLoadingMachines } =
     TanstackQueryClientService.current.clientMachineServices.useMachinesQuery(Boolean(isRelayConnected));
+
+  const handleServiceAdded = (machineId: string): void => {
+    void queryClient.invalidateQueries({ queryKey: TanstackQueryKeysCON.clientMachineCuratedServices(machineId) });
+    void queryClient.invalidateQueries({ queryKey: TanstackQueryKeysCON.clientMachineAllServices(machineId) });
+  };
 
   return (
     <div className="space-y-6">
@@ -34,13 +40,12 @@ export default function ClientMachineServicesScreenController(): React.JSX.Eleme
           <h1 className="text-3xl sm:text-4xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
             {ClientMachineServicesScreenCON.TITLE}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl flex items-center gap-2">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1.5 max-w-2xl">
+            Monitor and control Windows services on registered client machines over the relay.{' '}
             {isLoadingRelayStatus ? (
-              <span className="text-slate-400 dark:text-zinc-500">Checking relay status…</span>
+              'Checking relay status…'
             ) : isRelayConnected ? (
-              <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-                <Wifi className="w-3.5 h-3.5" /> Relay connected
-              </span>
+              'Live service status is available right now.'
             ) : (
               <span className="inline-flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-medium">
                 <WifiOff className="w-3.5 h-3.5" /> Relay offline
@@ -48,14 +53,32 @@ export default function ClientMachineServicesScreenController(): React.JSX.Eleme
             )}
           </p>
         </div>
-        <ButtonSharedComponent
-          variant="outline"
-          size="sm"
-          onClick={() => void refetchRelayStatus()}
-          isLoading={isRefetchingRelayStatus}
-        >
-          Refresh
-        </ButtonSharedComponent>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search services…"
+              className="h-9 pl-9 pr-3 text-xs rounded-lg bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 border border-slate-200/80 dark:border-zinc-800 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors w-56 sm:w-80"
+            />
+          </div>
+          <ButtonSharedComponent
+            variant="outline"
+            size="md"
+            onClick={() => void refetchRelayStatus()}
+            isLoading={isRefetchingRelayStatus}
+            ariaLabel="Refresh"
+            title="Refresh"
+            icon={<RotateCw className="w-3.5 h-3.5" />}
+          />
+          <PrimaryActionButtonSharedComponent
+            label="Add Service"
+            size="md"
+            onClick={() => setIsAddServiceModalOpen(true)}
+          />
+        </div>
       </div>
 
       {!isLoadingRelayStatus && !isRelayConnected && (
@@ -75,8 +98,17 @@ export default function ClientMachineServicesScreenController(): React.JSX.Eleme
             ))}
           </div>
         ) : (
-          machines.map((machine) => <ClientMachineMachineSectionComponent key={machine.id} machine={machine} />)
+          machines.map((machine) => (
+            <ClientMachineMachineSectionComponent key={machine.id} machine={machine} searchQuery={searchQuery} />
+          ))
         ))}
+
+      <ClientMachineAddServiceModalSharedComponent
+        isOpen={isAddServiceModalOpen}
+        onClose={() => setIsAddServiceModalOpen(false)}
+        machines={machines}
+        onAdded={handleServiceAdded}
+      />
     </div>
   );
 }
