@@ -24,6 +24,19 @@ class ApplicationMonitorRoutes {
     public static readonly HIT_LIVE = '/hit-attempts/:hitAttemptId/live';
 }
 
+class ClientMachineServicesRoutes {
+    public static readonly CONTROLLER_URL = '/api/v1/client-machine-services';
+    public static readonly LOGIN = '/auth/login';
+    public static readonly REFRESH = '/auth/refresh';
+    public static readonly RELAY_STATUS = '/relay/status';
+    public static readonly RELAY_CONNECT = '/relay/connect';
+    public static readonly GET_MACHINES = '/machines';
+    public static readonly GET_CURATED_SERVICES = '/machines/:machineId/services';
+    public static readonly GET_ALL_SERVICES = '/machines/:machineId/services/all';
+    public static readonly START_ACTION = '/machines/:machineId/services/:serviceName/actions';
+    public static readonly ACTION_LIVE = '/action-attempts/:actionAttemptId/live';
+}
+
 class NotificationsRoutes {
     public static readonly CONTROLLER_URL = '/api/v1/notifications';
     public static readonly GET_VAPID_PUBLIC_KEY = '/vapid-public-key';
@@ -41,4 +54,5 @@ export default class ApplicationRouteFactory {
     public readonly dataManagement = DataManagementRoutes;
     public readonly notifications = NotificationsRoutes;
     public readonly applicationMonitor = ApplicationMonitorRoutes;
+    public readonly clientMachineServices = ClientMachineServicesRoutes;
 }

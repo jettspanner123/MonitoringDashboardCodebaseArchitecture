@@ -9,6 +9,7 @@ import RunsController from './Features/Runs/RunsController';
 import DataManagementController from './Features/DataManagement/DataManagementController';
 import NotificationsController from './Features/Notifications/NotificationsController';
 import ApplicationMonitorController from './Features/ApplicationMonitor/ApplicationMonitorController';
+import ClientMachineServicesController from './Features/ClientMachineServices/ClientMachineServicesController';
 import ApplicationDatabaseProvider from './Providers/ApplicationDatabaseProvider';
 
 async function bootstrap(): Promise<void> {
@@ -28,6 +29,7 @@ async function bootstrap(): Promise<void> {
     await fastify.register(DataManagementController, { prefix: ApplicationRouteFactory.current.dataManagement.CONTROLLER_URL });
     await fastify.register(NotificationsController, { prefix: ApplicationRouteFactory.current.notifications.CONTROLLER_URL });
     await fastify.register(ApplicationMonitorController, { prefix: ApplicationRouteFactory.current.applicationMonitor.CONTROLLER_URL });
+    await fastify.register(ClientMachineServicesController, { prefix: ApplicationRouteFactory.current.clientMachineServices.CONTROLLER_URL });
 
     const port = Number(process.env.PORT ?? 4000);
     await fastify.listen({ port, host: '0.0.0.0' });

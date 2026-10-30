@@ -216,3 +216,77 @@ model ApplicationEndpointHit {
 
   @@map("MD_ApplicationEndpointHitHistoryTBL")
 }
+
+// Fixed, admin-seeded list of Windows VMs reachable only via the relay
+// (see ClientMachineServices feature) - never user-editable from the UI.
+model ClientMachine {
+  id        String   @id @default(cuid())
+  hostname  String   @unique
+  nickname  String
+  createdAt DateTime @default(now())
+
+  actions ClientMachineServiceAction[]
+
+  @@map("MD_ClientMachineConstantTBL")
+}
+
+// Generic key-value configuration store - same shape as AssetSphere's
+// AS_ConfigurationConstantTBL and SignForge's SF_ConfigurationConstantTBL
+// (verified against SignForge's live schema), so this convention is
+// identical across all 3 apps' own databases. Used here to hold the curated
+// "default shown" services per machine: one row per machine, keyed
+// "ClientMachineDefaultServices:<hostname>", value a JSON array of service
+// names (see ClientMachineServicesService for the read path). A machine with
+// no row here falls back to "Show all services" (a live, unfiltered sc.exe
+// query) instead of an empty curated list.
+model ConfigurationConstant {
+  id                 String    @id @default(cuid())
+  configurationKey   String    @unique
+  configurationValue String
+  description        String?
+  isActive           Boolean   @default(true)
+  createdBy          String    @default("system")
+  updatedBy          String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@map("MD_ConfigurationConstantTBL")
+}
+
+// One row per Start/Stop/Restart attempt (not view/query actions) - who,
+// when, which machine/service, what happened. "performedBy" is the real
+// validated hostname\account username from the login JWT, never free text.
+model ClientMachineServiceAction {
+  id          String   @id @default(cuid())
+  machineId   String
+  machine     ClientMachine @relation(fields: [machineId], references: [id])
+
+  serviceName  String
+  // "Start" | "Stop" | "Restart"
+  action       String
+  performedBy  String
+  performedAt  DateTime @default(now())
+  succeeded    Boolean
+  errorMessage String?
+  durationMs   Int
+
+  @@map("MD_ClientMachineServiceActionAuditTBL")
+}
+
+// One row per logged-in session (see the pre-navigation login gate PRD,
+// section 3a). refreshTokenHash is a SHA-256 hash of the refresh token -
+// never the raw token - so a DB leak alone can't be replayed. encryptedPassword
+// is the real daily VM password, AES-256-GCM encrypted at rest (mirrors
+// MorningSmokeTestAutomation's EncryptionHelper), needed so later visits can
+// silently re-validate against the real VM without asking the user again.
+model ClientMachineRefreshToken {
+  id                String   @id @default(cuid())
+  username          String
+  refreshTokenHash  String   @unique
+  encryptedPassword String
+  issuedAt          DateTime @default(now())
+  expiresAt         DateTime
+  revokedAt         DateTime?
+
+  @@map("MD_ClientMachineRefreshTokenTBL")
+}
