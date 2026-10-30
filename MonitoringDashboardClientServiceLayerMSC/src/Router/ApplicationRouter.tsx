@@ -17,6 +17,7 @@ import RunFailureAlarmSharedComponent from '../Shared/Components/RunFailureAlarm
 import DashboardOverviewScreenRoute from '../Routes/DashboardOverviewScreenRoute';
 import RunDetailScreenRoute from '../Routes/RunDetailScreenRoute';
 import ApplicationMonitorScreenRoute from '../Routes/ApplicationMonitorScreenRoute';
+import ClientMachineServicesScreenRoute from '../Routes/ClientMachineServicesScreenRoute';
 import DashboardCON from '../Features/Dashboard/Constants/DashboardCON';
 import NavigationCON from '../Features/Navigation/Constants/NavigationCON';
 
@@ -147,6 +148,10 @@ const dashboardRoute = createRoute({
     const { data: run, isLoading: isLoadingRun } = TanstackQueryClientService.current.runs.useRunDetailQuery(
       selectedRunId ?? ''
     );
+
+    if (activeAppSlug === NavigationCON.CLIENT_MACHINES_NAV_ID) {
+      return <ClientMachineServicesScreenRoute />;
+    }
 
     if (activeAppSlug) {
       return (

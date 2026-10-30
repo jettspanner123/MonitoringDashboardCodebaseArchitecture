@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Activity, Boxes, FileSignature } from 'lucide-react';
+import { Activity, Boxes, FileSignature, ServerCog } from 'lucide-react';
 
 export interface NavItemDef {
   id: string;
@@ -19,11 +19,19 @@ export default class NavigationCON {
   // MonitoredApplication.slug it switches ApplicationMonitorScreenController to display
   // (see ApplicationRouteCON.PARAM_APP) - entries without a seeded application row stay
   // disabled placeholders until one exists.
+  // 'client-machines' is a different shape of entry than the others - it
+  // isn't a MonitoredApplication slug, it's gated by its own pre-navigation
+  // JWT login modal (see ApplicationRouter's handleActiveViewChange) rather
+  // than navigating instantly, but it still rides the same activeView/
+  // PARAM_APP mechanism as every other entry here.
   public static readonly PRIMARY_NAV_ITEMS: NavItemDef[] = [
     { id: 'morning-smoke-test', label: 'Morning Smoke Test', icon: Activity },
     { id: 'assetsphere', label: 'Assetsphere', icon: Boxes },
     { id: 'signforge', label: 'SignForge', icon: FileSignature, disabled: true },
+    { id: 'client-machines', label: 'Client Machines', icon: ServerCog },
   ];
+
+  public static readonly CLIENT_MACHINES_NAV_ID: string = 'client-machines';
 
   // This dashboard has no authentication system, so the profile dropdown's identity
   // block is always this static, generic content - mirroring what SignForge itself

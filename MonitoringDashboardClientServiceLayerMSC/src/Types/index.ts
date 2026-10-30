@@ -11,3 +11,14 @@ export type {
   HitAttemptEntry,
   HitAttemptSnapshot,
 } from './ApplicationMonitorType';
+export type {
+  ClientMachineTokenPair,
+  ClientMachine,
+  ClientMachineServiceStatus,
+  ClientMachineServiceActionType,
+  ServiceActionOutcome,
+  ServiceActionPhase,
+  ServiceActionAttemptEntry,
+  ServiceActionResult,
+  ServiceActionSnapshot,
+} from './ClientMachineServicesType';
