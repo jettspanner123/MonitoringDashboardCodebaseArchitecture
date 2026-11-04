@@ -24,14 +24,25 @@ class DevelopmentServerStartUp:
     RELAY_DIR = REPO_ROOT / "MonitoringDashboardClientMachineRelayWorkerMSC"
     RELAY_WEBSOCKET_URL = "ws://localhost:4000/api/v1/client-machine-services/relay/connect"
 
+    SERVICE_COLORS = {
+        "Backend": DevServerProcessUtility.Color.BLUE,
+        "Frontend": DevServerProcessUtility.Color.MAGENTA,
+        "Relay": DevServerProcessUtility.Color.GREEN,
+    }
+
     @classmethod
     def run(cls) -> None:
-        cls._log("Starting development servers...")
+        DevServerProcessUtility.enable_ansi_support()
+        cls._log("Starting development servers...", emoji="🚀", color=DevServerProcessUtility.Color.CYAN)
         cls._stop_previous_session_if_running()
 
         relay_secret = DevServerProcessUtility.read_env_value(cls.BACKEND_DIR / ".env", "RELAY_SHARED_SECRET")
         if relay_secret is None:
-            cls._log("ERROR: RELAY_SHARED_SECRET not found in the backend's .env - cannot start the relay worker.")
+            cls._log(
+                "ERROR: RELAY_SHARED_SECRET not found in the backend's .env - cannot start the relay worker.",
+                emoji="🔥",
+                color=DevServerProcessUtility.Color.RED_BOLD,
+            )
             sys.exit(1)
 
         state = {
@@ -52,14 +63,25 @@ class DevelopmentServerStartUp:
         cls._log("Waiting 5 seconds before checking status...")
         time.sleep(5)
         for name, info in state.items():
+            display_name = name.capitalize()
             alive = DevServerProcessUtility.is_pid_alive(info["pid"])
-            status = "running" if alive else "EXITED ALREADY - check its log"
-            cls._log(f"  {name}: pid {info['pid']} - {status} - log: {info['log']}")
+            if alive:
+                cls._log(
+                    f"  {display_name}: pid {info['pid']} - running - log: {info['log']}",
+                    emoji="✅",
+                    color=DevServerProcessUtility.Color.GREEN,
+                )
+            else:
+                cls._log(
+                    f"  {display_name}: pid {info['pid']} - EXITED ALREADY - check its log: {info['log']}",
+                    emoji="❌",
+                    color=DevServerProcessUtility.Color.RED,
+                )
 
         cls._log("Backend:  http://localhost:4000")
         cls._log("Frontend: check Logs/Frontend.log for the printed URL (usually http://localhost:5173)")
         cls._log(f"Logs directory: {cls.LOGS_DIR}")
-        cls._log("Run DevelopmentServerShutDown.py to stop everything.")
+        cls._log("Run DevelopmentServerShutDown.py to stop everything.", emoji="✅", color=DevServerProcessUtility.Color.GREEN)
 
     @classmethod
     def _spawn(cls, name: str, command: list[str], cwd: Path, extra_env: dict[str, str] | None) -> dict:
@@ -79,7 +101,7 @@ class DevelopmentServerStartUp:
             env=env,
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
         )
-        cls._log(f"Started {name} (pid {process.pid}) in {cwd}")
+        cls._log(f"Started {name} (pid {process.pid}) in {cwd}", emoji="▶️", color=cls.SERVICE_COLORS[name])
         return {"pid": process.pid, "log": str(log_path)}
 
     @classmethod
@@ -95,14 +117,18 @@ class DevelopmentServerStartUp:
         if not still_alive:
             return
 
-        cls._log("Found a previous session still running - stopping it first...")
+        cls._log(
+            "Found a previous session still running - stopping it first...",
+            emoji="⚠️",
+            color=DevServerProcessUtility.Color.YELLOW,
+        )
         for pid in still_alive:
             DevServerProcessUtility.kill_tree(pid)
         cls.STATE_FILE.unlink(missing_ok=True)
 
     @classmethod
-    def _log(cls, message: str) -> None:
-        DevServerProcessUtility.log(cls.LOGS_DIR, message)
+    def _log(cls, message: str, emoji: str = "", color: str = "") -> None:
+        DevServerProcessUtility.log(cls.LOGS_DIR, message, emoji=emoji, color=color)
 
 
 if __name__ == "__main__":
