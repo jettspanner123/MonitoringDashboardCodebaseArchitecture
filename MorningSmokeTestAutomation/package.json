@@ -11,7 +11,13 @@
     "test:headed:dev1": "cross-env SMOKE_ENV=Dev1 playwright test --headed",
     "test:headed:testing": "cross-env SMOKE_ENV=Testing playwright test --headed",
     "test:headed:dev2": "cross-env SMOKE_ENV=Dev2 playwright test --headed",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "test:training": "cross-env SMOKE_ENV=Training playwright test",
+    "test:production": "cross-env SMOKE_ENV=Production playwright test",
+    "test:qa": "cross-env SMOKE_ENV=QA playwright test",
+    "test:dev1": "cross-env SMOKE_ENV=Dev1 playwright test",
+    "test:testing": "cross-env SMOKE_ENV=Testing playwright test",
+    "test:dev2": "cross-env SMOKE_ENV=Dev2 playwright test",
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

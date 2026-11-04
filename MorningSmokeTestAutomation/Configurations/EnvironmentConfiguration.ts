@@ -91,8 +91,8 @@ export default class EnvironmentConfiguration {
     Dev2: {
         authUrl: 'https://air3dpassportdev2.atlascopco.group/3dpassport/login',
         spaceUrl: 'https://air3dspacedev2.atlascopco.group/3dspace',
-        xpdmgwUrl: 'http://air3dspacedev224x.atlascopco.group:8050/XPDMGW/',
-        platformGwUrl: 'http://air3dspacedev224x.atlascopco.group:8040/3DEXPERIENCEPlatformGW/',
+        xpdmgwUrl: 'http://air3dspacedev2.atlascopco.group:8050/XPDMGW/;jsessionid=9483545C14948F7DDEC028744E1F3665',
+        platformGwUrl: 'http://air3dspacedev2.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=1D515FB04FE4CDB976CEBD2504CDE72B',
         extraChecks: [
             { name: 'NOCAS', url: 'https://air3dspacenocasdev2.atlascopco.group/internal', kind: 'selector-wait', selector: '#loginForm' },
         ],

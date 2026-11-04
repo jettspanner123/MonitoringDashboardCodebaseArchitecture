@@ -210,12 +210,12 @@
 
         <Service>
             <ServiceName>XPDMGW</ServiceName>
-            <ServiceURL>http://air3dspacedev224x.atlascopco.group:8050/XPDMGW/;jsessionid=9483545C14948F7DDEC028744E1F3665</ServiceURL>
+            <ServiceURL>http://air3dspacedev2.atlascopco.group:8050/XPDMGW/;jsessionid=9483545C14948F7DDEC028744E1F3665</ServiceURL>
         </Service>
 
         <Service>
             <ServiceName>3DExperiencePlatformGW</ServiceName>
-            <ServiceURL>http://air3dspacedev224x.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=1D515FB04FE4CDB976CEBD2504CDE72B</ServiceURL>
+            <ServiceURL>air3dspacedev2.atlascopco.group:8040/3DEXPERIENCEPlatformGW/;jsessionid=1D515FB04FE4CDB976CEBD2504CDE72B</ServiceURL>
         </Service>
     </Dev2>
 
