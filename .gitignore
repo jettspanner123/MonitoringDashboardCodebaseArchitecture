@@ -3,3 +3,7 @@ dist/
 .turbo/
 .env
 .env.local
+
+# Local CLI tool config - contains API keys/credentials, never commit (see
+# commit history around 2026-11-04 for why this is here).
+.codex/
