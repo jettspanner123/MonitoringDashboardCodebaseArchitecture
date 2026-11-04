@@ -7,3 +7,9 @@ dist/
 # Local CLI tool config - contains API keys/credentials, never commit (see
 # commit history around 2026-11-04 for why this is here).
 .codex/
+
+# Dev-server runner script artifacts - local only
+MonitoringDashboardRunnerScriptsNMSC/DevelopmentServerScripts/Logs/
+MonitoringDashboardRunnerScriptsNMSC/DevelopmentServerScripts/DevServerState.json
+__pycache__/
+*.pyc
