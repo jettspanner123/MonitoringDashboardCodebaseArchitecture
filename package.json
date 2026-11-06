@@ -28,7 +28,13 @@
     "smoke:test:headed:qa": "bun run --cwd MorningSmokeTestAutomation test:headed:qa",
     "smoke:test:headed:dev1": "bun run --cwd MorningSmokeTestAutomation test:headed:dev1",
     "smoke:test:headed:testing": "bun run --cwd MorningSmokeTestAutomation test:headed:testing",
-    "smoke:test:headed:dev2": "bun run --cwd MorningSmokeTestAutomation test:headed:dev2"
+    "smoke:test:headed:dev2": "bun run --cwd MorningSmokeTestAutomation test:headed:dev2",
+    "smoke:test:headed:indexing-freshness:training": "bun run --cwd MorningSmokeTestAutomation test:headed:indexing-freshness:training",
+    "smoke:test:headed:indexing-freshness:production": "bun run --cwd MorningSmokeTestAutomation test:headed:indexing-freshness:production",
+    "smoke:test:headed:indexing-freshness:qa": "bun run --cwd MorningSmokeTestAutomation test:headed:indexing-freshness:qa",
+    "smoke:test:headed:indexing-freshness:dev1": "bun run --cwd MorningSmokeTestAutomation test:headed:indexing-freshness:dev1",
+    "smoke:test:headed:indexing-freshness:testing": "bun run --cwd MorningSmokeTestAutomation test:headed:indexing-freshness:testing",
+    "smoke:test:headed:indexing-freshness:dev2": "bun run --cwd MorningSmokeTestAutomation test:headed:indexing-freshness:dev2"
   },
   "devDependencies": {
     "turbo": "^2.4.4"
