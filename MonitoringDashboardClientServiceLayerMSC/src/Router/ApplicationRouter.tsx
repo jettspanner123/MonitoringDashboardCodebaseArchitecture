@@ -153,14 +153,8 @@ const dashboardRoute = createRoute({
       return <ClientMachineServicesScreenRoute />;
     }
 
-    if (activeAppSlug) {
-      return (
-        <ApplicationMonitorScreenRoute
-          applications={applications}
-          isLoading={isLoadingApplications}
-          activeAppSlug={activeAppSlug}
-        />
-      );
+    if (activeAppSlug === NavigationCON.APPLICATION_MONITORING_NAV_ID) {
+      return <ApplicationMonitorScreenRoute applications={applications} isLoading={isLoadingApplications} />;
     }
 
     if (selectedRunId) {

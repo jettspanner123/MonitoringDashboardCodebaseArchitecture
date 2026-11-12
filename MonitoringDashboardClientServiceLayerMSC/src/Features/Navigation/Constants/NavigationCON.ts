@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Activity, Boxes, FileSignature, ServerCog } from 'lucide-react';
+import { Activity, HeartPulse, ServerCog } from 'lucide-react';
 
 export interface NavItemDef {
   id: string;
@@ -13,12 +13,9 @@ export default class NavigationCON {
   public static readonly BRAND_SUBTITLE: string = 'Smoke Test Monitor';
 
   // Top-nav capsule, ported 1:1 (visual + shared-layout-pill mechanics) from SignForge's
-  // HeaderStaticComponent internal view switcher. Unlike SignForge's version (which
-  // switches between real internal views of the same app), these options represent
-  // separate sibling applications. Each enabled entry's id doubles as the
-  // MonitoredApplication.slug it switches ApplicationMonitorScreenController to display
-  // (see ApplicationRouteCON.PARAM_APP) - entries without a seeded application row stay
-  // disabled placeholders until one exists.
+  // HeaderStaticComponent internal view switcher. 'application-monitoring' shows every
+  // registered MonitoredApplication at once (see ApplicationMonitorScreenController) -
+  // it used to be one nav entry per app/slug, consolidated into a single page instead.
   // 'client-machines' is a different shape of entry than the others - it
   // isn't a MonitoredApplication slug, it's gated by its own pre-navigation
   // JWT login modal (see ApplicationRouter's handleActiveViewChange) rather
@@ -26,11 +23,11 @@ export default class NavigationCON {
   // PARAM_APP mechanism as every other entry here.
   public static readonly PRIMARY_NAV_ITEMS: NavItemDef[] = [
     { id: 'morning-smoke-test', label: 'Morning Smoke Test', icon: Activity },
-    { id: 'assetsphere', label: 'Assetsphere', icon: Boxes },
-    { id: 'signforge', label: 'SignForge', icon: FileSignature, disabled: true },
+    { id: 'application-monitoring', label: 'Application Monitoring', icon: HeartPulse },
     { id: 'client-machines', label: 'Client Machines', icon: ServerCog },
   ];
 
+  public static readonly APPLICATION_MONITORING_NAV_ID: string = 'application-monitoring';
   public static readonly CLIENT_MACHINES_NAV_ID: string = 'client-machines';
 
   // This dashboard has no authentication system, so the profile dropdown's identity

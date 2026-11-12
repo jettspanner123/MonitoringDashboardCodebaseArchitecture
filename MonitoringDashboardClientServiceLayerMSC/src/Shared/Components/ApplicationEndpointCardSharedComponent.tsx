@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { Globe, FileJson, Zap, Link2, ArrowUpFromLine, ArrowDownToLine } from 'lucide-react';
@@ -25,6 +25,13 @@ export interface ApplicationEndpointCardSharedComponentProps {
   endpoint: ApplicationEndpoint;
   baseUrl: string;
   enableContextMenu: boolean;
+}
+
+// Lets a parent (the page-level "Ping All"/"Ping This App" orchestrator)
+// trigger this exact card's hit the same way its own button does, and await
+// the real outcome instead of racing ahead while the websocket is still open.
+export interface ApplicationEndpointCardHandle {
+  triggerHit: () => Promise<void>;
 }
 
 function formatConfigSummary(config: unknown): string | null {
@@ -76,11 +83,10 @@ function formatDuration(durationMs: number): string {
   return `${(durationMs / 1000).toFixed(1)}s`;
 }
 
-export default function ApplicationEndpointCardSharedComponent({
-  endpoint,
-  baseUrl,
-  enableContextMenu,
-}: ApplicationEndpointCardSharedComponentProps): React.JSX.Element {
+const ApplicationEndpointCardSharedComponent = forwardRef<
+  ApplicationEndpointCardHandle,
+  ApplicationEndpointCardSharedComponentProps
+>(function ApplicationEndpointCardSharedComponent({ endpoint, baseUrl, enableContextMenu }, ref): React.JSX.Element {
   const configSummary = formatConfigSummary(endpoint.config);
   const [isHitPending, setIsHitPending] = useState<boolean>(false);
   const [hitResult, setHitResult] = useState<EndpointHitResult | null>(null);
@@ -94,59 +100,71 @@ export default function ApplicationEndpointCardSharedComponent({
     };
   }, []);
 
-  const handleHit = async (): Promise<void> => {
+  // Wrapped in its own Promise (rather than just `async`) so callers - the
+  // button below, or an external "Ping All"/"Ping This App" orchestrator via
+  // triggerHit - can await the real outcome, not just "the socket opened".
+  const handleHit = (): Promise<void> => {
     setIsHitPending(true);
     setLiveAttempts([]);
 
-    try {
-      const hitAttemptId = await ApplicationMonitorService.current.startHit(endpoint.id);
-      const socket = new WebSocket(
-        `${ApplicationNetworkAPIConfiguration.WS_BASE_URL}/api/v1/application-monitor/hit-attempts/${hitAttemptId}/live`
-      );
-      activeSocketRef.current = socket;
+    return new Promise<void>((resolve) => {
+      void (async () => {
+        try {
+          const hitAttemptId = await ApplicationMonitorService.current.startHit(endpoint.id);
+          const socket = new WebSocket(
+            `${ApplicationNetworkAPIConfiguration.WS_BASE_URL}/api/v1/application-monitor/hit-attempts/${hitAttemptId}/live`
+          );
+          activeSocketRef.current = socket;
 
-      socket.onmessage = (event: MessageEvent<string>) => {
-        const snapshot: HitAttemptSnapshot = JSON.parse(event.data);
-        setLiveAttempts(snapshot.attempts);
+          socket.onmessage = (event: MessageEvent<string>) => {
+            const snapshot: HitAttemptSnapshot = JSON.parse(event.data);
+            setLiveAttempts(snapshot.attempts);
 
-        // Only once the backend is actually detected as down (a retryable
-        // 502/503/504) does the wake-up modal appear - a warm server that
-        // resolves on its first attempt never shows it at all.
-        if (snapshot.attempts.some((attempt) => attempt.outcome === 'retrying')) {
-          setIsWakeUpModalOpen(true);
-        }
+            // Only once the backend is actually detected as down (a retryable
+            // 502/503/504) does the wake-up modal appear - a warm server that
+            // resolves on its first attempt never shows it at all.
+            if (snapshot.attempts.some((attempt) => attempt.outcome === 'retrying')) {
+              setIsWakeUpModalOpen(true);
+            }
 
-        if (snapshot.finished) {
-          socket.close();
+            if (snapshot.finished) {
+              socket.close();
+              setIsHitPending(false);
+              setHitResult(snapshot.result);
+              if (snapshot.result?.success) {
+                setTimeout(() => setIsWakeUpModalOpen(false), ApplicationEndpointHitFlowCON.AUTO_CLOSE_ON_SUCCESS_DELAY_MS);
+              }
+              resolve();
+            }
+          };
+
+          socket.onerror = () => {
+            setIsHitPending(false);
+            setHitResult({
+              success: false,
+              statusCode: null,
+              responseBody: null,
+              durationMs: 0,
+              errorMessage: 'Lost connection while watching the hit.',
+            });
+            resolve();
+          };
+        } catch (error) {
           setIsHitPending(false);
-          setHitResult(snapshot.result);
-          if (snapshot.result?.success) {
-            setTimeout(() => setIsWakeUpModalOpen(false), ApplicationEndpointHitFlowCON.AUTO_CLOSE_ON_SUCCESS_DELAY_MS);
-          }
+          setHitResult({
+            success: false,
+            statusCode: null,
+            responseBody: null,
+            durationMs: 0,
+            errorMessage: error instanceof Error ? error.message : 'Failed to start the hit.',
+          });
+          resolve();
         }
-      };
-
-      socket.onerror = () => {
-        setIsHitPending(false);
-        setHitResult({
-          success: false,
-          statusCode: null,
-          responseBody: null,
-          durationMs: 0,
-          errorMessage: 'Lost connection while watching the hit.',
-        });
-      };
-    } catch (error) {
-      setIsHitPending(false);
-      setHitResult({
-        success: false,
-        statusCode: null,
-        responseBody: null,
-        durationMs: 0,
-        errorMessage: error instanceof Error ? error.message : 'Failed to start the hit.',
-      });
-    }
+      })();
+    });
   };
+
+  useImperativeHandle(ref, () => ({ triggerHit: handleHit }));
 
   // A fresh click always wins; otherwise fall back to the last recorded hit
   // (from the page's own initial load) so the card stays populated across
@@ -356,4 +374,6 @@ export default function ApplicationEndpointCardSharedComponent({
       )}
     </motion.div>
   );
-}
+});
+
+export default ApplicationEndpointCardSharedComponent;

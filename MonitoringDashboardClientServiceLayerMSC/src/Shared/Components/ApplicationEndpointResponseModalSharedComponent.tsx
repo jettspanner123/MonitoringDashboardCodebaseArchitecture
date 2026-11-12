@@ -19,6 +19,11 @@ class ApplicationEndpointResponseModalCON {
 
 class ApplicationEndpointResponseModalHelper {
   public static formatResponseText(responseBody: unknown): string {
+    // JSON.stringify(undefined) returns the undefined value, not a string -
+    // every endpoint that's never been hit yet reaches this with
+    // responseBody === undefined, so it needs its own case rather than
+    // falling through to the stringify branch.
+    if (responseBody === undefined) return '';
     return typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody, null, 2);
   }
 

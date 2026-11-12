@@ -53,7 +53,7 @@ export default function NavigationController({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Suite Navigation Capsule (Morning Smoke Test / Assetsphere / SignForge) */}
+            {/* Suite Navigation Capsule (Morning Smoke Test / Application Monitoring / Client Machines) */}
             <SegmentedControlSharedComponent
               value={activeView}
               onChange={onActiveViewChange}
