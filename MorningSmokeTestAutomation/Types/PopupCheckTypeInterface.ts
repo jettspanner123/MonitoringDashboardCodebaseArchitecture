@@ -9,4 +9,9 @@ export default  interface PopupCheckTypeInterface {
     menuItemSelector: string;
     expectedElementSelector?: string;
     closePopupAfterCheck?: boolean;
+    // Opt-in: if the expectedElementSelector wait times out, reload the
+    // popup once and retry the wait before treating it as a real failure.
+    // For popups whose client-side bootstrap is known to occasionally fail
+    // on first load but recover cleanly on a reload (confirmed for 3DSwym).
+    retryOnceWithReload?: boolean;
 }

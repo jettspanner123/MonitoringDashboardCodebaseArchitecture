@@ -227,6 +227,13 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
       const postResultsButton = page.locator(pageConfig.postResultsClickSelector);
       await postResultsButton.waitFor({ state: 'attached', timeout: pageConfig.timeoutMs ?? 0 });
       await postResultsButton.click();
+
+      // The compass menu's accordion sections animate open (measured:
+      // margin/background-color transitions, 300ms) - clicking a menu item
+      // before that settles can land on a sibling panel's content that's
+      // transiently overlapping it ("subtree intercepts pointer events"),
+      // which is what was causing 3DDashboard/3DSwym click flakiness.
+      await page.waitForTimeout(500);
     }
 
     // Go through each menu item we're told to check, one at a time. Each one
@@ -322,14 +329,27 @@ for (const pageConfig of SmokePageConfigurationService.current.getSmokePageConfi
       // it fails fast with a clear reason instead.
       const notFoundHeading = popup.locator('h1', { hasText: /HTTP Status 404/i }).first();
 
+      // Some popups (3DSwym, confirmed live) occasionally fail their
+      // client-side bootstrap on first load and never render anything - a
+      // single reload reliably recovers them, so popupCheck.retryOnceWithReload
+      // opts a popup into one retry before the wait is treated as a real failure.
+      const waitForExpectedElementOrNotFound = (): Promise<void> =>
+        Promise.race([
+          popup.locator(popupCheck.expectedElementSelector!).first().waitFor({ state: 'attached', timeout: pageConfig.timeoutMs ?? 0 }),
+          notFoundHeading.waitFor({ state: 'visible', timeout: pageConfig.timeoutMs ?? 0 }).then(() => {
+            throw new Error(`${SmokeCheckFailureClassifier.NOT_FOUND_ERROR_PREFIX}: Popup rendered an HTTP Status 404 error page.`);
+          }),
+        ]);
+
       try {
         if (popupCheck.expectedElementSelector) {
-          await Promise.race([
-            popup.locator(popupCheck.expectedElementSelector).first().waitFor({ state: 'attached', timeout: pageConfig.timeoutMs ?? 0 }),
-            notFoundHeading.waitFor({ state: 'visible', timeout: pageConfig.timeoutMs ?? 0 }).then(() => {
-              throw new Error(`${SmokeCheckFailureClassifier.NOT_FOUND_ERROR_PREFIX}: Popup rendered an HTTP Status 404 error page.`);
-            }),
-          ]);
+          try {
+            await waitForExpectedElementOrNotFound();
+          } catch (waitError) {
+            if (!popupCheck.retryOnceWithReload) throw waitError;
+            await popup.reload({ timeout: pageConfig.timeoutMs ?? 0 });
+            await waitForExpectedElementOrNotFound();
+          }
         } else {
           if (await notFoundHeading.isVisible().catch(() => false)) {
             throw new Error(`${SmokeCheckFailureClassifier.NOT_FOUND_ERROR_PREFIX}: Popup rendered an HTTP Status 404 error page.`);

@@ -29,7 +29,15 @@ export default class SmokePageConfigurationService {
                 timeoutMs: SmokePageConfigurationService.POPUP_CHECK_TIMEOUT_MS,
                 popupChecks: [
                     { name: '3DDashboard', menuItemSelector: '[data-search="3DDashboard"]' },
-                    { name: '3DSwym', menuItemSelector: '[data-search="3DSwym"]', expectedElementSelector: '#communities-tab' },
+                    {
+                        name: '3DSwym',
+                        menuItemSelector: '[data-search="3DSwym"]',
+                        expectedElementSelector: '#communities-tab',
+                        // Its RequireJS-based tenant bootstrap occasionally fails on
+                        // first load (confirmed live: 404/400 on a required module,
+                        // page stays blank forever) - a reload reliably recovers it.
+                        retryOnceWithReload: true,
+                    },
                     {
                         name: 'AtlasWidget1',
                         compassSearchIconSelector: '.compass-nav-search-icon',
