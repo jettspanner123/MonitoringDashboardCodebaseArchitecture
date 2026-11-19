@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ServerOff, Clock, Zap, Globe, Boxes, FileSignature, type LucideIcon } from 'lucide-react';
+import { ServerOff, Clock, Zap } from 'lucide-react';
 import ApplicationEndpointCardSharedComponent, {
   type ApplicationEndpointCardHandle,
 } from '../../Shared/Components/ApplicationEndpointCardSharedComponent';
@@ -25,15 +25,6 @@ class ApplicationMonitorCON {
   // menu itself (Hit/Copy URL/Copy Request/Copy Response) has nothing
   // app-specific in it, so every seeded app gets it.
   public static readonly CONTEXT_MENU_ENABLED_SLUGS: string[] = ['assetsphere', 'signforge'];
-
-  public static readonly APP_ICONS: Record<string, LucideIcon> = {
-    Boxes: Boxes,
-    FileSignature: FileSignature,
-  };
-
-  public static getAppIcon(iconName: string | null): LucideIcon {
-    return (iconName && ApplicationMonitorCON.APP_ICONS[iconName]) || Globe;
-  }
 }
 
 // ISO 8601 strings sort correctly as plain strings, so no Date parsing is
@@ -67,7 +58,6 @@ interface ApplicationSectionProps {
 function ApplicationSection({ application, cardRefs }: ApplicationSectionProps): React.JSX.Element {
   const mostRecentHitTimestamp = getMostRecentHitTimestamp(application.endpoints);
   const isContextMenuEnabled = ApplicationMonitorCON.CONTEXT_MENU_ENABLED_SLUGS.includes(application.slug);
-  const AppIcon = ApplicationMonitorCON.getAppIcon(application.iconName);
   const [isPinging, setIsPinging] = React.useState<boolean>(false);
 
   const handlePingThisApp = async (): Promise<void> => {
@@ -85,24 +75,19 @@ function ApplicationSection({ application, cardRefs }: ApplicationSectionProps):
     // another ~2rem on top of that, so set the combined total directly.
     <div className={`space-y-6 ${application.slug === 'signforge' ? 'mt-[4.5rem]' : ''}`}>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-zinc-800/80 pb-6">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">
-            <AppIcon className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-2xl sm:text-3xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
-              {application.name}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1 flex items-center flex-wrap gap-2">
-              <span>{application.baseUrl}</span>
-              {mostRecentHitTimestamp && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 border border-slate-200/80 dark:border-zinc-700/60">
-                  <Clock className="w-3 h-3" />
-                  Last hit {DateFormatterUtility.current.formatRelativeTime(mostRecentHitTimestamp)}
-                </span>
-              )}
-            </p>
-          </div>
+        <div className="min-w-0">
+          <h2 className="text-2xl sm:text-3xl font-bold font-serif-headline tracking-tight text-slate-900 dark:text-zinc-100 leading-tight">
+            {application.name}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1 flex items-center flex-wrap gap-2">
+            <span>{application.baseUrl}</span>
+            {mostRecentHitTimestamp && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 border border-slate-200/80 dark:border-zinc-700/60">
+                <Clock className="w-3 h-3" />
+                Last hit {DateFormatterUtility.current.formatRelativeTime(mostRecentHitTimestamp)}
+              </span>
+            )}
+          </p>
         </div>
         <ButtonSharedComponent
           variant="outline"
