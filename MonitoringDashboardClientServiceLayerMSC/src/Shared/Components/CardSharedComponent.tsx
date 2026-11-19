@@ -36,7 +36,7 @@ export default function CardSharedComponent({
     <div
       onClick={onClick}
       onContextMenu={onContextMenu}
-      className={`rounded-xl p-5 relative transition-all duration-200 ${surfaceStyle} ${hoverClass} ${className}`}
+      className={`rounded-xl p-5 relative transition-all duration-200 flex flex-col h-full ${surfaceStyle} ${hoverClass} ${className}`}
     >
       {children}
     </div>

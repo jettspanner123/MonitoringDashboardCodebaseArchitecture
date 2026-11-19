@@ -55,7 +55,7 @@ export default function ShimmerOverlaySharedComponent({
   const backgroundPosition = useTransform(progress, (p) => `${150 - p * 2}% center`);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative h-full ${className}`}>
       {children}
       <AnimatePresence>
         {isLoading && (

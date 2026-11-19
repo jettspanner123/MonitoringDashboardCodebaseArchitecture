@@ -73,7 +73,7 @@ export default function PageLoadCheckCardSharedComponent({
         </div>
       </div>
 
-      <p className="text-[11px] text-slate-400 dark:text-zinc-500 px-5 py-3.5 mt-3 border-t border-slate-100 dark:border-zinc-800/60 bg-slate-50/60 dark:bg-zinc-900/30">
+      <p className="text-[11px] text-slate-400 dark:text-zinc-500 px-5 py-3.5 mt-auto border-t border-slate-100 dark:border-zinc-800/60 bg-slate-50/60 dark:bg-zinc-900/30">
         {check.message || 'No additional details.'}
       </p>
     </CardSharedComponent>
