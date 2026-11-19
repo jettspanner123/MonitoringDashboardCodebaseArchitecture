@@ -105,7 +105,7 @@ export default function ClientMachineServiceCardSharedComponent({
   return (
     <motion.div layout transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
       <ShimmerOverlaySharedComponent isLoading={isActionPending} className="rounded-xl">
-        <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
+        <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#171717]`}>
           <div className="flex items-center justify-between gap-3 px-5 pt-5">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">

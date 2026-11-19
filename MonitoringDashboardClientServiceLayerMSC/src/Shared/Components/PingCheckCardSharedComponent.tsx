@@ -28,7 +28,7 @@ export default function PingCheckCardSharedComponent({
   const iconBg = statusIconBg(check.status);
 
   return (
-    <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#0d0d10]`}>
+    <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${gradient} to-transparent dark:bg-[#171717]`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${iconBg} text-white flex items-center justify-center shadow-xs shrink-0`}>

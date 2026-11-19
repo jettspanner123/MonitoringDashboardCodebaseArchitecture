@@ -48,7 +48,7 @@ export default function LoginCheckCardSharedComponent({
   const stampText = getStampText(check.status);
 
   return (
-    <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#0d0d10]`}>
+    <CardSharedComponent className={`!p-0 overflow-hidden bg-gradient-to-br ${tone.gradient} to-transparent dark:bg-[#171717]`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${headerIconBg} text-white flex items-center justify-center shadow-xs shrink-0`}>
@@ -85,7 +85,7 @@ export default function LoginCheckCardSharedComponent({
           </div>
 
           <div
-            className={`absolute -top-2.5 -right-2.5 rotate-[8deg] px-2 py-1 rounded-md ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 text-[9px] font-mono font-extrabold uppercase tracking-wider shadow-sm border-2 border-white dark:border-[#0d0d10] whitespace-nowrap`}
+            className={`absolute -top-2.5 -right-2.5 rotate-[8deg] px-2 py-1 rounded-md ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 text-[9px] font-mono font-extrabold uppercase tracking-wider shadow-sm border-2 border-white dark:border-[#171717] whitespace-nowrap`}
           >
             {stampText}
           </div>
