@@ -319,7 +319,7 @@ const ApplicationEndpointCardSharedComponent = forwardRef<
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="px-5 py-3.5 mt-auto border-t border-slate-100 dark:border-zinc-800/60 bg-slate-50/60 dark:bg-zinc-900/30"
+              className="px-5 py-3.5 mt-auto border-t border-slate-100 dark:border-zinc-800/60 bg-[#f5f5f5] dark:bg-zinc-900/30"
             >
               {!result && (
                 <p className="text-[11px] text-slate-400 dark:text-zinc-500">Click "Hit" to check this endpoint.</p>

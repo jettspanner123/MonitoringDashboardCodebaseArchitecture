@@ -139,7 +139,7 @@ export default function CustomSelectSharedComponent({
         type="button"
         onPointerDown={() => ApplicationHapticsUtility.current.triggerHapticFeedback(12)}
         onClick={() => setIsOpen(!isOpen)}
-        className={`${className.includes('w-') ? 'w-full' : ''} ${heightClass} rounded-xl sm:rounded-lg bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 border border-slate-200/80 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors focus:outline-none flex items-center justify-between gap-2 cursor-pointer select-none ${triggerClassName || ''}`}
+        className={`${className.includes('w-') ? 'w-full' : ''} ${heightClass} rounded-xl sm:rounded-lg bg-[#f5f5f5] dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 border border-slate-200/80 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors focus:outline-none flex items-center justify-between gap-2 cursor-pointer select-none ${triggerClassName || ''}`}
       >
         <div className="flex items-center gap-2 truncate font-medium">
           {selectedOption?.icon}
@@ -161,7 +161,7 @@ export default function CustomSelectSharedComponent({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 4 }}
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className={`absolute left-0 right-0 min-w-[200px] top-full mt-1.5 z-50 bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-xl p-1 sm:p-1 text-xs space-y-1 sm:space-y-0.5 max-h-80 sm:max-h-72 overflow-y-auto ${dropdownClassName || ''}`}
+            className={`absolute left-0 right-0 min-w-[200px] top-full mt-1.5 z-50 bg-[#f5f5f5] dark:bg-[#0c0c0e] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-xl p-1 sm:p-1 text-xs space-y-1 sm:space-y-0.5 max-h-80 sm:max-h-72 overflow-y-auto ${dropdownClassName || ''}`}
           >
             {isSearchActive && (
               <div className="p-2 sm:p-1.5 border-b border-slate-100 dark:border-zinc-800/80 mb-1">
