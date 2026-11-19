@@ -79,7 +79,11 @@ function ApplicationSection({ application, cardRefs }: ApplicationSectionProps):
   };
 
   return (
-    <div className="space-y-6">
+    // Parent's space-y-10 already puts ~2.5rem above every section but the
+    // first (Tailwind's :where() wrapper keeps that at zero specificity, so
+    // this plain class cleanly overrides it) - SignForge specifically needs
+    // another ~2rem on top of that, so set the combined total directly.
+    <div className={`space-y-6 ${application.slug === 'signforge' ? 'mt-[4.5rem]' : ''}`}>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-zinc-800/80 pb-6">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 h-10 rounded-lg bg-[#0d2086] text-white flex items-center justify-center shadow-xs shrink-0">
