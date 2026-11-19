@@ -69,7 +69,7 @@ export default function LoginCheckCardSharedComponent({
       <div className="mx-5 mt-4 border-t border-slate-300/70 dark:border-zinc-800/80" />
 
       <div className="px-5 py-4">
-        <div className="relative flex items-center gap-3 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-[#f5f5f5] dark:bg-zinc-900/40 px-4 py-3 min-w-0">
+        <div className="relative flex items-center gap-3 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-white/60 dark:bg-zinc-900/40 px-4 py-3 min-w-0">
           <div
             className={`w-11 h-11 rounded-full ${tone.iconBg} text-white dark:bg-zinc-800/90 dark:text-zinc-200 flex items-center justify-center font-mono font-extrabold text-sm shadow-xs shrink-0`}
           >
@@ -92,7 +92,7 @@ export default function LoginCheckCardSharedComponent({
         </div>
       </div>
 
-      <p className="text-[11px] text-slate-400 dark:text-zinc-500 px-5 py-3.5 mt-auto border-t border-slate-100 dark:border-zinc-800/60 bg-[#f5f5f5] dark:bg-zinc-900/30">
+      <p className="text-[11px] text-slate-400 dark:text-zinc-500 px-5 py-3.5 mt-auto border-t border-slate-100 dark:border-zinc-800/60 bg-slate-50/60 dark:bg-zinc-900/30">
         {check.message || 'No additional details.'}
       </p>
     </CardSharedComponent>

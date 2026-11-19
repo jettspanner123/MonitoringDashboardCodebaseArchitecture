@@ -4,7 +4,7 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --color-canvas: #e0e0e0;
+  --color-canvas: #ffffff;
   --color-surface-card: #f8fafc;
   --color-surface-elevated: #f1f5f9;
   --color-surface-deep: #f8fafc;

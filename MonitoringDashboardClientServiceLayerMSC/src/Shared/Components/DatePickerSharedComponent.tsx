@@ -207,7 +207,7 @@ export default function DatePickerSharedComponent({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-label={value ? `Selected date: ${fullDateFormatter.format(fromDateKey(value))}` : 'Choose a date'}
-        className={`${className.includes('w-') ? 'w-full' : ''} ${heightClass} rounded-xl sm:rounded-lg bg-[#f5f5f5] dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 border border-slate-200/80 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors focus:outline-none flex items-center justify-between gap-2 cursor-pointer select-none`}
+        className={`${className.includes('w-') ? 'w-full' : ''} ${heightClass} rounded-xl sm:rounded-lg bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 border border-slate-200/80 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors focus:outline-none flex items-center justify-between gap-2 cursor-pointer select-none`}
       >
         <div className="flex items-center gap-2 truncate font-medium">
           <CalendarDays className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
@@ -224,7 +224,7 @@ export default function DatePickerSharedComponent({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 4 }}
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-0 top-full mt-1.5 z-50 w-72 bg-[#f5f5f5] dark:bg-[#0c0c0e] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-xl p-3 text-xs"
+            className="absolute left-0 top-full mt-1.5 z-50 w-72 bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-xl p-3 text-xs"
           >
             <div className="flex items-center justify-between mb-2.5">
               <button

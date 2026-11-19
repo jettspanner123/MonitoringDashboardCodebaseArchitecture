@@ -64,7 +64,7 @@ export default function HealthByDayBarChartSharedComponent({
   }, [days]);
 
   return (
-    <div className="rounded-2xl p-6 bg-[#EAEAEA] dark:bg-[#171717] border border-slate-200/90 dark:border-zinc-800/80 shadow-xs hover:shadow-md transition-shadow duration-300 flex flex-col justify-between h-full">
+    <div className="rounded-2xl p-6 bg-white dark:bg-[#171717] border border-slate-200/90 dark:border-zinc-800/80 shadow-xs hover:shadow-md transition-shadow duration-300 flex flex-col justify-between h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-serif-headline">
