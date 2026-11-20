@@ -8,8 +8,6 @@ class RunsRoutes {
     public static readonly CONTROLLER_URL = '/api/v1/runs';
     public static readonly GET_ALL = '/';
     public static readonly GET_BY_ID = '/:id';
-    public static readonly TRIGGER = '/trigger';
-    public static readonly LIVE = '/:testRunId/live';
 }
 
 class DataManagementRoutes {
@@ -37,6 +35,14 @@ class ClientMachineServicesRoutes {
     public static readonly ACTION_LIVE = '/action-attempts/:actionAttemptId/live';
 }
 
+class ReportsRoutes {
+    public static readonly CONTROLLER_URL = '/api/v1/reports';
+    public static readonly DAY_COMPLETENESS = '/day-completeness';
+    public static readonly AVAILABLE_CATEGORIES = '/available-categories';
+    public static readonly GENERATE = '/generate';
+    public static readonly GET_BY_ID = '/:reportId';
+}
+
 class NotificationsRoutes {
     public static readonly CONTROLLER_URL = '/api/v1/notifications';
     public static readonly GET_VAPID_PUBLIC_KEY = '/vapid-public-key';
@@ -55,4 +61,5 @@ export default class ApplicationRouteFactory {
     public readonly notifications = NotificationsRoutes;
     public readonly applicationMonitor = ApplicationMonitorRoutes;
     public readonly clientMachineServices = ClientMachineServicesRoutes;
+    public readonly reports = ReportsRoutes;
 }

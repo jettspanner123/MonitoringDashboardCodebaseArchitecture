@@ -5,7 +5,10 @@ import type PageCheckDTO from '../Models/PageCheckDTO';
 import type RunDetailDTO from '../Models/RunDetailDTO';
 import type RunSummaryDTO from '../Models/RunSummaryDTO';
 
-const RUN_WITH_CHECKS_INCLUDE = {
+// Exported so ReportsService can query TestRun with the identical shape and
+// reuse mapRunToPageChecks below, rather than a second, possibly-drifting
+// copy of this include/mapping.
+export const RUN_WITH_CHECKS_INCLUDE = {
     pingChecks: true,
     loginChecks: true,
     pageLoadChecks: true,
@@ -13,7 +16,7 @@ const RUN_WITH_CHECKS_INCLUDE = {
     queueStatusChecks: true,
 } satisfies Prisma.TestRunInclude;
 
-type RunWithChecks = Prisma.TestRunGetPayload<{ include: typeof RUN_WITH_CHECKS_INCLUDE }>;
+export type RunWithChecks = Prisma.TestRunGetPayload<{ include: typeof RUN_WITH_CHECKS_INCLUDE }>;
 
 export default class RunsService {
     public static current = new RunsService();
@@ -78,7 +81,10 @@ export default class RunsService {
     // vocabulary. QueueStatusCheck is the one exception: it's several rows
     // (one per state) per actual check, so those are grouped into a single
     // PageCheck per pageName with all states nested under `details.states`.
-    private mapRunToPageChecks(run: RunWithChecks): PageCheckDTO[] {
+    // Public - ReportsService reuses this exact mapping so a report's
+    // single-day check data can never drift from what this dashboard's own
+    // "Today's Test" tab already shows for the same run.
+    public mapRunToPageChecks(run: RunWithChecks): PageCheckDTO[] {
         const pageChecks: PageCheckDTO[] = [];
 
         for (const check of run.pingChecks) {

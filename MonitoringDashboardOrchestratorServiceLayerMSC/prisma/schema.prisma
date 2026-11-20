@@ -279,6 +279,24 @@ model ClientMachineServiceAction {
 // is the real daily VM password, AES-256-GCM encrypted at rest (mirrors
 // MorningSmokeTestAutomation's EncryptionHelper), needed so later visits can
 // silently re-validate against the real VM without asking the user again.
+// One row per completed "Generate Report" request - an immutable snapshot
+// (selectedKeys/content are frozen at generation time), never recomputed on
+// later view, so a shared /report/:id link always shows the same thing
+// (see specs/001-generate-report). selectedKeys/content are free-form JSON
+// text, matching ApplicationEndpoint.config's existing convention rather
+// than a new Postgres json/jsonb column type.
+model GeneratedReport {
+  id           String      @id @default(cuid())
+  environment  Environment
+  rangeStart   DateTime
+  rangeEnd     DateTime
+  selectedKeys String
+  content      String
+  createdAt    DateTime    @default(now())
+
+  @@map("MD_GeneratedReportTBL")
+}
+
 model ClientMachineRefreshToken {
   id                String   @id @default(cuid())
   username          String
