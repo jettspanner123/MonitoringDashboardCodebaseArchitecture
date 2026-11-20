@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { toast } from 'sonner';
 import {
   Activity,
   CheckCircle2,
@@ -11,7 +12,7 @@ import {
   Download,
   List,
   LayoutGrid,
-  Play,
+  FileBarChart,
   CalendarDays,
   CalendarRange,
 } from 'lucide-react';
@@ -23,7 +24,6 @@ import EmptyStateSharedComponent from '../../Shared/Components/EmptyStateSharedC
 import CustomSelectSharedComponent, { type SelectOption } from '../../Shared/Components/CustomSelectSharedComponent';
 import DatePickerSharedComponent from '../../Shared/Components/DatePickerSharedComponent';
 import ShimmerOverlaySharedComponent from '../../Shared/Components/ShimmerOverlaySharedComponent';
-import ConfirmationModalSharedComponent from '../../Shared/Components/ConfirmationModalSharedComponent';
 import HealthByDayBarChartSharedComponent from '../../Shared/Components/HealthByDayBarChartSharedComponent';
 import SegmentedControlSharedComponent from '../../Shared/Components/SegmentedControlSharedComponent';
 import PingCheckCardSharedComponent from '../../Shared/Components/PingCheckCardSharedComponent';
@@ -33,9 +33,11 @@ import IndexingFreshnessCardSharedComponent from '../../Shared/Components/Indexi
 import QueueStatusCardSharedComponent from '../../Shared/Components/QueueStatusCardSharedComponent';
 import DateFormatterUtility from '../../Utilities/DateFormatterUtility';
 import RunsService from '../../Services/RunsService';
+import ReportService from '../../Services/ReportService';
 import type { RunSummary, RunDetail, HealthType } from '../../Types';
 import DashboardCON from './Constants/DashboardCON';
-import LiveRunProgressModalComponent from './Components/LiveRunProgressModalComponent';
+import GenerateReportModalComponent from './Components/GenerateReportModalComponent';
+import ReportGenerationLoadingModalComponent from './Components/ReportGenerationLoadingModalComponent';
 
 // Local-calendar date key ('YYYY-MM-DD') - matches how DatePickerSharedComponent
 // keys dates, so a run's createdAt and the picker's selection compare directly.
@@ -60,6 +62,7 @@ export interface DashboardScreenControllerProps {
   environment: string;
   onEnvironmentChange: (environment: string) => void;
   onSelectRun: (run: RunSummary) => void;
+  onReportGenerated: (reportId: string) => void;
 }
 
 type StatusFilterType = 'ALL' | HealthType;
@@ -93,36 +96,15 @@ export default function DashboardScreenController({
   environment,
   onEnvironmentChange,
   onSelectRun,
+  onReportGenerated,
 }: DashboardScreenControllerProps): React.JSX.Element {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilterType>('ALL');
   const [viewMode, setViewMode] = useState<ViewModeType>('table');
   const [gridColumns, setGridColumns] = useState<GridColumnsType>(2);
   const [isExportingCsv, setIsExportingCsv] = useState<boolean>(false);
-  const [isRunTestModalOpen, setIsRunTestModalOpen] = useState<boolean>(false);
-  const [isTriggeringRun, setIsTriggeringRun] = useState<boolean>(false);
-  const [triggerRunError, setTriggerRunError] = useState<string | null>(null);
-  const [liveTestRunId, setLiveTestRunId] = useState<string | null>(null);
-  const [selectedEnvironment, setSelectedEnvironment] = useState<string>(
-    DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS[0].value,
-  );
-  const [selectedTestIds, setSelectedTestIds] = useState<Set<string>>(
-    () => new Set(DashboardCON.RUN_SMOKE_TEST_ITEMS.map((item) => item.id)),
-  );
-
-  const toggleTestSelection = (id: string): void => {
-    setSelectedTestIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const isAuthenticationLoginUnchecked = !selectedTestIds.has(DashboardCON.AUTHENTICATION_LOGIN_TEST_ID);
+  const [isGenerateReportModalOpen, setIsGenerateReportModalOpen] = useState<boolean>(false);
+  const [isGeneratingReport, setIsGeneratingReport] = useState<boolean>(false);
   const [scopeFilter, setScopeFilter] = useState<ScopeFilterType>('Today');
   // todayRunDetail/isLoadingTodayRun hold whichever run is currently
   // selected below (defaults to today's most recent run, but the date
@@ -322,22 +304,21 @@ export default function DashboardScreenController({
     }
   };
 
-  const handleOpenRunTestModal = (): void => {
-    setTriggerRunError(null);
-    setIsRunTestModalOpen(true);
-  };
-
-  const handleConfirmRunTest = async (): Promise<void> => {
-    setIsTriggeringRun(true);
-    setTriggerRunError(null);
+  const handleGenerateReport = async (params: {
+    environment: string;
+    startDate: string;
+    endDate: string;
+    selectedKeys: string[];
+  }): Promise<void> => {
+    setIsGenerateReportModalOpen(false);
+    setIsGeneratingReport(true);
     try {
-      const testRunId = await RunsService.current.triggerRun(selectedEnvironment);
-      setIsRunTestModalOpen(false);
-      setLiveTestRunId(testRunId);
+      const reportId = await ReportService.current.generateReport(params);
+      onReportGenerated(reportId);
     } catch (error) {
-      setTriggerRunError(error instanceof Error ? error.message : 'Failed to trigger the smoke test.');
+      toast.error(error instanceof Error ? error.message : 'Failed to generate the report.');
     } finally {
-      setIsTriggeringRun(false);
+      setIsGeneratingReport(false);
     }
   };
 
@@ -367,12 +348,11 @@ export default function DashboardScreenController({
           />
 
           <PrimaryActionButtonSharedComponent
-            onClick={handleOpenRunTestModal}
-            icon={<Play className="w-4 h-4 sm:w-3.5 sm:h-3.5 !text-white" />}
+            onClick={() => setIsGenerateReportModalOpen(true)}
+            icon={<FileBarChart className="w-4 h-4 sm:w-3.5 sm:h-3.5 !text-white" />}
             className="w-full sm:w-auto justify-center !h-11 sm:!h-9 px-4 sm:px-3.5 text-sm sm:text-xs font-bold"
           >
-            <span className="sm:hidden">Run Test</span>
-            <span className="hidden sm:inline">Run Smoke Test</span>
+            Generate Report
           </PrimaryActionButtonSharedComponent>
         </div>
       </div>
@@ -958,87 +938,13 @@ export default function DashboardScreenController({
       )}
       </AnimatePresence>
 
-      <ConfirmationModalSharedComponent
-        isOpen={isRunTestModalOpen}
-        onClose={() => setIsRunTestModalOpen(false)}
-        onConfirm={() => void handleConfirmRunTest()}
-        isLoading={isTriggeringRun}
-        title="Run Smoke Test"
-        subtitle="Automated Morning Check"
-        description="This runs the full morning smoke test suite against the selected environment, using the same checks and credentials as the scheduled 8:30 AM run."
-        confirmText="Start Test"
-        cancelText="Cancel"
-        variant="primary"
-        maxWidth="md"
-        additionalContent={
-          <div className="space-y-3.5">
-            <CustomSelectSharedComponent
-              label="Environment"
-              value={selectedEnvironment}
-              onChange={setSelectedEnvironment}
-              options={DashboardCON.RUN_SMOKE_TEST_ENVIRONMENTS}
-              size="sm"
-            />
-            {triggerRunError && (
-              <div className="flex items-start gap-2 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 text-xs text-rose-800 dark:text-rose-300">
-                <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                <span>{triggerRunError}</span>
-              </div>
-            )}
-            <div>
-              <span className="text-xs font-medium text-slate-600 dark:text-zinc-400 mb-1.5 block">
-                Tests that will run
-              </span>
-              <p className="text-xs text-slate-400 dark:text-zinc-500 mb-1.5">
-                Every run always exercises the full suite for now - picking individual tests isn't available yet.
-              </p>
-              <div className="rounded-lg border border-slate-200 dark:border-zinc-800 divide-y divide-slate-100 dark:divide-zinc-800/60 overflow-hidden">
-                {DashboardCON.RUN_SMOKE_TEST_ITEMS.map((item) => {
-                  const isChecked = selectedTestIds.has(item.id);
-                  return (
-                    <label
-                      key={item.id}
-                      className="flex items-center gap-2.5 px-3 py-2 text-xs select-none opacity-60 cursor-not-allowed"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        disabled
-                        onChange={() => toggleTestSelection(item.id)}
-                        className="w-3.5 h-3.5 rounded border-slate-300 dark:border-zinc-700 text-[#0C2086] focus:ring-[#0C2086] shrink-0 cursor-not-allowed"
-                      />
-                      <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-zinc-800/80 text-slate-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
-                        <item.icon className="w-3.5 h-3.5" />
-                      </div>
-                      <span
-                        className={`font-medium ${
-                          isChecked
-                            ? 'text-slate-700 dark:text-zinc-200'
-                            : 'text-slate-400 dark:text-zinc-500 line-through'
-                        }`}
-                      >
-                        {item.label}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-              {isAuthenticationLoginUnchecked && (
-                <div className="mt-2.5 flex items-start gap-2 rounded-lg border border-amber-200 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
-                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                  <span>No tests can proceed if the Authentication Login Test is skipped — every other check depends on being signed in first.</span>
-                </div>
-              )}
-            </div>
-          </div>
-        }
+      <GenerateReportModalComponent
+        isOpen={isGenerateReportModalOpen}
+        onClose={() => setIsGenerateReportModalOpen(false)}
+        onGenerate={(params) => void handleGenerateReport(params)}
       />
 
-      <LiveRunProgressModalComponent
-        isOpen={liveTestRunId !== null}
-        onClose={() => setLiveTestRunId(null)}
-        testRunId={liveTestRunId}
-      />
+      <ReportGenerationLoadingModalComponent isOpen={isGeneratingReport} />
     </div>
   );
 }

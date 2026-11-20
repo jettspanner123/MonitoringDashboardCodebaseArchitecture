@@ -7,6 +7,7 @@ import {
   Outlet,
   useNavigate,
   useSearch,
+  useParams,
 } from '@tanstack/react-router';
 import ApplicationRouteCON from '../Constants/ApplicationRouteCON';
 import ApplicationThemeUtility from '../Utilities/ApplicationThemeUtility';
@@ -18,6 +19,7 @@ import DashboardOverviewScreenRoute from '../Routes/DashboardOverviewScreenRoute
 import RunDetailScreenRoute from '../Routes/RunDetailScreenRoute';
 import ApplicationMonitorScreenRoute from '../Routes/ApplicationMonitorScreenRoute';
 import ClientMachineServicesScreenRoute from '../Routes/ClientMachineServicesScreenRoute';
+import ReportScreenRoute from '../Routes/ReportScreenRoute';
 import DashboardCON from '../Features/Dashboard/Constants/DashboardCON';
 import NavigationCON from '../Features/Navigation/Constants/NavigationCON';
 
@@ -195,15 +197,29 @@ const dashboardRoute = createRoute({
             search: (prev: DashboardSearchParams) => ({ ...prev, [ApplicationRouteCON.PARAM_RUN_ID]: selected.id }),
           })
         }
+        onReportGenerated={(reportId) => navigate({ to: '/report/$reportId', params: { reportId } })}
       />
     );
   },
 });
 
 // ==========================================
-// 3. Router Tree
+// 3. Report Route
 // ==========================================
-const routeTree = rootRoute.addChildren([dashboardRoute]);
+const reportRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/report/$reportId',
+  component: function ReportRouteComponent() {
+    const navigate = useNavigate();
+    const { reportId } = useParams({ from: reportRoute.id });
+    return <ReportScreenRoute reportId={reportId} onBack={() => navigate({ to: ApplicationRouteCON.ROOT })} />;
+  },
+});
+
+// ==========================================
+// 4. Router Tree
+// ==========================================
+const routeTree = rootRoute.addChildren([dashboardRoute, reportRoute]);
 
 export const applicationRouter = createRouter({ routeTree });
 

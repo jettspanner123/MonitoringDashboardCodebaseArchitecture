@@ -10,6 +10,7 @@ export interface DashboardOverviewScreenRouteProps {
   environment: string;
   onEnvironmentChange: (environment: string) => void;
   onSelectRun: (run: RunSummary) => void;
+  onReportGenerated: (reportId: string) => void;
 }
 
 export default function DashboardOverviewScreenRoute({
@@ -20,6 +21,7 @@ export default function DashboardOverviewScreenRoute({
   environment,
   onEnvironmentChange,
   onSelectRun,
+  onReportGenerated,
 }: DashboardOverviewScreenRouteProps): React.JSX.Element {
   return (
     <DashboardScreenController
@@ -30,6 +32,7 @@ export default function DashboardOverviewScreenRoute({
       environment={environment}
       onEnvironmentChange={onEnvironmentChange}
       onSelectRun={onSelectRun}
+      onReportGenerated={onReportGenerated}
     />
   );
 }

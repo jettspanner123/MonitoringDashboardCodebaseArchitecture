@@ -22,3 +22,14 @@ export type {
   ServiceActionResult,
   ServiceActionSnapshot,
 } from './ClientMachineServicesType';
+export type {
+  ReportCategoryKeyType,
+  DayCompletenessStateType,
+  AvailableCategoriesType,
+  SingleDayReportContentType,
+  ReportCategorySummaryType,
+  ReportFailureEntryType,
+  RangeReportContentType,
+  GeneratedReportContentType,
+  GeneratedReportType,
+} from './ReportType';

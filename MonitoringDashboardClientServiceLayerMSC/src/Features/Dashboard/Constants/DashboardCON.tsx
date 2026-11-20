@@ -1,17 +1,10 @@
 import React from 'react';
-import type { LucideIcon } from 'lucide-react';
-import { KeyRound, Radio, FileText, Database, ListOrdered, Rocket, ClipboardCheck, FlaskConical, GraduationCap, Code2 } from 'lucide-react';
+import { Rocket, ClipboardCheck, FlaskConical, GraduationCap, Code2 } from 'lucide-react';
 
 export interface RunSmokeTestEnvironmentOption {
   value: string;
   label: string;
   icon?: React.ReactNode;
-}
-
-export interface RunSmokeTestItemDef {
-  id: string;
-  label: string;
-  icon: LucideIcon;
 }
 
 export default class DashboardCON {
@@ -40,17 +33,4 @@ export default class DashboardCON {
     { value: 'DEV2', label: 'Dev2', icon: <Code2 className={DashboardCON.ENV_ICON_CLASS} /> },
   ];
 
-  public static readonly RUN_SMOKE_TEST_ENVIRONMENTS: RunSmokeTestEnvironmentOption[] = DashboardCON.ENVIRONMENTS;
-
-  // The suite of checks the morning smoke test automation actually performs, shown in
-  // the Run Smoke Test modal so the user knows what will be exercised.
-  public static readonly RUN_SMOKE_TEST_ITEMS: RunSmokeTestItemDef[] = [
-    { id: 'authentication-login', label: 'Authentication Login Test', icon: KeyRound },
-    { id: 'authentication-ping', label: 'Authentication Ping Test', icon: Radio },
-    { id: 'page-load', label: 'Page Load Test', icon: FileText },
-    { id: 'indexing-freshness', label: 'Indexing Freshness Test', icon: Database },
-    { id: 'queue-status', label: 'Queue Status Test', icon: ListOrdered },
-  ];
-
-  public static readonly AUTHENTICATION_LOGIN_TEST_ID: string = 'authentication-login';
 }
